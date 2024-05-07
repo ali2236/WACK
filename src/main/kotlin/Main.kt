@@ -13,12 +13,11 @@ fun main(args: Array<String>) {
     val module = Wat.module(parseTree)
     val ir = IRConstructor(module)
 
-    val function = ir.function(Index(3))
+    val function = ir.function(Index(2))
 
     val buffer = StringBuffer()
     function.c(buffer)
     println(buffer)
-
 }
 
 

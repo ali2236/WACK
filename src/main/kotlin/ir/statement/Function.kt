@@ -1,10 +1,7 @@
-package ir
+package ir.statement
 
+import ir.expression.Block
 import wasm.WasmFunction
-
-interface Statement {
-    fun c(out: Appendable)
-}
 
 class Function(val functionData: WasmFunction, val body: Block) : Statement {
     override fun c(out: Appendable) {
