@@ -55,7 +55,7 @@ class FunctionVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
                 topLevel = false,
                 brackets = false,
             )
-            stack.push(If(ifCondition, ifBody))
+            stack.push(BrIf(ifCondition, ifBody))
         } else if (ctx.CONST() != null) {
             stack.push(Value(ctx.literal().text))
         } else if (ctx.CALL() != null) {
@@ -86,20 +86,20 @@ class FunctionVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
         } else if (ctx.TEST() != null) {
             val operatorName = ctx.TEST()!!.text.substring(4)
             val expr = when (operatorName) {
-                "eqz" -> BinaryOP("==", stack.pop(), Value("0"))
+                "eqz" -> BinaryOP(Operator.eq, stack.pop(), Value("0"))
                 else -> throw Error()
             }
             stack.push(expr)
         } else if (ctx.COMPARE() != null) {
             val operatorName = ctx.COMPARE()!!.text.substring(4)
             val operatorSign = when (operatorName) {
-                "eq" -> "=="
-                "ne" -> "!="
-                "lt", "lt_s", "lt_u" -> "<"
-                "le", "le_s", "le_u" -> "<="
-                "gt", "gt_s", "gt_u" -> "<"
-                "ge", "ge_s", "ge_u" -> ">="
-                else -> operatorName
+                "eq" -> Operator.eq
+                "ne" -> Operator.neq
+                "lt", "lt_s", "lt_u" -> Operator.lt
+                "le", "le_s", "le_u" -> Operator.le
+                "gt", "gt_s", "gt_u" -> Operator.gt
+                "ge", "ge_s", "ge_u" -> Operator.ge
+                else -> throw Error()
             }
             val second = stack.pop()
             val first = stack.pop()
@@ -107,11 +107,11 @@ class FunctionVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
         } else if (ctx.BINARY() != null) {
             val operatorName = ctx.BINARY()!!.text.substring(4)
             val operatorSign = when (operatorName) {
-                "add" -> "+"
-                "sub" -> "-"
-                "and" -> "&"
-                "shl" -> "<<"
-                else -> operatorName
+                "add" -> Operator.add
+                "sub" -> Operator.sub
+                "and" -> Operator.and
+                "shl" -> Operator.shl
+                else -> throw Error()
             }
             val second = stack.pop()
             val first = stack.pop()

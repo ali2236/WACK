@@ -1,6 +1,6 @@
 package ir.expression
 
-class If(val condition: Expression, val trueBody: Block) : Expression() {
+open class If(val condition: Expression, val trueBody: Block) : Expression() {
     override fun c(out: Appendable) {
         out.append("if(")
         condition.c(out)
@@ -9,3 +9,11 @@ class If(val condition: Expression, val trueBody: Block) : Expression() {
     }
 
 }
+
+class BrIf(
+    condition: Expression,
+    trueBody: Block
+) : If(
+    if(condition is BinaryOP) condition.invert() else condition,
+    trueBody
+)
