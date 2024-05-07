@@ -1,6 +1,8 @@
 import dev.aligator.parser.WatParser
 import dev.aligator.parser.WatParserBaseVisitor
+import ir.IRConstructor
 import parser.Wat
+import wasm.Index
 import java.util.LinkedList
 import java.util.Stack
 
@@ -9,23 +11,17 @@ fun main(args: Array<String>) {
 
     val parseTree = Wat.parse(sample)
     val module = Wat.module(parseTree)
+    val ir = IRConstructor(module)
 
-    FunctionVisitor().visit(module.functions[2].code)
-}
+    val function = ir.function(Index(3))
 
-class FunctionVisitor : WatParserBaseVisitor<Unit>() {
-
-    val stack = Stack<Any>()
-
-    override fun visitInstr(ctx: WatParser.InstrContext) {
-        if(ctx.plain_instr() != null){
-            println(ctx.text)
-        } else if (ctx.block_instr() != null) {
-            println("block")
-        }
-    }
+    val buffer = StringBuffer()
+    function.c(buffer)
+    println(buffer)
 
 }
+
+
 
 fun printInstructions(instructions: MutableList<WatParser.InstrContext>){
     instructions.forEach {

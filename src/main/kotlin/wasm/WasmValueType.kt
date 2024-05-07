@@ -1,5 +1,7 @@
 package wasm
 
+import ir.Expression
+
 enum class WasmValueType {
     I32,
     I64,
