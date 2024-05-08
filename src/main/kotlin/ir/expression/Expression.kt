@@ -9,7 +9,7 @@ abstract class Expression : Statement {
         return b.toString()
     }
 
-    open fun dependencies(): List<Symbol> {
+    open fun symbols(): List<Symbol> {
         return listOf()
     }
 }

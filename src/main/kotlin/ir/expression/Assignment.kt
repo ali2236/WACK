@@ -1,7 +1,7 @@
 package ir.expression
 
 
-class Assignment(val symbol: Symbol, val value: Expression) : Expression() {
+open class Assignment(val symbol: Symbol, val value: Expression) : Expression() {
     override fun c(out: Appendable) {
         symbol.c(out)
         out.append(" = ")

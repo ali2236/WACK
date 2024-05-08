@@ -1,7 +1,7 @@
 package ir.expression
 
 class Symbol(symbol: String) : Value(symbol) {
-    override fun dependencies(): List<Symbol> {
+    override fun symbols(): List<Symbol> {
         return listOf(this)
     }
 

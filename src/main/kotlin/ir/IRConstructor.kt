@@ -2,12 +2,19 @@ package ir
 
 import ir.expression.Block
 import ir.statement.Function
+import ir.statement.Program
 import ir.statement.Statement
 import org.antlr.v4.runtime.tree.ParseTree
 import wasm.Index
 import wasm.WasmModule
 
 class IRConstructor(val module: WasmModule) {
+
+    fun program(): Program {
+        return Program(
+            module.functions.map { function(it.index) }
+        )
+    }
 
     fun function(index: Index): Statement {
         val function = module.functions.first { it.index == index }

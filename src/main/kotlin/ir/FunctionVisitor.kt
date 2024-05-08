@@ -11,7 +11,7 @@ class FunctionVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
 
     private val blocks = mutableListOf(Block())
 
-    public val currentBlock: Block
+    private val currentBlock: Block
         get() = blocks.last()
 
     val stack: Block
@@ -81,7 +81,7 @@ class FunctionVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
         } else if (ctx.LOCAL_TEE() != null) {
             val symbol = Symbol("l" + ctx.var_().first().text)
             val value = stack.pop()
-            val dependant = value.dependencies().any { it == symbol }
+            val dependant = value.symbols().any { it == symbol }
             if (dependant) {
                 stack.push(symbol)
             } else {

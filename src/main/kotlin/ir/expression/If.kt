@@ -1,11 +1,15 @@
 package ir.expression
 
-open class If(val condition: Expression, val trueBody: Expression) : Expression() {
+open class If(val condition: Expression, val trueBody: Expression, val elseBody: Expression? = null) : Expression() {
     override fun c(out: Appendable) {
         out.append("if(")
         condition.c(out)
         out.append(")")
         trueBody.c(out)
+        if(elseBody != null){
+            out.append("else ")
+            elseBody.c(out)
+        }
     }
 
 }

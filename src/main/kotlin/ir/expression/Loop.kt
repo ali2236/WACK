@@ -1,12 +1,11 @@
 package ir.expression
 
-class Loop : Block() {
+open class Loop(var condition: Expression = Value("1")) : Block() {
 
-    fun conditions(): List<IndexedValue<BrIf>> {
+    fun breakConditions(): List<IndexedValue<BrIf>> {
         return instructions.withIndex()
             .filter { it.value is BrIf }
             .filterIsInstance<IndexedValue<BrIf>>()
-            .filter { it.value.depth == 0 }
     }
     override fun c(out: Appendable) {
         // search for break condition
@@ -14,19 +13,11 @@ class Loop : Block() {
 
 
         // condition
-        /*if (conditions.isNotEmpty()) {
-            val indexedCondition = conditions.last()
-            val condition = indexedCondition.value
-            val invertedCondition = BrIf(condition.condition, condition.trueBody, condition.depth).condition
-
-            // print condition here
-            invertedCondition.c(out)
-
-            // remove original condition from code
-            body.instructions.removeAt(indexedCondition.index)
-        }*/
+        /**/
         // end search
-        out.append("while(1)")
+        out.append("while(")
+        condition.c(out)
+        out.append(")")
         super.c(out)
     }
 

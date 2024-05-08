@@ -1,11 +1,9 @@
 package ir.expression
 
-class BinaryOP(operator: Operator, val left: Expression, right: Expression) : Expression() {
-    val operator: Operator
-    val right: Expression
-
+class BinaryOP(val operator: Operator, val left: Expression,val right: Expression) : Expression() {
     init {
-        val isArrayIndexCalculation = operator.sign == "<<" && right is Value && right.value == "2"
+        // TODO: (Remove) put special cases in refinement
+        /*val isArrayIndexCalculation = operator.sign == "<<" && right is Value && right.value == "2"
         this.operator = if (isArrayIndexCalculation) {
             Operator.mul
         } else {
@@ -15,7 +13,7 @@ class BinaryOP(operator: Operator, val left: Expression, right: Expression) : Ex
             Value("4")
         } else {
             right
-        }
+        }*/
     }
 
     override fun c(out: Appendable) {
@@ -35,8 +33,8 @@ class BinaryOP(operator: Operator, val left: Expression, right: Expression) : Ex
         return BinaryOP(invertedOperator, left, right)
     }
 
-    override fun dependencies(): List<Symbol> {
-        return left.dependencies() + right.dependencies()
+    override fun symbols(): List<Symbol> {
+        return left.symbols() + right.symbols()
     }
 }
 

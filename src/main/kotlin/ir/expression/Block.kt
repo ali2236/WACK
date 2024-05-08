@@ -37,4 +37,8 @@ open class Block(
     }
 
     open fun close() {}
+
+    override fun symbols(): List<Symbol> {
+        return instructions.map { it.symbols() }.reduce { a, b -> a + b }
+    }
 }

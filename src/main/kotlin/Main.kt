@@ -2,6 +2,7 @@ import dev.aligator.parser.WatParser
 import dev.aligator.parser.WatParserBaseVisitor
 import ir.IRConstructor
 import parser.Wat
+import refinment.Refiner
 import wasm.Index
 import java.util.LinkedList
 import java.util.Stack
@@ -12,11 +13,11 @@ fun main(args: Array<String>) {
     val parseTree = Wat.parse(sample)
     val module = Wat.module(parseTree)
     val ir = IRConstructor(module)
-
-    val function = ir.function(Index(2))
+    val program = ir.program()
+    Refiner.refine(program)
 
     val buffer = StringBuffer()
-    function.c(buffer)
+    program.c(buffer)
     println(buffer)
 }
 
