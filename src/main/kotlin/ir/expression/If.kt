@@ -12,7 +12,8 @@ open class If(val condition: Expression, val trueBody: Block) : Expression() {
 
 class BrIf(
     condition: Expression,
-    trueBody: Block
+    trueBody: Block,
+    val depth: Int,
 ) : If(
     if(condition is BinaryOP) condition.invert() else condition,
     trueBody

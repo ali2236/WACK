@@ -12,9 +12,13 @@ class IRConstructor(val module: WasmModule) {
     fun function(index: Index): Statement {
         val function = module.functions.first { it.index == index }
         val functionBlock = if (function.code != null) {
-            Block(functionBody(function.code).instructions, topLevel = true, brackets = false)
+            Block(
+                functionBody(function.code).instructions,
+                hasReturn = function.type.result.isNotEmpty(),
+                brackets = false
+            )
         } else {
-            Block(topLevel = true, brackets = false)
+            Block(hasReturn = false, brackets = false)
         }
         return Function(function, functionBlock)
     }

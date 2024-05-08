@@ -9,7 +9,7 @@ import wasm.WasmModule
 
 class FunctionVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
 
-    private val blocks = mutableListOf(Block(mutableListOf(), true))
+    private val blocks = mutableListOf(Block())
 
     public val currentBlock: Block
         get() = blocks.last()
@@ -41,7 +41,7 @@ class FunctionVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
 
     override fun visitPlain_instr(ctx: WatParser.Plain_instrContext) {
         if (ctx.UNREACHABLE() != null) {
-            // TODO: thorw trap
+            stack.push(Unreachable())
         } else if (ctx.BR() != null) {
             // TODO: Jump N blocks back
         } else if (ctx.BR_IF() != null) {
@@ -52,10 +52,10 @@ class FunctionVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
                 mutableListOf(
                     Jump(depth, blocks[blocks.size - depth - 1])
                 ),
-                topLevel = false,
+                hasReturn = false,
                 brackets = false,
             )
-            stack.push(BrIf(ifCondition, ifBody))
+            stack.push(BrIf(ifCondition, ifBody, depth))
         } else if (ctx.CONST() != null) {
             stack.push(Value(ctx.literal().text))
         } else if (ctx.CALL() != null) {
@@ -66,23 +66,28 @@ class FunctionVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val hasReturn = resultTypes.isNotEmpty()
             stack.push(FunctionCall("f${functionIndex}", params, hasReturn))
         } else if (ctx.LOCAL_GET() != null) {
-            val symbol = ctx.var_().first().text
-            stack.push(Value("l$symbol"))
+            val symbol = Symbol("l"+ ctx.var_().first().text)
+            stack.push(symbol)
         } else if (ctx.LOCAL_SET() != null) {
-            val symbol = ctx.var_().first().text
+            val symbol = Symbol("l"+ ctx.var_().first().text)
             val value = stack.pop()
-            stack.push(Assignment("l$symbol", value))
+            stack.push(Assignment(symbol, value))
         } else if (ctx.LOCAL_TEE() != null) {
-            val symbol = ctx.var_().first().text
+            val symbol = Symbol("l"+ctx.var_().first().text)
             val value = stack.pop()
-            stack.push(value)
-            stack.push(Assignment("l$symbol", value))
+            val dependant = value.dependencies().any { it == symbol}
+            if(dependant){
+                stack.push(symbol)
+            } else {
+                stack.push(value)
+            }
+            stack.push(Assignment(symbol, value))
         } else if (ctx.GLOBAL_GET() != null) {
-            val symbol = ctx.var_().first().text
-            stack.push(Value("g$symbol"))
+            val symbol = Symbol("g"+ ctx.var_().first().text )
+            stack.push(symbol)
         } else if (ctx.GLOBAL_SET() != null) {
-            val symbol = ctx.var_().first().text
-            stack.push(Assignment("g$symbol", stack.pop()))
+            val symbol = Symbol("g"+ ctx.var_().first().text)
+            stack.push(Assignment(symbol, stack.pop()))
         } else if (ctx.TEST() != null) {
             val operatorName = ctx.TEST()!!.text.substring(4)
             val expr = when (operatorName) {

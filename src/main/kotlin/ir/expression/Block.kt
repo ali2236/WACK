@@ -2,7 +2,7 @@ package ir.expression
 
 class Block(
     val instructions: MutableList<Expression> = mutableListOf(),
-    val topLevel: Boolean = false,
+    val hasReturn: Boolean = false,
     val brackets : Boolean = true,
 ) : Expression() {
 
@@ -25,7 +25,7 @@ class Block(
         if (brackets) out.append("{\n")
         for (i in 0 until len) {
             val expr = instructions[i]
-            if(i == len - 1 && topLevel){
+            if(i == len - 1 && hasReturn){
                 out.append("return ")
                 expr.c(out)
                 out.append(";\n")

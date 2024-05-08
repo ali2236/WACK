@@ -1,20 +1,42 @@
 package ir.expression
 
-class BinaryOP(val operator: Operator, val first: Expression, val second: Expression) : Expression() {
+class BinaryOP(operator: Operator, val left: Expression, right: Expression) : Expression() {
+    val operator: Operator
+    val right: Expression
+
+    init {
+        val isArrayIndexCalculation = operator.sign == "<<" && right is Value && right.value == "2"
+        this.operator = if (isArrayIndexCalculation) {
+            Operator.mul
+        } else {
+            operator
+        }
+        this.right = if (isArrayIndexCalculation) {
+            Value("4")
+        } else {
+            right
+        }
+    }
+
     override fun c(out: Appendable) {
-        if (first is BinaryOP) out.append("(")
-        first.c(out)
-        if (first is BinaryOP) out.append(")")
+        if (left is BinaryOP) out.append("(")
+        left.c(out)
+        if (left is BinaryOP) out.append(")")
 
         out.append(operator.sign)
-        if (second is BinaryOP) out.append("(")
-        second.c(out)
-        if (second is BinaryOP) out.append(")")
+
+        if (right is BinaryOP) out.append("(")
+        right.c(out)
+        if (right is BinaryOP) out.append(")")
     }
 
     fun invert(): Expression {
         val invertedOperator = Operator(operator.invertSign, operator.sign)
-        return BinaryOP(invertedOperator, first, second)
+        return BinaryOP(invertedOperator, left, right)
+    }
+
+    override fun dependencies(): List<Symbol> {
+        return left.dependencies() + right.dependencies()
     }
 }
 

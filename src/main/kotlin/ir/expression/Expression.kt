@@ -8,6 +8,10 @@ abstract class Expression : Statement {
         c(b)
         return b.toString()
     }
+
+    open fun dependencies(): List<Symbol> {
+        return listOf()
+    }
 }
 
 
