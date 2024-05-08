@@ -1,4 +1,4 @@
-package ir.statement
+package ast.statement
 
 class Program(val statements: List<Statement>) : Statement {
     override fun c(out: Appendable) {

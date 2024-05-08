@@ -1,8 +1,8 @@
 package refinment
 
-import ir.expression.*
+import ast.expression.*
 
-class WhileLoopRefiner : BlockRefiner() {
+class WhileLoopRefiner : Refiner() {
 
     override fun refineBlock(block: Block) {
         super.refineBlock(block)

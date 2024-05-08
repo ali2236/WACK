@@ -1,6 +1,6 @@
-package ir.statement
+package ast.statement
 
-import ir.expression.Block
+import ast.expression.Block
 import wasm.WasmFunction
 
 class Function(val functionData: WasmFunction, val body: Block) : Statement {

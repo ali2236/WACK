@@ -1,4 +1,4 @@
-package ir.expression
+package ast.expression
 
 class Store(val data: Expression, val address: Expression) : Expression() {
     override fun c(out: Appendable) {

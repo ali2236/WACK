@@ -1,9 +1,9 @@
-package ir
+package ast
 
-import ir.expression.Block
-import ir.statement.Function
-import ir.statement.Program
-import ir.statement.Statement
+import ast.expression.Block
+import ast.statement.Function
+import ast.statement.Program
+import ast.statement.Statement
 import org.antlr.v4.runtime.tree.ParseTree
 import wasm.Index
 import wasm.WasmModule

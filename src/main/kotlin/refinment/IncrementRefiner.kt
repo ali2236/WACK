@@ -1,10 +1,10 @@
 package refinment
 
-import ir.expression.*
+import ast.expression.*
 
 // check for "<symbol> = <symbol> + 1" pattern
 // replace with <symbol>++
-class IncrementRefiner : InstructionRefiner() {
+class IncrementRefiner : Refiner() {
 
     override fun refineInstruction(expr: Expression) {
         if (expr is Assignment) {
@@ -15,9 +15,9 @@ class IncrementRefiner : InstructionRefiner() {
                     (opr.left == expr.symbol || opr.right == expr.symbol)
                 ){
                     if (opr.operator == Operator.add){
-                        replaceCurrent(Increment(expr.symbol, Operator.add))
+                        replaceCurrentInstruction(Increment(expr.symbol, Operator.add))
                     } else if(opr.operator == Operator.sub){
-                        replaceCurrent(Increment(expr.symbol, Operator.sub))
+                        replaceCurrentInstruction(Increment(expr.symbol, Operator.sub))
                     }
                 }
             }

@@ -1,4 +1,4 @@
-package ir.expression
+package ast.expression
 
 open class If(val condition: Expression, val trueBody: Expression, val elseBody: Expression? = null) : Expression() {
     override fun c(out: Appendable) {

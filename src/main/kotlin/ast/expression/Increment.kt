@@ -1,4 +1,4 @@
-package ir.expression
+package ast.expression
 
 class Increment(symbol: Symbol, operator: Operator = Operator.add) :
     Assignment(symbol, BinaryOP(operator, symbol, Value("1"))) {
@@ -9,6 +9,9 @@ class Increment(symbol: Symbol, operator: Operator = Operator.add) :
             Operator.sub -> "--"
             else -> throw Error()
         }
-        out.append("$op;\n")
+        out.append(op)
+        if(!inline){
+            out.append(";\n")
+        }
     }
 }

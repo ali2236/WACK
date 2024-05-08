@@ -1,11 +1,7 @@
 import dev.aligator.parser.WatParser
-import dev.aligator.parser.WatParserBaseVisitor
-import ir.IRConstructor
+import ast.IRConstructor
 import parser.Wat
-import refinment.Refiner
-import wasm.Index
-import java.util.LinkedList
-import java.util.Stack
+import refinment.RefinerPasses
 
 fun main(args: Array<String>) {
     val sample = "./samples/seq.wat"
@@ -14,7 +10,7 @@ fun main(args: Array<String>) {
     val module = Wat.module(parseTree)
     val ir = IRConstructor(module)
     val program = ir.program()
-    Refiner.refine(program)
+    RefinerPasses.all(program)
 
     val buffer = StringBuffer()
     program.c(buffer)

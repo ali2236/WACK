@@ -1,4 +1,4 @@
-package ir.expression
+package ast.expression
 
 open class Loop(var condition: Expression = Value("1")) : Block() {
 
@@ -8,17 +8,14 @@ open class Loop(var condition: Expression = Value("1")) : Block() {
             .filterIsInstance<IndexedValue<BrIf>>()
     }
     override fun c(out: Appendable) {
-        // search for break condition
-        // WARNING: this could break code if you don't check dependence better
-
-
-        // condition
-        /**/
-        // end search
         out.append("while(")
         condition.c(out)
         out.append(")")
         super.c(out)
+    }
+
+    override fun symbols(): List<Symbol> {
+        return condition.symbols() + super.symbols()
     }
 
     override fun close() {

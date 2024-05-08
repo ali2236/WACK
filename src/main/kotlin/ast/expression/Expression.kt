@@ -1,6 +1,6 @@
-package ir.expression
+package ast.expression
 
-import ir.statement.Statement
+import ast.statement.Statement
 
 abstract class Expression : Statement {
     override fun toString(): String {

@@ -1,9 +1,9 @@
-package ir
+package ast
 
 import dev.aligator.parser.WatParser
 import dev.aligator.parser.WatParserBaseVisitor
-import ir.expression.*
-import ir.expression.Assignment
+import ast.expression.*
+import ast.expression.Assignment
 import wasm.Index
 import wasm.WasmModule
 
