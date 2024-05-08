@@ -1,7 +1,7 @@
 package ir.expression
 
-class Block(
-    val instructions: MutableList<Expression> = mutableListOf(),
+open class Block(
+    open val instructions: MutableList<Expression> = mutableListOf(),
     val hasReturn: Boolean = false,
     val brackets : Boolean = true,
 ) : Expression() {
@@ -35,4 +35,6 @@ class Block(
         }
         if (brackets) out.append("}\n")
     }
+
+    open fun close() {}
 }

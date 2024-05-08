@@ -1,12 +1,12 @@
 package ir.expression
 
-class Loop(val body: Block) : Expression() {
+class Loop : Block() {
+
     fun conditions(): List<IndexedValue<BrIf>> {
-        val conditions = body.instructions.withIndex()
+        return instructions.withIndex()
             .filter { it.value is BrIf }
             .filterIsInstance<IndexedValue<BrIf>>()
             .filter { it.value.depth == 0 }
-        return conditions
     }
     override fun c(out: Appendable) {
         // search for break condition
@@ -27,6 +27,10 @@ class Loop(val body: Block) : Expression() {
         }*/
         // end search
         out.append("while(1)")
-        body.c(out)
+        super.c(out)
+    }
+
+    override fun close() {
+        instructions.add(Break())
     }
 }

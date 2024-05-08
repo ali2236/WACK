@@ -17,20 +17,26 @@ class FunctionVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
     val stack: Block
         get() = currentBlock
 
-    private fun newScope() {
-        blocks.add(Block())
+    private fun newScope(loop: Boolean = false) {
+        if (loop) {
+            blocks.add(Loop())
+        } else {
+            blocks.add(Block())
+        }
     }
 
     private fun exitScope(): Block {
-        return blocks.removeLast()
+        val block = blocks.removeLast()
+        block.close()
+        return block
     }
 
     override fun visitBlock_instr(ctx: WatParser.Block_instrContext) {
         if (ctx.LOOP() != null) {
-            newScope()
+            newScope(loop = true)
             super.visitBlock_instr(ctx)
-            val block = exitScope()
-            currentBlock.push(Loop(block))
+            val loop = exitScope() as Loop
+            currentBlock.push(loop)
         } else if (ctx.BLOCK() != null) {
             newScope()
             super.visitBlock_instr(ctx)
@@ -45,16 +51,16 @@ class FunctionVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
         } else if (ctx.BR() != null) {
             // TODO: Jump N blocks back
         } else if (ctx.BR_IF() != null) {
-            // TODO: Jump N blocks back if != 0
             val depth = ctx.var_().first().text.toInt()
             val ifCondition = stack.pop()
-            val ifBody = Block(
-                mutableListOf(
-                    Jump(depth, blocks[blocks.size - depth - 1])
-                ),
-                hasReturn = false,
-                brackets = false,
-            )
+            val target = blocks[blocks.size - depth - 1]
+            val ifBody = if (target is Loop && depth == 0) {
+                Continue()
+            } else if (target is Block && depth == 0) {
+                Break()
+            } else {
+                throw Error()
+            }
             stack.push(BrIf(ifCondition, ifBody, depth))
         } else if (ctx.CONST() != null) {
             stack.push(Value(ctx.literal().text))
@@ -66,27 +72,27 @@ class FunctionVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val hasReturn = resultTypes.isNotEmpty()
             stack.push(FunctionCall("f${functionIndex}", params, hasReturn))
         } else if (ctx.LOCAL_GET() != null) {
-            val symbol = Symbol("l"+ ctx.var_().first().text)
+            val symbol = Symbol("l" + ctx.var_().first().text)
             stack.push(symbol)
         } else if (ctx.LOCAL_SET() != null) {
-            val symbol = Symbol("l"+ ctx.var_().first().text)
+            val symbol = Symbol("l" + ctx.var_().first().text)
             val value = stack.pop()
             stack.push(Assignment(symbol, value))
         } else if (ctx.LOCAL_TEE() != null) {
-            val symbol = Symbol("l"+ctx.var_().first().text)
+            val symbol = Symbol("l" + ctx.var_().first().text)
             val value = stack.pop()
-            val dependant = value.dependencies().any { it == symbol}
-            if(dependant){
+            val dependant = value.dependencies().any { it == symbol }
+            if (dependant) {
                 stack.push(symbol)
             } else {
                 stack.push(value)
             }
             stack.push(Assignment(symbol, value))
         } else if (ctx.GLOBAL_GET() != null) {
-            val symbol = Symbol("g"+ ctx.var_().first().text )
+            val symbol = Symbol("g" + ctx.var_().first().text)
             stack.push(symbol)
         } else if (ctx.GLOBAL_SET() != null) {
-            val symbol = Symbol("g"+ ctx.var_().first().text)
+            val symbol = Symbol("g" + ctx.var_().first().text)
             stack.push(Assignment(symbol, stack.pop()))
         } else if (ctx.TEST() != null) {
             val operatorName = ctx.TEST()!!.text.substring(4)
