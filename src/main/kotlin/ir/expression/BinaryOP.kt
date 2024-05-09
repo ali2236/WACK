@@ -1,6 +1,6 @@
 package ir.expression
 
-class BinaryOP(val operator: Operator, val left: Expression,val right: Expression) : Expression() {
+class BinaryOP(var operator: Operator, val left: Expression,val right: Expression) : Expression() {
     init {
         // TODO: (Remove) put special cases in refinement
         /*val isArrayIndexCalculation = operator.sign == "<<" && right is Value && right.value == "2"
