@@ -1,4 +1,6 @@
-package ast.expression
+package ir.expression
+
+import ir.statement.Assignment
 
 class Increment(symbol: Symbol, operator: Operator = Operator.add) :
     Assignment(symbol, BinaryOP(operator, symbol, Value("1"))) {

@@ -1,6 +1,7 @@
 package refinment
 
-import ast.expression.*
+import ir.expression.*
+import ir.statement.*
 
 class ForLoopRefiner : Refiner() {
 
@@ -21,7 +22,7 @@ class ForLoopRefiner : Refiner() {
         replaceCurrentBlock(forLoop)
     }
 
-    private fun findForLoopInitInParent(symbol: Symbol): Expression {
+    private fun findForLoopInitInParent(symbol: Symbol): Statement {
         val parent = parentBlock
         for (i in currentBlockIndex!! downTo 0) {
             val stmt = parent.instructions[i]
@@ -36,7 +37,7 @@ class ForLoopRefiner : Refiner() {
         return Assignment(symbol, Value("??"), inline = true)
     }
 
-    private fun findForLoopStep(loop: Loop, symbol: Symbol): Expression {
+    private fun findForLoopStep(loop: Loop, symbol: Symbol): Statement {
         val (i, step) = loop.instructions.withIndex()
             .filter { it.value is Increment }
             .last() as IndexedValue<Increment>

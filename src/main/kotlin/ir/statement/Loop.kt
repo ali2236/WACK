@@ -1,4 +1,9 @@
-package ast.expression
+package ir.statement
+
+import ir.expression.Break
+import ir.expression.Expression
+import ir.expression.Symbol
+import ir.expression.Value
 
 open class Loop(var condition: Expression = Value("1")) : Block() {
 

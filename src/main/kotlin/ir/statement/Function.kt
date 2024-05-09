@@ -1,6 +1,6 @@
-package ast.statement
+package ir.statement
 
-import ast.expression.Block
+import ir.expression.Symbol
 import wasm.WasmFunction
 
 class Function(val functionData: WasmFunction, val body: Block) : Statement {
@@ -46,6 +46,10 @@ class Function(val functionData: WasmFunction, val body: Block) : Statement {
 
         // Close
         out.append("}\n")
+    }
+
+    override fun symbols(): List<Symbol> {
+        return body.symbols()
     }
 
 }

@@ -1,6 +1,6 @@
-package ast.expression
+package ir.expression
 
-import ast.statement.Statement
+import ir.statement.Statement
 
 abstract class Expression : Statement {
     override fun toString(): String {
@@ -9,7 +9,7 @@ abstract class Expression : Statement {
         return b.toString()
     }
 
-    open fun symbols(): List<Symbol> {
+    override fun symbols(): List<Symbol> {
         return listOf()
     }
 }

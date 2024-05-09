@@ -1,21 +1,24 @@
-package ast.expression
+package ir.statement
+
+import ir.expression.Expression
+import ir.expression.Symbol
 
 open class Block(
-    open val instructions: MutableList<Expression> = mutableListOf(),
+    open val instructions: MutableList<Statement> = mutableListOf(),
     val hasReturn: Boolean = false,
     val brackets : Boolean = true,
-) : Expression() {
+) : Statement {
 
-    fun push(expr: Expression) {
-        instructions.add(expr)
+    fun push(stmt: Statement) {
+        instructions.add(stmt)
     }
 
     fun pop(): Expression {
         for(i in (instructions.size-1) downTo 0){
-            if(instructions[i] is Assignment){
+            if(instructions[i] !is Expression){
                 continue
             }
-            return instructions.removeAt(i)
+            return instructions.removeAt(i) as Expression
         }
         throw Error()
     }

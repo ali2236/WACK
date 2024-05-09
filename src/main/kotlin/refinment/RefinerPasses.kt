@@ -1,6 +1,6 @@
 package refinment
 
-import ast.statement.Program
+import ir.statement.Program
 
 object RefinerPasses {
 

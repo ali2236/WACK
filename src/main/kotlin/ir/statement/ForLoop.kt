@@ -1,6 +1,9 @@
-package ast.expression
+package ir.statement
 
-class ForLoop(val init: Expression, val condition: Expression, val step: Expression) : Block() {
+import ir.expression.Expression
+import ir.expression.Symbol
+
+class ForLoop(val init: Statement, val condition: Expression, val step: Statement) : Block() {
     override fun c(out: Appendable) {
         out.append("for(")
         init.c(out)

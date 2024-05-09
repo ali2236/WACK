@@ -1,9 +1,10 @@
 package refinment
 
-import ast.expression.Block
-import ast.expression.Expression
-import ast.statement.Function
-import ast.statement.Program
+import ir.statement.Block
+import ir.expression.Expression
+import ir.statement.Function
+import ir.statement.Program
+import ir.statement.Statement
 import java.util.*
 
 abstract class Refiner {
@@ -35,8 +36,8 @@ abstract class Refiner {
         // call every instruction
         for (i in 0 until block.instructions.size) {
             currentInstrIndex = i
-            val expr = block.instructions[i]
-            refineInstruction(expr)
+            val stmt = block.instructions[i]
+            refineInstruction(stmt)
         }
 
         // call every sub-block
@@ -53,13 +54,13 @@ abstract class Refiner {
         }
     }
 
-    open fun refineInstruction(expr: Expression){}
+    open fun refineInstruction(stmt: Statement){}
     fun replaceCurrentBlock(block: Block){
         assert(currentBlockIndex != null)
         parentBlock.instructions[currentBlockIndex!!] = block
     }
-    fun replaceCurrentInstruction(expr: Expression){
+    fun replaceCurrentInstruction(stmt: Statement){
         assert(currentInstrIndex != null)
-        currentBlock.instructions[currentInstrIndex!!] = expr
+        currentBlock.instructions[currentInstrIndex!!] = stmt
     }
 }

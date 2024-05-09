@@ -1,4 +1,4 @@
-package ast.expression
+package ir.expression
 
 class Symbol(symbol: String) : Value(symbol) {
     override fun symbols(): List<Symbol> {

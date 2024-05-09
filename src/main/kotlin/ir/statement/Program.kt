@@ -1,4 +1,6 @@
-package ast.statement
+package ir.statement
+
+import ir.expression.Symbol
 
 class Program(val statements: List<Statement>) : Statement {
     override fun c(out: Appendable) {
@@ -6,5 +8,9 @@ class Program(val statements: List<Statement>) : Statement {
             statement.c(out)
             out.append('\n')
         }
+    }
+
+    override fun symbols(): List<Symbol> {
+        return statements.map { it.symbols() }.reduce { a, b -> a + b }
     }
 }

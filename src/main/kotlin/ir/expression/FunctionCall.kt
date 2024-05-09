@@ -1,4 +1,4 @@
-package ast.expression
+package ir.expression
 
 class FunctionCall(
     val name: String,

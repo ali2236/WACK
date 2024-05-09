@@ -1,5 +1,5 @@
 import dev.aligator.parser.WatParser
-import ast.IRConstructor
+import ir.IRConstructor
 import parser.Wat
 import refinment.RefinerPasses
 

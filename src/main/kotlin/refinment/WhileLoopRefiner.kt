@@ -1,6 +1,9 @@
 package refinment
 
-import ast.expression.*
+import ir.expression.*
+import ir.statement.Block
+import ir.statement.Continue
+import ir.statement.Loop
 
 class WhileLoopRefiner : Refiner() {
 
