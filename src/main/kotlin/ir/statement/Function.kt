@@ -1,9 +1,38 @@
 package ir.statement
 
 import ir.expression.Symbol
+import ir.expression.Value
 import wasm.WasmFunction
 
-class Function(val functionData: WasmFunction, val body: Block) : Statement {
+class Function(val functionData: WasmFunction, private val body: Block) : Block(hasReturn = false, brackets = false) {
+
+    override val instructions: MutableList<Statement>
+        get() {
+            val inst = mutableListOf<Statement>()
+            // Local Variables
+            // declaration
+            val paramCount = functionData.type.params.size
+            val localCount = functionData.locals.size
+            for (i in 0 until localCount){
+                val localType = functionData.locals[i]
+                val symbol = Symbol("l${paramCount+i}")
+                val dec = Declaration(localType, symbol)
+                inst.add(dec)
+            }
+            // assignment
+            for (i in 0 until localCount){
+                val localType = functionData.locals[i]
+                val symbol = Symbol("l${paramCount+i}")
+                val value = Value(localType.defaultValue())
+                val assignment = Assignment(symbol, value)
+                inst.add(assignment)
+            }
+
+            body.parent = this
+            body.indexInParent = inst.size
+            inst.add(body)
+            return inst
+        }
     override fun c(out: Appendable) {
 
         // Return Type
@@ -32,17 +61,8 @@ class Function(val functionData: WasmFunction, val body: Block) : Statement {
         }
         out.append("){\n")
 
-        // Local Variables
-        val localCount = functionData.locals.size
-        for (i in 0 until localCount){
-            val localType = functionData.locals[i]
-            out.append(localType.name)
-            out.append(' ')
-            out.append("l${paramCount+i} = 0;\n")
-        }
-
-        // Rest of Body
-        body.c(out)
+        // function body
+        super.c(out)
 
         // Close
         out.append("}\n")

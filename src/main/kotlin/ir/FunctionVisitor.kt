@@ -7,9 +7,9 @@ import ir.statement.*
 import wasm.Index
 import wasm.WasmModule
 
-class FunctionVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
+class FunctionVisitor(val module: WasmModule, firstBlock: Block) : WatParserBaseVisitor<Unit>() {
 
-    private val blocks = mutableListOf(Block())
+    private val blocks = mutableListOf(firstBlock)
 
     private val currentBlock: Block
         get() = blocks.last()

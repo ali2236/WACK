@@ -7,9 +7,15 @@ open class Block(
     open val instructions: MutableList<Statement> = mutableListOf(),
     val hasReturn: Boolean = false,
     val brackets : Boolean = true,
+    var parent : Block? = null,
+    var indexInParent : Int? = null,
 ) : Statement {
 
     fun push(stmt: Statement) {
+        if(stmt is Block){
+            stmt.parent = this
+            stmt.indexInParent = instructions.size
+        }
         instructions.add(stmt)
     }
 

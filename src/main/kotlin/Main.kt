@@ -17,24 +17,3 @@ fun main(args: Array<String>) {
     println(buffer)
 }
 
-
-
-fun printInstructions(instructions: MutableList<WatParser.InstrContext>){
-    instructions.forEach {
-        it.block_instr()?.let { b ->
-            println("Block(")
-            printInstructions(b.block().instr_list().instr())
-            println(")")
-        }
-        it.expr()?.let {e ->
-            println("expr(${e.text})")
-        }
-        it.call_instr_instr()?.let {
-            println("call")
-        }
-        it.plain_instr()?.let {p ->
-            println("plain(${p.text})")
-        }
-    }
-}
-

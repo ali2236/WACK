@@ -9,26 +9,25 @@ import java.util.*
 
 abstract class Refiner {
     lateinit var currentProgram: Program
-    lateinit var currentFunction : Function
+    lateinit var currentFunction: Function
     private var blocks = Stack<Block>()
-    val parentBlock: Block
-        get() = blocks.elementAt(blocks.size - 2)
     val currentBlock: Block
         get() = blocks.peek()
 
-    var currentBlockIndex : Int? = null
-    var currentInstrIndex : Int? = null
+    var currentInstrIndex: Int? = null
     open fun run(program: Program) {
         currentProgram = program
-        program.statements
-            .filterIsInstance<Function>()
-            .forEach(this::refineFunction)
+        val functions = program.statements.filterIsInstance<Function>()
+        for (function in functions) {
+            currentFunction = function
+            refineFunction(function)
+        }
     }
 
     open fun refineFunction(function: Function) {
-        currentFunction = function
-        blocks.push(function.body)
-        refineBlock(function.body)
+        blocks.push(function)
+        refineBlock(function)
+        blocks.pop()
     }
 
     open fun refineBlock(block: Block) {
@@ -48,18 +47,19 @@ abstract class Refiner {
 
         for ((i, subBlock) in subBlocks) {
             blocks.push(subBlock)
-            currentBlockIndex = i
             refineBlock(subBlock)
             blocks.pop()
         }
     }
 
-    open fun refineInstruction(stmt: Statement){}
-    fun replaceCurrentBlock(block: Block){
-        assert(currentBlockIndex != null)
-        parentBlock.instructions[currentBlockIndex!!] = block
+    open fun refineInstruction(stmt: Statement) {}
+    fun replaceCurrentBlock(block: Block) {
+        block.parent = currentBlock.parent
+        block.indexInParent = currentBlock.indexInParent
+        currentBlock.parent!!.instructions[currentBlock.indexInParent!!] = block
     }
-    fun replaceCurrentInstruction(stmt: Statement){
+
+    fun replaceCurrentInstruction(stmt: Statement) {
         assert(currentInstrIndex != null)
         currentBlock.instructions[currentInstrIndex!!] = stmt
     }

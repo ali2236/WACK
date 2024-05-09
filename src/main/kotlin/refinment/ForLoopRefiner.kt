@@ -17,22 +17,28 @@ class ForLoopRefiner : Refiner() {
         val symbol = condition.symbols().first()
         val init = findForLoopInitInParent(symbol)
         val step = findForLoopStep(loop, symbol)
-        val forLoop = ForLoop(init, condition, step)
-        forLoop.instructions.addAll(loop.instructions)
+        val forLoop = ForLoop(init, condition, step, loop.instructions)
         replaceCurrentBlock(forLoop)
     }
 
     private fun findForLoopInitInParent(symbol: Symbol): Statement {
-        val parent = parentBlock
-        for (i in currentBlockIndex!! downTo 0) {
-            val stmt = parent.instructions[i]
-            if (stmt is Assignment && stmt.symbol == symbol) {
-                // TODO: Check Forward Dependencies (if you use ssa you dont need this)
-                parent.instructions.removeAt(i)
-                currentBlockIndex = currentBlockIndex!! - 1
-                stmt.inline = true
-                return stmt
+        var current = currentBlock
+        var parent = current.parent
+        var blockIndex = current.indexInParent
+        while (parent != null) {
+            for (i in (blockIndex!! - 1) downTo 0) {
+                val stmt = parent.instructions[i]
+                if (stmt is Assignment && stmt.symbol == symbol) {
+                    // TODO: Check Forward Dependencies (if you use ssa you dont need this)
+                    parent.instructions.removeAt(i)
+                    current.indexInParent = blockIndex - 1
+                    stmt.inline = true
+                    return stmt
+                }
             }
+            current = parent
+            parent = current.parent
+            blockIndex = current.indexInParent
         }
         return Assignment(symbol, Value("??"), inline = true)
     }

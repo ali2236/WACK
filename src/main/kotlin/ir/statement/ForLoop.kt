@@ -3,7 +3,7 @@ package ir.statement
 import ir.expression.Expression
 import ir.expression.Symbol
 
-class ForLoop(val init: Statement, val condition: Expression, val step: Statement) : Block() {
+class ForLoop(val init: Statement, val condition: Expression, val step: Statement, instructions : MutableList<Statement>) : Block(instructions) {
     override fun c(out: Appendable) {
         out.append("for(")
         init.c(out)

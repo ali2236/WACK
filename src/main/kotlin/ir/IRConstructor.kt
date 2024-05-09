@@ -19,20 +19,18 @@ class IRConstructor(val module: WasmModule) {
     fun function(index: Index): Statement {
         val function = module.functions.first { it.index == index }
         val functionBlock = if (function.code != null) {
-            Block(
-                functionBody(function.code).instructions,
-                hasReturn = function.type.result.isNotEmpty(),
-                brackets = false
+            val visitor = FunctionVisitor(
+                module,
+                Block(
+                    hasReturn = function.type.result.isNotEmpty(),
+                    brackets = false
+                )
             )
+            visitor.visit(function.code)
+            visitor.stack
         } else {
             Block(hasReturn = false, brackets = false)
         }
         return Function(function, functionBlock)
-    }
-
-    private fun functionBody(parseTree: ParseTree): Block {
-        val visitor = FunctionVisitor(module)
-        visitor.visit(parseTree)
-        return visitor.stack
     }
 }

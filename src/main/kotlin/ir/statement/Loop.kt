@@ -24,6 +24,6 @@ open class Loop(var condition: Expression = Value("1")) : Block() {
     }
 
     override fun close() {
-        instructions.add(Break())
+        push(Break())
     }
 }
