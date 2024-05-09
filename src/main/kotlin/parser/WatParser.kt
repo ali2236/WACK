@@ -16,7 +16,7 @@ object Wat {
 
     fun parse(path: String): ParseTree {
         // 1. Read
-        val reader = File("./samples/seq.wat").reader(Charsets.UTF_16)
+        val reader = File(path).reader(Charsets.UTF_8)
 
         // 2. Tokenize
         val lexer = WatLexer(CharStreams.fromReader(reader))

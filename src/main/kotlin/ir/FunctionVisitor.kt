@@ -6,6 +6,7 @@ import ir.expression.*
 import ir.statement.*
 import wasm.Index
 import wasm.WasmModule
+import wasm.WasmValueType
 
 class FunctionVisitor(val module: WasmModule, firstBlock: Block) : WatParserBaseVisitor<Unit>() {
 
@@ -128,9 +129,11 @@ class FunctionVisitor(val module: WasmModule, firstBlock: Block) : WatParserBase
             val first = stack.pop()
             stack.push(BinaryOP(operatorSign, first, second))
         } else if (ctx.STORE() != null) {
+            val type = WasmValueType.parse(ctx.STORE()!!.text.substring(0,3))
+            val offset = ctx.OFFSET_EQ_NAT() // TODO: add offset
             val data = stack.pop()
             val addr = stack.pop()
-            stack.push(Store(data, addr))
+            stack.push(Store(type, data, addr))
         }
         return super.visitPlain_instr(ctx)
     }

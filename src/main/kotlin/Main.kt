@@ -4,7 +4,7 @@ import parser.Wat
 import refinment.RefinerPasses
 
 fun main(args: Array<String>) {
-    val sample = "./samples/seq.wat"
+    val sample = "./samples/simple_loop.wat"
 
     val parseTree = Wat.parse(sample)
     val module = Wat.module(parseTree)

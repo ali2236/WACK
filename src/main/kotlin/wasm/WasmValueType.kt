@@ -25,6 +25,16 @@ enum class WasmValueType {
         }
     }
 
+    fun byteCount(): Int {
+        return when(this){
+            I32 -> 4
+            I64 -> 8
+            F32 -> 4
+            F64 -> 8
+            Unknown -> 4
+        }
+    }
+
     companion object {
         fun parse(text: String) : WasmValueType{
             return valueOf(text.trim().uppercase())
