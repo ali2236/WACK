@@ -5,10 +5,11 @@ import dev.aligator.parser.WatParserBaseVisitor
 import ir.expression.*
 import ir.statement.*
 import wasm.Index
+import wasm.WasmFunction
 import wasm.WasmModule
 import wasm.WasmValueType
 
-class FunctionVisitor(val module: WasmModule, firstBlock: Block) : WatParserBaseVisitor<Unit>() {
+class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstBlock: Block) : WatParserBaseVisitor<Unit>() {
 
     private val blocks = mutableListOf(firstBlock)
 
@@ -58,7 +59,8 @@ class FunctionVisitor(val module: WasmModule, firstBlock: Block) : WatParserBase
         if (ctx.UNREACHABLE() != null) {
             stack.push(Unreachable())
         } else if (ctx.BR() != null) {
-            // TODO: Jump N blocks back
+            val depth = ctx.var_().first().text.toInt()
+            stack.push(Br(depth))
         } else if (ctx.BR_IF() != null) {
             val depth = ctx.var_().first().text.toInt()
             val ifCondition = stack.pop()
@@ -86,14 +88,20 @@ class FunctionVisitor(val module: WasmModule, firstBlock: Block) : WatParserBase
             val hasReturn = resultTypes.isNotEmpty()
             stack.push(FunctionCall("f${functionIndex}", params, hasReturn))
         } else if (ctx.LOCAL_GET() != null) {
-            val symbol = Symbol(Names.local + ctx.var_().first().text)
+            val index = ctx.var_().first().text.toInt()
+            val type = function.locals[index]
+            val symbol = Symbol(type,Names.local + index)
             stack.push(symbol)
         } else if (ctx.LOCAL_SET() != null) {
-            val symbol = Symbol(Names.local + ctx.var_().first().text)
+            val index = ctx.var_().first().text.toInt()
+            val type = function.locals[index]
+            val symbol = Symbol(type, Names.local + index)
             val value = stack.pop()
             stack.push(Assignment(symbol, value))
         } else if (ctx.LOCAL_TEE() != null) {
-            val symbol = Symbol(Names.local + ctx.var_().first().text)
+            val index = ctx.var_().first().text.toInt()
+            val type = function.locals[index]
+            val symbol = Symbol(type, Names.local + index)
             val value = stack.pop()
             val dependant = value.symbols().any { it == symbol }
             stack.push(Assignment(symbol, value))
@@ -103,10 +111,14 @@ class FunctionVisitor(val module: WasmModule, firstBlock: Block) : WatParserBase
                 stack.push(value)
             }
         } else if (ctx.GLOBAL_GET() != null) {
-            val symbol = Symbol(Names.global + ctx.var_().first().text)
+            val index = ctx.var_().first().text.toInt()
+            val type = module.globals[index].type.type
+            val symbol = Symbol(type,Names.global + index)
             stack.push(symbol)
         } else if (ctx.GLOBAL_SET() != null) {
-            val symbol = Symbol(Names.global + ctx.var_().first().text)
+            val index = ctx.var_().first().text.toInt()
+            val type = module.globals[index].type.type
+            val symbol = Symbol( type,Names.global + index)
             stack.push(Assignment(symbol, stack.pop()))
         } else if (ctx.TEST() != null) {
             val operatorName = ctx.TEST()!!.text.substring(4)

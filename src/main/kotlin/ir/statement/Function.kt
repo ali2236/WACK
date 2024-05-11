@@ -2,6 +2,7 @@ package ir.statement
 
 import ir.ChildExpression
 import ir.Names
+import ir.expression.Expression
 import ir.expression.Symbol
 import ir.expression.Value
 import wasm.WasmFunction
@@ -23,15 +24,15 @@ class Function(
             val localCount = functionData.locals.size
             for (i in 0 until localCount) {
                 val localType = functionData.locals[i]
-                val symbol = Symbol(Names.local + "${paramCount + i}")
+                val symbol = Symbol(localType, Names.local + "${paramCount + i}")
                 val dec = Declaration(localType, symbol)
                 inst.add(dec)
             }
             // assignment
             for (i in 0 until localCount) {
                 val localType = functionData.locals[i]
-                val symbol = Symbol(Names.local + "${paramCount + i}")
-                val value = Value(localType,localType.defaultValue())
+                val symbol = Symbol(localType, Names.local + "${paramCount + i}")
+                val value = Value(localType, localType.defaultValue())
                 val assignment = Assignment(symbol, value)
                 inst.add(assignment)
             }
@@ -71,7 +72,19 @@ class Function(
         out.append("){\n")
 
         // function body
-        super.c(out)
+        if (functionData.import != null) {
+            val i = functionData.import
+
+            out.append("// ")
+            out.append(i.module)
+            out.append(" ")
+            out.append(i.name)
+            out.append("\n")
+
+
+        } else {
+            super.c(out)
+        }
 
         // Close
         out.append("}\n")

@@ -24,4 +24,10 @@ open class Assignment(val symbol: Symbol, var value: Expression, var inline: Boo
             ChildExpression(value){value = it}
         )
     }
+
+    override fun toString(): String {
+        val buffer = StringBuffer()
+        this.c(buffer)
+        return buffer.toString()
+    }
 }

@@ -5,7 +5,15 @@ import ir.Names
 import ir.expression.*
 import wasm.WasmValueType
 
-class Store(val type: WasmValueType, var data: Expression, var address: Expression, val offset: Int = 0) : Statement {
+class Store(
+    val type: WasmValueType,
+    var data: Expression,
+    var address: Expression,
+    val offset: Int = 0
+) : Statement {
+    val load: Load
+        get() = Load(type, address, offset)
+
     override fun c(out: Appendable) {
         out.append(Names.memory)
         //out.append("_$type")

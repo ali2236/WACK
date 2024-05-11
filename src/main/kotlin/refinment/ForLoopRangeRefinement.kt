@@ -14,7 +14,11 @@ class ForLoopRangeRefinement : Refiner() {
     override fun refineBlock(block: Block) {
         super.refineBlock(block)
         if (block is ForLoop) {
+            try {
             refineForLoop(block)
+            } catch (e: NotRangeLoopException){
+
+            }
         }
     }
 

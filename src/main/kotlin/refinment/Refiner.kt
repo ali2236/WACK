@@ -10,7 +10,7 @@ import java.util.*
 abstract class Refiner {
     lateinit var currentProgram: Program
     lateinit var currentFunction: Function
-    private var blocks = Stack<Block>()
+    protected var blocks = Stack<Block>()
     val currentBlock: Block
         get() = blocks.peek()
 

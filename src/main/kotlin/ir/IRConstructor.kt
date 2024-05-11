@@ -21,6 +21,7 @@ class IRConstructor(val module: WasmModule) {
         val functionBlock = if (function.code != null) {
             val visitor = FunctionVisitor(
                 module,
+                function,
                 Block(
                     hasReturn = function.type.result.isNotEmpty(),
                     brackets = false

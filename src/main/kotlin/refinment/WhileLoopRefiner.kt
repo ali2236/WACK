@@ -24,7 +24,7 @@ class WhileLoopRefiner : Refiner() {
     private fun whileConditionStyle(loop: Loop){
         val f = loop.instructions.first()
         val l = loop.instructions.last()
-        if(f is If && f.elseBody == null && l is Break){
+        if(f is If && f.elseBody == null && f.instructions.last() is Br && l is Break){
             // remove break
             loop.instructions.removeLast()
 
@@ -34,6 +34,9 @@ class WhileLoopRefiner : Refiner() {
             // move true block to loop instructions
             val instr = (f.trueBody as Block).instructions
             loop.instructions.addAll(instr)
+
+            // remove last instructions (Br)
+            loop.instructions.removeLast()
 
             // move sub-block parent pointers to loop
             loop.instructions.forEachIndexed { i, stmt ->

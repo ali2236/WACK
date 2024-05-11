@@ -4,17 +4,15 @@ import ir.statement.Program
 
 object RefinerPasses {
 
-    fun all(program: Program){
+    fun all(program: Program) {
         val passes = listOf(
-            // MEMORY
-            ShiftToMultiply(),
-            MemoryVariableRecovery(),
-            // LOOP
-            IncrementRefiner(),
             WhileLoopRefiner(),
+            LoopMemoryCounterAlias(),
+            IncrementRefiner(),
             ForLoopRefiner(),
-            ForLoopRangeRefinement()
-            // TODO: have typed memory
+            ShiftToMultiply(),
+            ForLoopRangeRefinement(),
+            LoopVariableFlattening(),
         )
         passes.forEach { it.run(program) }
     }

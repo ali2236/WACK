@@ -12,7 +12,7 @@ open class Block(
     var indexInParent : Int? = null,
 ) : Statement {
 
-    fun push(stmt: Statement) {
+    open fun push(stmt: Statement) {
         if(stmt is Block){
             stmt.parent = this
             stmt.indexInParent = instructions.size
@@ -20,7 +20,7 @@ open class Block(
         instructions.add(stmt)
     }
 
-    fun pop(): Expression {
+    open fun pop(): Expression {
         for(i in (instructions.size-1) downTo 0){
             if(instructions[i] !is Expression){
                 continue

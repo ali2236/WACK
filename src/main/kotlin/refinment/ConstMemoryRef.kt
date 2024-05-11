@@ -11,17 +11,22 @@ import ir.statement.Statement
 import ir.statement.Store
 
 
-class MemoryVariableRecovery : Refiner() {
+// Shouldn't be used
+class ConstMemoryRef : Refiner() {
 
     private val constRef = mutableMapOf<Value, Symbol>()
     private fun getConstRef(value: Value) : Symbol{
-        if(constRef.containsKey(value)){
-            return constRef[value]!!
-        } else {
-            val symbol = Symbol(Names.constRef + "${constRef.size}")
+        if(!constRef.containsKey(value)){
+            // make symbol
+            val functionLocals = currentFunction.functionData.locals
+            val symbol = Symbol(value.type, Names.local + "${functionLocals.size}")
+            functionLocals.add(value.type)
             constRef[value] = symbol
-            return symbol
+
+            // push init code into function body
+            currentFunction.push(Assignment(symbol, value))
         }
+        return constRef[value]!!
     }
 
     override fun refineInstruction(stmt: Statement) {
@@ -50,10 +55,4 @@ class MemoryVariableRecovery : Refiner() {
             }
         }
     }
-
-    // constant memory load
-    private fun constantMemoryLoadStoreReplace(stmt: Statement){
-
-    }
-    // local variable memory load
 }

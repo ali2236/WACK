@@ -96,6 +96,10 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
         module.functions.add(function)
     }
 
+    override fun enterSglobal(ctx: WatParser.SglobalContext?) {
+        super.enterSglobal(ctx)
+    }
+
 }
 
 
