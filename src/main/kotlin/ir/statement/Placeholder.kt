@@ -2,8 +2,9 @@ package ir.statement
 
 import ir.expression.Symbol
 
-class Unreachable : BasicStatement() {
+class Placeholder(val msg: String) : BasicStatement() {
     override fun c(out: Appendable) {
-        // out.append("UNREACHABLE;\n")
+        Comment(msg).c(out)
     }
+
 }

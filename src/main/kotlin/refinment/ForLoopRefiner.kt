@@ -2,13 +2,18 @@ package refinment
 
 import ir.expression.*
 import ir.statement.*
+import java.lang.Exception
 
 class ForLoopRefiner : Refiner() {
 
     override fun refineBlock(block: Block) {
         super.refineBlock(block)
         if (block is Loop && block.condition !is Value && block.condition.symbols().isNotEmpty()) {
-            transformIntoForLoop(block)
+            try {
+                transformIntoForLoop(block)
+            } catch (e : Exception){
+
+            }
         }
     }
 

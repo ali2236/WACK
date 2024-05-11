@@ -1,9 +1,10 @@
 package ir.statement
 
+import ir.ChildExpression
 import ir.expression.Expression
 import ir.expression.Symbol
 
-class ForLoop(val init: Statement, val condition: Expression, val step: Statement, instructions : MutableList<Statement>) : Block(instructions) {
+class ForLoop(val init: Statement, var condition: Expression, val step: Statement, instructions : MutableList<Statement>) : Block(instructions) {
     override fun c(out: Appendable) {
         out.append("for(")
         init.c(out)
@@ -17,5 +18,11 @@ class ForLoop(val init: Statement, val condition: Expression, val step: Statemen
 
     override fun symbols(): List<Symbol> {
         return init.symbols() + condition.symbols() + step.symbols() + super.symbols()
+    }
+
+    override fun expressions(): List<ChildExpression> {
+        return listOf(
+            ChildExpression(condition){condition = it}
+        ) + init.expressions() + step.expressions()
     }
 }

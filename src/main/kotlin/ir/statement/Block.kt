@@ -1,5 +1,6 @@
 package ir.statement
 
+import ir.ChildExpression
 import ir.expression.Expression
 import ir.expression.Symbol
 
@@ -49,5 +50,9 @@ open class Block(
 
     override fun symbols(): List<Symbol> {
         return instructions.map { it.symbols() }.reduce { a, b -> a + b }
+    }
+
+    override fun expressions(): List<ChildExpression> {
+        return listOf()
     }
 }

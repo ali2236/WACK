@@ -1,6 +1,6 @@
 package ir.expression
 
-class Symbol(symbol: String) : Value(symbol) {
+open class Symbol(symbol: String) : Value(symbol) {
     override fun symbols(): List<Symbol> {
         return listOf(this)
     }

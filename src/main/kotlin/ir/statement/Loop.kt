@@ -1,5 +1,6 @@
 package ir.statement
 
+import ir.ChildExpression
 import ir.expression.Break
 import ir.expression.Expression
 import ir.expression.Symbol
@@ -21,6 +22,12 @@ open class Loop(var condition: Expression = Value("1")) : Block() {
 
     override fun symbols(): List<Symbol> {
         return condition.symbols() + super.symbols()
+    }
+
+    override fun expressions(): List<ChildExpression> {
+        return listOf(
+            ChildExpression(condition){condition = it}
+        )
     }
 
     override fun close() {

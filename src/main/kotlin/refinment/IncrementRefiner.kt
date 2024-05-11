@@ -10,17 +10,21 @@ class IncrementRefiner : Refiner() {
 
     override fun refineInstruction(stmt: Statement) {
         if (stmt is Assignment) {
-            if (stmt.value is BinaryOP) {
-                val opr = stmt.value
-                if (
-                    (opr.left == Value("1") || opr.right == Value("1")) &&
-                    (opr.left == stmt.symbol || opr.right == stmt.symbol)
-                ){
-                    if (opr.operator == Operator.add){
-                        replaceCurrentInstruction(Increment(stmt.symbol, Operator.add))
-                    } else if(opr.operator == Operator.sub){
-                        replaceCurrentInstruction(Increment(stmt.symbol, Operator.sub))
-                    }
+            checkAssignmentStyleIncrement(stmt)
+        }
+    }
+
+    private fun checkAssignmentStyleIncrement(stmt: Assignment){
+        if (stmt.value is BinaryOP) {
+            val opr = stmt.value as BinaryOP
+            if (
+                (opr.left == Value("1") || opr.right == Value("1")) &&
+                (opr.left == stmt.symbol || opr.right == stmt.symbol)
+            ){
+                if (opr.operator == Operator.add){
+                    replaceCurrentInstruction(Increment(stmt.symbol, Operator.add))
+                } else if(opr.operator == Operator.sub){
+                    replaceCurrentInstruction(Increment(stmt.symbol, Operator.sub))
                 }
             }
         }

@@ -1,5 +1,7 @@
 package ir.statement
 
+import ir.ChildExpression
+import ir.Names
 import ir.expression.Symbol
 import ir.expression.Value
 import wasm.WasmFunction
@@ -15,14 +17,14 @@ class Function(val functionData: WasmFunction, private val body: Block) : Block(
             val localCount = functionData.locals.size
             for (i in 0 until localCount){
                 val localType = functionData.locals[i]
-                val symbol = Symbol("l${paramCount+i}")
+                val symbol = Symbol(Names.local + "${paramCount+i}")
                 val dec = Declaration(localType, symbol)
                 inst.add(dec)
             }
             // assignment
             for (i in 0 until localCount){
                 val localType = functionData.locals[i]
-                val symbol = Symbol("l${paramCount+i}")
+                val symbol = Symbol( Names.local + "${paramCount+i}")
                 val value = Value(localType.defaultValue())
                 val assignment = Assignment(symbol, value)
                 inst.add(assignment)
@@ -70,6 +72,10 @@ class Function(val functionData: WasmFunction, private val body: Block) : Block(
 
     override fun symbols(): List<Symbol> {
         return body.symbols()
+    }
+
+    override fun expressions(): List<ChildExpression> {
+        return body.expressions()
     }
 
 }

@@ -1,9 +1,7 @@
 package refinment
 
 import ir.expression.*
-import ir.statement.Block
-import ir.statement.Continue
-import ir.statement.Loop
+import ir.statement.*
 
 class WhileLoopRefiner : Refiner() {
 
@@ -16,6 +14,41 @@ class WhileLoopRefiner : Refiner() {
 
     private fun refineLoop(loop: Loop) {
         val conditions = loop.breakConditions()
+        if(conditions.isNotEmpty()){
+            doWhileConditionStyle(loop, conditions)
+        } else {
+            whileConditionStyle(loop)
+        }
+    }
+
+    private fun whileConditionStyle(loop: Loop){
+        val f = loop.instructions.first()
+        val l = loop.instructions.last()
+        if(f is If && f.elseBody == null && l is Break){
+            // remove break
+            loop.instructions.removeLast()
+
+            // move condition to loop
+            loop.condition = f.condition
+
+            // move true block to loop instructions
+            val instr = (f.trueBody as Block).instructions
+            loop.instructions.addAll(instr)
+
+            // move sub-block parent pointers to loop
+            loop.instructions.forEachIndexed { i, stmt ->
+                if(stmt is Block){
+                    stmt.parent = loop
+                    stmt.indexInParent = i
+                }
+            }
+
+            // remove if
+            loop.instructions.removeFirst()
+        }
+    }
+
+    private fun doWhileConditionStyle(loop: Loop, conditions: List<IndexedValue<BrIf>>){
         val continueConditions = conditions.filter {
             it.value.trueBody is Continue && loop.instructions[it.index + 1] is Break
         }
