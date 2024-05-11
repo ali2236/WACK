@@ -43,7 +43,7 @@ class MemoryVariableRecovery : Refiner() {
     private fun refineChildExpression(expr: ChildExpression){
         if(expr.statement is Load){
             val load = expr.statement
-            if(load.address is Value && load.address !is Symbol){
+            if(load.address is Value){
                 val address = load.address as Value
                 val smbl = getConstRef(address)
                 expr.replace(ConstLoad(load, smbl))

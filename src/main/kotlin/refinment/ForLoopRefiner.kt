@@ -2,6 +2,7 @@ package refinment
 
 import ir.expression.*
 import ir.statement.*
+import wasm.WasmValueType
 import java.lang.Exception
 
 class ForLoopRefiner : Refiner() {
@@ -45,7 +46,7 @@ class ForLoopRefiner : Refiner() {
             parent = current.parent
             blockIndex = current.indexInParent
         }
-        return Assignment(symbol, Value("??"), inline = true)
+        return Assignment(symbol, Value(WasmValueType.Unknown,"??"), inline = true)
     }
 
     private fun findForLoopStep(loop: Loop, symbol: Symbol): Statement {

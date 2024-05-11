@@ -6,7 +6,13 @@ import ir.expression.Symbol
 import ir.expression.Value
 import wasm.WasmFunction
 
-class Function(val functionData: WasmFunction, private val body: Block) : Block(hasReturn = false, brackets = false) {
+class Function(
+    val functionData: WasmFunction,
+    private val body: Block
+) : Block(
+    hasReturn = false,
+    brackets = false,
+) {
 
     override val instructions: MutableList<Statement>
         get() {
@@ -15,17 +21,17 @@ class Function(val functionData: WasmFunction, private val body: Block) : Block(
             // declaration
             val paramCount = functionData.type.params.size
             val localCount = functionData.locals.size
-            for (i in 0 until localCount){
+            for (i in 0 until localCount) {
                 val localType = functionData.locals[i]
-                val symbol = Symbol(Names.local + "${paramCount+i}")
+                val symbol = Symbol(Names.local + "${paramCount + i}")
                 val dec = Declaration(localType, symbol)
                 inst.add(dec)
             }
             // assignment
-            for (i in 0 until localCount){
+            for (i in 0 until localCount) {
                 val localType = functionData.locals[i]
-                val symbol = Symbol( Names.local + "${paramCount+i}")
-                val value = Value(localType.defaultValue())
+                val symbol = Symbol(Names.local + "${paramCount + i}")
+                val value = Value(localType,localType.defaultValue())
                 val assignment = Assignment(symbol, value)
                 inst.add(assignment)
             }
@@ -35,11 +41,12 @@ class Function(val functionData: WasmFunction, private val body: Block) : Block(
             inst.add(body)
             return inst
         }
+
     override fun c(out: Appendable) {
 
         // Return Type
         val results = functionData.type.result
-        if(results.isEmpty()){
+        if (results.isEmpty()) {
             out.append("void")
         } else {
             out.append(results.first().name)
@@ -52,12 +59,12 @@ class Function(val functionData: WasmFunction, private val body: Block) : Block(
         // params
         out.append("(")
         val paramCount = functionData.type.params.size
-        for (i in 0 until paramCount){
+        for (i in 0 until paramCount) {
             val param = functionData.type.params[i]
             out.append(param.name)
             out.append(' ') // space
             out.append("l$i")
-            if(i != functionData.type.params.size - 1){
+            if (i != functionData.type.params.size - 1) {
                 out.append(',')
             }
         }

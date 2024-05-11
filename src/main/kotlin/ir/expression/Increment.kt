@@ -1,9 +1,10 @@
 package ir.expression
 
 import ir.statement.Assignment
+import wasm.WasmValueType
 
 class Increment(symbol: Symbol, operator: Operator = Operator.add) :
-    Assignment(symbol, BinaryOP(operator, symbol, Value("1"))) {
+    Assignment(symbol, BinaryOP(operator, symbol, Value(WasmValueType.I32,"1"))) {
     override fun c(out: Appendable) {
         symbol.c(out)
         val op = when ((value as BinaryOP).operator) {

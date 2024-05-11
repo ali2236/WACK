@@ -76,7 +76,8 @@ class FunctionVisitor(val module: WasmModule, firstBlock: Block) : WatParserBase
             // TODO: jump to outer most block
             stack.push(Placeholder("Return"))
         } else if (ctx.CONST() != null) {
-            stack.push(Value(ctx.literal().text))
+            val type = WasmValueType.parse(ctx.CONST()!!.text.substring(0, 3))
+            stack.push(Value(type, ctx.literal().text))
         } else if (ctx.CALL() != null) {
             val functionIndex = ctx.var_().first().text.toInt()
             val calledFunction = module.functions.first { it.index == Index(functionIndex) }
@@ -110,7 +111,7 @@ class FunctionVisitor(val module: WasmModule, firstBlock: Block) : WatParserBase
         } else if (ctx.TEST() != null) {
             val operatorName = ctx.TEST()!!.text.substring(4)
             val expr = when (operatorName) {
-                "eqz" -> BinaryOP(Operator.eq, stack.pop(), Value("0"))
+                "eqz" -> BinaryOP(Operator.eq, stack.pop(), Value(WasmValueType.I32,"0"))
                 else -> throw Error()
             }
             stack.push(expr)

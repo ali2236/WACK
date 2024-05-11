@@ -11,7 +11,7 @@ class Store(val type: WasmValueType, var data: Expression, var address: Expressi
         //out.append("_$type")
         out.append("[")
         if (offset != 0) {
-            BinaryOP(Operator.add, address, Value(offset.toString())).c(out)
+            BinaryOP(Operator.add, address, Value(WasmValueType.I32, offset.toString())).c(out)
         } else {
             address.c(out)
         }

@@ -5,8 +5,9 @@ import ir.expression.Break
 import ir.expression.Expression
 import ir.expression.Symbol
 import ir.expression.Value
+import wasm.WasmValueType
 
-open class Loop(var condition: Expression = Value("1")) : Block() {
+open class Loop(var condition: Expression = Value(WasmValueType.I32,"1")) : Block() {
 
     fun breakConditions(): List<IndexedValue<BrIf>> {
         return instructions.withIndex()

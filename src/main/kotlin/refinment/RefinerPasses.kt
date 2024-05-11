@@ -7,6 +7,7 @@ object RefinerPasses {
     fun all(program: Program){
         val passes = listOf(
             // MEMORY
+            ShiftToMultiply(),
             MemoryVariableRecovery(),
             // LOOP
             IncrementRefiner(),

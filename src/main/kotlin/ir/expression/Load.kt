@@ -10,7 +10,7 @@ class Load(val type: WasmValueType, var address: Expression, val offset: Int = 0
         //out.append("_${type}")
         out.append("[")
         if (offset != 0) {
-            BinaryOP(Operator.add, address, Value(offset.toString())).c(out)
+            BinaryOP(Operator.add, address, Value(WasmValueType.I32, offset.toString())).c(out)
         } else {
             address.c(out)
         }
