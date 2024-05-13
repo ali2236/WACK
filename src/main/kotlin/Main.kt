@@ -3,7 +3,7 @@ import parser.Wat
 import restructure.RefinerPasses
 
 fun main(args: Array<String>) {
-    val sample = "./samples/simple_loop.wat"
+    val sample = "./samples/seq.wat"
 
     val parseTree = Wat.parse(sample)
     val module = Wat.module(parseTree)
