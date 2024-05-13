@@ -1,11 +1,11 @@
-package refinment
+package restructure
 
 import ir.ChildExpression
 import ir.Names
 import ir.expression.*
 import ir.statement.*
 
-class LoopMemoryCounterAlias : Refiner() {
+class LoopMemoryCounterAlias : Restructure() {
 
     private val memRef = mutableMapOf<Load, Symbol>()
     private fun getMemRef(load: Load): Symbol {
@@ -19,7 +19,7 @@ class LoopMemoryCounterAlias : Refiner() {
         return memRef[load]!!
     }
 
-    override fun refineBlock(block: Block) {
+    override fun restructureBlock(block: Block) {
         // call every instruction in loop body
         if (block is Loop) {
             refineLoop(block)
@@ -46,25 +46,25 @@ class LoopMemoryCounterAlias : Refiner() {
 
         for ((i, subBlock) in subBlocks) {
             blocks.push(subBlock)
-            refineBlock(subBlock)
+            restructureBlock(subBlock)
             blocks.pop()
         }
     }
 
     private fun refineLoop(loop: Loop) {
-        refineInstruction(loop.condition)
+        restructureInstruction(loop.condition)
         // call every instruction
         for (i in 0 until loop.instructions.size) {
             currentInstrIndex = i
             val stmt = loop.instructions[i]
-            refineInstruction(stmt)
+            restructureInstruction(stmt)
         }
     }
 
-    override fun refineInstruction(stmt: Statement) {
+    override fun restructureInstruction(stmt: Statement) {
         for (child in stmt.expressions()) {
             refineChildExpression(child)
-            refineInstruction(child.statement)
+            restructureInstruction(child.statement)
         }
         if (stmt is Store && stmt.address is Symbol) {
             val smbl = getMemRef(stmt.load)

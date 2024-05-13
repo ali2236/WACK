@@ -1,6 +1,6 @@
 import ir.IRConstructor
 import parser.Wat
-import refinment.RefinerPasses
+import restructure.RefinerPasses
 
 fun main(args: Array<String>) {
     val sample = "./samples/simple_loop.wat"

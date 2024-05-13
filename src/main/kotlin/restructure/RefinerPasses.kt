@@ -1,4 +1,4 @@
-package refinment
+package restructure
 
 import ir.statement.Program
 
@@ -6,10 +6,10 @@ object RefinerPasses {
 
     fun all(program: Program) {
         val passes = listOf(
-            WhileLoopRefiner(),
+            WhileLoopRestructure(),
             LoopMemoryCounterAlias(),
-            IncrementRefiner(),
-            ForLoopRefiner(),
+            IncrementRestructure(),
+            ForLoopRestructure(),
             ShiftToMultiply(),
             ForLoopRangeRefinement(),
             LoopVariableFlattening(),

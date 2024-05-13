@@ -1,4 +1,4 @@
-package refinment
+package restructure
 
 import ir.expression.*
 import ir.statement.Assignment
@@ -7,9 +7,9 @@ import wasm.WasmValueType
 
 // check for "<symbol> = <symbol> + 1" pattern
 // replace with <symbol>++
-class IncrementRefiner : Refiner() {
+class IncrementRestructure : Restructure() {
 
-    override fun refineInstruction(stmt: Statement) {
+    override fun restructureInstruction(stmt: Statement) {
         if (stmt is Assignment) {
             checkAssignmentStyleIncrement(stmt)
         }

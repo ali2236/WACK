@@ -1,4 +1,4 @@
-package refinment
+package restructure
 
 import ir.ChildExpression
 import ir.expression.*
@@ -6,12 +6,12 @@ import ir.statement.Statement
 import wasm.WasmValueType
 import kotlin.math.pow
 
-class ShiftToMultiply : Refiner() {
+class ShiftToMultiply : Restructure() {
 
-    override fun refineInstruction(stmt: Statement) {
+    override fun restructureInstruction(stmt: Statement) {
         for (child in stmt.expressions()) {
             refineChildExpression(child)
-            refineInstruction(child.statement)
+            restructureInstruction(child.statement)
         }
     }
 

@@ -1,12 +1,12 @@
-package refinment
+package restructure
 
 import ir.expression.*
 import ir.statement.*
 
-class WhileLoopRefiner : Refiner() {
+class WhileLoopRestructure : Restructure() {
 
-    override fun refineBlock(block: Block) {
-        super.refineBlock(block)
+    override fun restructureBlock(block: Block) {
+        super.restructureBlock(block)
         if (block is Loop) {
             refineLoop(block)
         }

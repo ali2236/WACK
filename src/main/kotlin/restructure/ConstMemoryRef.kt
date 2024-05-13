@@ -1,4 +1,4 @@
-package refinment
+package restructure
 
 import ir.ChildExpression
 import ir.Names
@@ -12,7 +12,7 @@ import ir.statement.Store
 
 
 // Shouldn't be used
-class ConstMemoryRef : Refiner() {
+class ConstMemoryRef : Restructure() {
 
     private val constRef = mutableMapOf<Value, Symbol>()
     private fun getConstRef(value: Value) : Symbol{
@@ -29,10 +29,10 @@ class ConstMemoryRef : Refiner() {
         return constRef[value]!!
     }
 
-    override fun refineInstruction(stmt: Statement) {
+    override fun restructureInstruction(stmt: Statement) {
         for (child in stmt.expressions()) {
             refineChildExpression(child)
-            refineInstruction(child.statement)
+            restructureInstruction(child.statement)
         }
 
         if (stmt is Store) {

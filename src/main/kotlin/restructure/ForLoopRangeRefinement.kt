@@ -1,4 +1,4 @@
-package refinment
+package restructure
 
 import ir.expression.BinaryOP
 import ir.expression.Increment
@@ -9,10 +9,10 @@ import ir.statement.Block
 import ir.statement.ForLoop
 import java.lang.Exception
 
-class ForLoopRangeRefinement : Refiner() {
+class ForLoopRangeRefinement : Restructure() {
 
-    override fun refineBlock(block: Block) {
-        super.refineBlock(block)
+    override fun restructureBlock(block: Block) {
+        super.restructureBlock(block)
         if (block is ForLoop) {
             try {
             refineForLoop(block)

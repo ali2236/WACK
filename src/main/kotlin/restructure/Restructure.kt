@@ -1,13 +1,12 @@
-package refinment
+package restructure
 
 import ir.statement.Block
-import ir.expression.Expression
 import ir.statement.Function
 import ir.statement.Program
 import ir.statement.Statement
 import java.util.*
 
-abstract class Refiner {
+abstract class Restructure {
     lateinit var currentProgram: Program
     lateinit var currentFunction: Function
     protected var blocks = Stack<Block>()
@@ -20,23 +19,23 @@ abstract class Refiner {
         val functions = program.statements.filterIsInstance<Function>()
         for (function in functions) {
             currentFunction = function
-            refineFunction(function)
+            restructureFunction(function)
         }
     }
 
-    open fun refineFunction(function: Function) {
+    open fun restructureFunction(function: Function) {
         blocks.push(function)
-        refineBlock(function)
+        restructureBlock(function)
         blocks.pop()
     }
 
-    open fun refineBlock(block: Block) {
+    open fun restructureBlock(block: Block) {
 
         // call every instruction
         for (i in 0 until block.instructions.size) {
             currentInstrIndex = i
             val stmt = block.instructions[i]
-            refineInstruction(stmt)
+            restructureInstruction(stmt)
         }
 
         // call every sub-block
@@ -47,12 +46,12 @@ abstract class Refiner {
 
         for ((i, subBlock) in subBlocks) {
             blocks.push(subBlock)
-            refineBlock(subBlock)
+            restructureBlock(subBlock)
             blocks.pop()
         }
     }
 
-    open fun refineInstruction(stmt: Statement) {}
+    open fun restructureInstruction(stmt: Statement) {}
     fun replaceCurrentBlock(block: Block) {
         block.parent = currentBlock.parent
         block.indexInParent = currentBlock.indexInParent

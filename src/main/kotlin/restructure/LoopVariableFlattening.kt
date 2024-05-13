@@ -1,4 +1,4 @@
-package refinment
+package restructure
 
 import ir.ChildExpression
 import ir.expression.Expression
@@ -6,7 +6,7 @@ import ir.expression.Symbol
 import ir.statement.*
 import java.util.Stack
 
-class LoopVariableFlattening : Refiner(){
+class LoopVariableFlattening : Restructure(){
     private val inserts = Stack<IndexedValue<Statement>>()
     private val symbolAssignment = mutableMapOf<Symbol, Expression>()
     private fun getSymbolAssignment(symbol: Symbol): Expression? {
@@ -21,7 +21,7 @@ class LoopVariableFlattening : Refiner(){
         return symbolAssignment.containsKey(symbol)
     }
 
-    override fun refineBlock(block: Block) {
+    override fun restructureBlock(block: Block) {
         // call every instruction in loop body
         if(block is ForLoop){
             refineForLoop(block)
@@ -39,7 +39,7 @@ class LoopVariableFlattening : Refiner(){
 
         for ((i, subBlock) in subBlocks) {
             blocks.push(subBlock)
-            refineBlock(subBlock)
+            restructureBlock(subBlock)
             blocks.pop()
         }
     }
@@ -49,11 +49,11 @@ class LoopVariableFlattening : Refiner(){
         for (i in 0 until loop.instructions.size) {
             currentInstrIndex = i
             val stmt = loop.instructions[i]
-            refineInstruction(stmt)
+            restructureInstruction(stmt)
         }
     }
 
-    override fun refineInstruction(stmt: Statement) {
+    override fun restructureInstruction(stmt: Statement) {
         if (stmt is Assignment) {
             val smbl = stmt.symbol
 
@@ -67,7 +67,7 @@ class LoopVariableFlattening : Refiner(){
 
         for (child in stmt.expressions()) {
             refineChildExpression(child)
-            refineInstruction(child.statement)
+            restructureInstruction(child.statement)
         }
     }
 
