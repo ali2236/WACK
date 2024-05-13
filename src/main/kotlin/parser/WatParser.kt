@@ -89,15 +89,21 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
         val function = WasmFunction(
             Index.next(module.functions),
             type = WasmFunctionType(Index(typeIndex), params, results),
-            locals = locals,
+            locals = (params + locals).toMutableList(),
             code = code
         )
 
         module.functions.add(function)
     }
 
-    override fun enterSglobal(ctx: WatParser.SglobalContext?) {
-        super.enterSglobal(ctx)
+    override fun enterSglobal(ctx: WatParser.SglobalContext) {
+        val typeCtx = ctx.global_fields().global_type()
+        val type = WasmValueType.parse(typeCtx.value_type().text)
+        val mutable = typeCtx.MUT() != null
+        val globalType = WasmGlobalType(type, mutable)
+        val instructions = ctx.global_fields().const_expr().instr_list().instr()
+        val global = WasmGlobal(globalType, WasmBuffer(instructions))
+        module.globals.add(global)
     }
 
 }

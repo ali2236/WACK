@@ -8,6 +8,7 @@ import wasm.Index
 import wasm.WasmFunction
 import wasm.WasmModule
 import wasm.WasmValueType
+import java.lang.Exception
 
 class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstBlock: Block) : WatParserBaseVisitor<Unit>() {
 
@@ -73,7 +74,8 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
                 //throw Error()
                 Placeholder("br_if $depth")
             }
-            stack.push(BrIf(ifCondition, ifBody, depth))
+            val brif = BrIf(ifCondition, ifBody, depth)
+            stack.push(brif)
         } else if (ctx.RETURN() != null) {
             // TODO: jump to outer most block
             stack.push(Placeholder("Return"))
@@ -166,6 +168,8 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
             val addr = stack.pop()
             val store = Store(type, data, addr, offset)
             stack.push(store)
+        } else {
+            throw Exception("No Case found for: " + ctx.text)
         }
         return super.visitPlain_instr(ctx)
     }

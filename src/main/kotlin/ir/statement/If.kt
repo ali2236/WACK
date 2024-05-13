@@ -4,16 +4,21 @@ import ir.ChildExpression
 import ir.expression.Expression
 import ir.expression.Symbol
 
-open class If(var condition: Expression, var elseBody: Statement? = null) : Block() {
-    val trueBody: Statement
-        get() = this
+open class If(
+    var condition: Expression,
+    trueBody: MutableList<Statement> = mutableListOf(),
+    var elseBody: Statement? = null,
+    brackets: Boolean = true
+) : Block(trueBody, brackets = brackets) {
+    open val trueBody: Statement
+        get() = this as Block
 
     override fun c(out: Appendable) {
         out.append("if(")
         condition.c(out)
         out.append(")")
         super.c(out)
-        if(elseBody != null){
+        if (elseBody != null) {
             out.append("else ")
             elseBody!!.c(out)
         }
@@ -25,7 +30,7 @@ open class If(var condition: Expression, var elseBody: Statement? = null) : Bloc
 
     override fun expressions(): List<ChildExpression> {
         return listOf(
-            ChildExpression(condition){condition = it}
+            ChildExpression(condition) { condition = it }
         )
     }
 }

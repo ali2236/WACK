@@ -8,5 +8,11 @@ class BrIf(
     val depth: Int,
 ) : If(
     condition,
-    trueBody
-)
+    mutableListOf(trueBody),
+    brackets = false,
+){
+
+    override val trueBody: Statement
+        get() = instructions.first()
+
+}

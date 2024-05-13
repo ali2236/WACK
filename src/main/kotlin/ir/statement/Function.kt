@@ -22,14 +22,14 @@ class Function(
             // declaration
             val paramCount = functionData.type.params.size
             val localCount = functionData.locals.size
-            for (i in 0 until localCount) {
+            for (i in paramCount until localCount) {
                 val localType = functionData.locals[i]
                 val symbol = Symbol(localType, Names.local + "${paramCount + i}")
                 val dec = Declaration(localType, symbol)
                 inst.add(dec)
             }
             // assignment
-            for (i in 0 until localCount) {
+            for (i in paramCount until localCount) {
                 val localType = functionData.locals[i]
                 val symbol = Symbol(localType, Names.local + "${paramCount + i}")
                 val value = Value(localType, localType.defaultValue())

@@ -3,20 +3,6 @@ package ir.expression
 import ir.ChildExpression
 
 class BinaryOP(var operator: Operator, var left: Expression,var right: Expression) : Expression() {
-    init {
-        // TODO: (Remove) put special cases in refinement
-        /*val isArrayIndexCalculation = operator.sign == "<<" && right is Value && right.value == "2"
-        this.operator = if (isArrayIndexCalculation) {
-            Operator.mul
-        } else {
-            operator
-        }
-        this.right = if (isArrayIndexCalculation) {
-            Value("4")
-        } else {
-            right
-        }*/
-    }
 
     override fun c(out: Appendable) {
         if (left is BinaryOP) out.append("(")
