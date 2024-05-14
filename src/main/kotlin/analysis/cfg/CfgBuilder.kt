@@ -28,12 +28,19 @@ class CfgBuilder(val function: Function) {
         for ((i, stmt) in instructions.withIndex()) {
             // elements that changes control flow: Block, If, Br, Br_if
             when (stmt) {
-                is Loop -> {
-                    pushBlock("loop", stmt.instructions, instructions.after(i, next))
-
+                is ConditionLoop -> {
+                    val loop = pushBlock(stmt.printHeader(), mutableListOf(), mutableListOf())
+                    val body = pushBlock(null, stmt.instructions, instructions.after(i, next))
+                    loop.successors.add(body.id)
+                    body.successors.add(loop.id)
+                    loop.successors.add(body.successors.first())
+                    body.successors.removeFirst()
                 }
+                /*is Loop -> {
+                    pushBlock(stmt.printHeader(), stmt.instructions, instructions.after(i, next))
+                }*/
                 is BrIf -> {
-                    val node = pushBlock("if(${stmt.condition})", mutableListOf(), instructions.after(i, next))
+                    val node = pushBlock(stmt.printHeader(), mutableListOf(), instructions.after(i, next))
                     node.successors.add(blocks[node.id - stmt.depth - 1].id)
                 }
 
@@ -43,7 +50,7 @@ class CfgBuilder(val function: Function) {
                 }
 
                 is Block -> {
-                    pushBlock(null, stmt.instructions, instructions.after(i, next))
+                    pushBlock(stmt.printHeader(), stmt.instructions, instructions.after(i, next))
                 }
 
                 else -> {

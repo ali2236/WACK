@@ -4,7 +4,7 @@ import ir.ChildExpression
 import ir.expression.Expression
 import ir.expression.Symbol
 
-open class ConditionLoop(var condition: Expression, instructions: MutableList<Statement>) : Block(instructions) {
+open class ConditionLoop(var condition: Expression, instructions: MutableList<Statement>) : Loop(instructions) {
 
     override fun symbols(): List<Symbol> {
         return condition.symbols() + super.symbols()
@@ -16,10 +16,9 @@ open class ConditionLoop(var condition: Expression, instructions: MutableList<St
         )
     }
 
-    override fun write(out: Appendable) {
+    override fun writeHeader(out: Appendable) {
         out.append("while(")
         condition.write(out)
         out.append(")")
-        super.write(out)
     }
 }

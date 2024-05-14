@@ -13,10 +13,12 @@ open class If(
     open val trueBody: Statement
         get() = this as Block
 
-    override fun write(out: Appendable) {
+    override fun writeHeader(out: Appendable) {
         out.append("if(")
         condition.write(out)
         out.append(")")
+    }
+    override fun write(out: Appendable) {
         super.write(out)
         if (elseBody != null) {
             out.append("else ")

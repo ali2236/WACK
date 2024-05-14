@@ -2,6 +2,7 @@ import analysis.cfg.CfgBuilder
 import ir.IRConstructor
 import ir.statement.Function
 import parser.Wat
+import restructure.RestructurePasses
 import restructure.ShiftToMultiply
 import java.io.File
 
@@ -16,13 +17,12 @@ fun main(args: Array<String>) {
     val program = ir.program()
 
     // restructure pass
-    ShiftToMultiply().run(program)
+    RestructurePasses.all(program)
 
     val cfg = CfgBuilder(program.statements.filterIsInstance<Function>()[functionIndex]).build()
 
-    //RefinerPasses.all(program)
 
-    // c
+    // ir
     val cOut = File("./out/c_$test.c")
     val cWriter = cOut.writer()
     program.write(cWriter)

@@ -60,7 +60,6 @@ class ConditionalLoopRestructure : Restructure() {
 
 
             // remove original condition from code
-            loop.instructions.removeAt(indexedCondition.index + 1)
             loop.instructions.removeAt(indexedCondition.index)
 
             // update loop condition

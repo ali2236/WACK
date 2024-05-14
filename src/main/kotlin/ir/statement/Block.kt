@@ -34,6 +34,15 @@ open class Block(
 
     }
 
+    fun printHeader() : String?{
+        val header = StringBuffer()
+        writeHeader(header)
+        if(header.isEmpty()){
+            return null
+        }
+        return header.toString()
+    }
+
     override fun write(out: Appendable) {
         val len = instructions.size
         writeHeader(out)

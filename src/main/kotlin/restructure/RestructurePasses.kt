@@ -11,7 +11,7 @@ object RestructurePasses {
             IncrementRestructure(),
             RangeLoopRestructure(),
             ShiftToMultiply(),
-            ForLoopRangeRefinement(),
+            RangeLoopRangeRefinement(),
             LoopVariableFlattening(),
         )
         passes.forEach { it.run(program) }

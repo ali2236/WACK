@@ -9,7 +9,7 @@ import ir.statement.Block
 import ir.statement.RangeLoop
 import java.lang.Exception
 
-class ForLoopRangeRefinement : Restructure() {
+class RangeLoopRangeRefinement : Restructure() {
 
     override fun restructureBlock(block: Block) {
         super.restructureBlock(block)
