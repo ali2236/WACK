@@ -10,9 +10,15 @@ class BrIf(
     condition,
     mutableListOf(Br(target, depth)),
     brackets = false,
-){
+) {
 
-    override val trueBody: Statement
+    override fun writeHeader(out: Appendable) {
+        out.append("if(")
+        condition.write(out)
+        out.append(") br $depth")
+    }
+
+    val onTrue: Statement
         get() = instructions.first()
 
 }

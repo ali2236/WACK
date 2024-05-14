@@ -1,6 +1,6 @@
 package ir.statement
 
-class Br(val target: Block, val depth: Int) : BasicStatement() {
+class Br(val target: Block, var depth: Int) : BasicStatement() {
     override fun write(out: Appendable) {
         if (target is Loop && depth == 0) {
             out.append("continue;\n")

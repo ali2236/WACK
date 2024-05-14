@@ -17,7 +17,7 @@ open class ConditionLoop(var condition: Expression, instructions: MutableList<St
     }
 
     override fun writeHeader(out: Appendable) {
-        out.append("while(")
+        out.append("condition-loop(")
         condition.write(out)
         out.append(")")
     }

@@ -30,9 +30,7 @@ open class Block(
         throw Error()
     }
 
-    open fun writeHeader(out: Appendable){
-
-    }
+    open fun writeHeader(out: Appendable){}
 
     fun printHeader() : String?{
         val header = StringBuffer()

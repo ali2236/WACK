@@ -1,5 +1,6 @@
 package analysis.cfg
 
+import ir.expression.Increment
 import ir.statement.*
 import ir.statement.Function
 import java.util.*
@@ -7,74 +8,167 @@ import java.util.*
 class CfgBuilder(val function: Function) {
 
     private var start = 0
-    private val blocks = Stack<CfgNode>()
+    private val blocks = Stack<CfgBlock>()
+    private val scope = Stack<CfgBlock>()
 
-    private val currentBlock: CfgNode
-        get() = blocks.peek()
+    private val previousBlock: CfgBlock
+        get() = blocks.elementAt(blocks.size - 2)
+    private val currentBlock: CfgBlock
+        get() = blocks.last()
+    private val currentScope: CfgBlock
+        get() = scope.last()
 
-    fun build() : CFG {
+    fun build(): CFG {
         val body = function.instructions
-        pushBlock(null, body, mutableListOf())
+        val function = makeBlock()
+        pushScope(function, null, null)
+        runOnBlock(function, body)
+        popScope()
         removeEmptyBlocks()
         return CFG(blocks)
     }
 
-    private fun pushBlock(name: String?, instructions: MutableList<Statement>, next: MutableList<Statement>): CfgNode {
-        val newBlock = CfgNode(blocks.size, name)
-        if(blocks.isNotEmpty()){
-            currentBlock.successors.add(newBlock.id)
+    private fun makeBlock(label: String? = null): CfgBlock {
+        val block = CfgBlock(blocks.size, label = label)
+        blocks.add(block)
+        return block
+    }
+
+    private fun pushScope(block: CfgBlock, br: CfgBlock?, next: CfgBlock?) {
+        block.next = next
+        block.br = br
+        scope.push(block)
+    }
+
+    private fun popScope() {
+        scope.pop()
+    }
+
+    private fun makeNext(i: Int, instructions: List<Statement>): CfgBlock {
+        val after = instructions.after(i)
+        if (after.isNotEmpty()) {
+            val next = makeBlock()
+            runOnBlock(next, after)
+            return next
+        } else if (currentScope.next != null) {
+            return currentScope.next!!
+        } else {
+            throw Error()
         }
-        blocks.add(newBlock)
+    }
+
+    private fun runOnBlock(
+        current: CfgBlock,
+        instructions: List<Statement>,
+    ) {
         for ((i, stmt) in instructions.withIndex()) {
-            // elements that changes control flow: Block, If, Br, Br_if
+            // elements that changes control flow: Block, If, Br, Br_if, Return
             when (stmt) {
-                is ConditionLoop -> {
-                    val loop = pushBlock(stmt.printHeader(), mutableListOf(), mutableListOf())
-                    val body = pushBlock(null, stmt.instructions, instructions.after(i, next))
-                    loop.successors.add(body.id)
-                    body.successors.add(loop.id)
-                    loop.successors.add(body.successors.first())
-                    body.successors.removeFirst()
+                is Unreachable -> {
+                    current.statements.add(stmt)
                 }
-                /*is Loop -> {
-                    pushBlock(stmt.printHeader(), stmt.instructions, instructions.after(i, next))
-                }*/
+
+                is Return -> {
+                    current.statements.add(stmt)
+                }
+
                 is BrIf -> {
-                    val node = pushBlock(stmt.printHeader(), mutableListOf(), instructions.after(i, next))
-                    node.successors.add(blocks[node.id - stmt.depth - 1].id)
+                    // next
+                    val next = makeNext(i, instructions)
+
+                    // body
+                    val block = makeBlock(stmt.printHeader())
+                    block.addSuccessor(scope[scope.size - stmt.depth - 1].br, "True")
+                    current.addSuccessor(block)
+
+                    // false
+                    block.addSuccessor(next, "False")
+                }
+
+                is If -> {
+                    // next
+                    val next = makeNext(i, instructions)
+
+                    val block = makeBlock(stmt.printHeader())
+                    pushScope(block, next, next)
+
+                    // true
+                    val trueBody = makeBlock()
+                    runOnBlock(trueBody, stmt.trueBody)
+                    block.addSuccessor(trueBody, "True")
+
+                    // false
+                    if (stmt.elseBody != null) {
+                        // TODO
+                        //val falseBody = makeScope()
+                        // remaining += runOnBlock(falseBody, stmt.elseBody!!)
+                        //block.addSuccessor(falseBody, "False")
+                        //popScope()
+                    } else {
+                        // go to next
+                        block.addSuccessor(next, "False")
+                    }
+                    popScope()
+                    current.addSuccessor(block)
                 }
 
                 is Br -> {
-                    val node = pushBlock("Br ${stmt.depth}", mutableListOf(), instructions.after(i, next))
-                    node.successors.add(blocks[node.id - stmt.depth - 1].id)
+                    currentBlock.statements.add(stmt)
+                    val target = scope[scope.size - stmt.depth - 1].br!!
+                    current.addSuccessor(target, "Jump")
+                }
+
+                is Loop -> {
+                    // next
+                    val next = makeNext(i, instructions)
+
+                    // loop
+                    val headBlock = makeBlock(stmt.printHeader())
+                    pushScope(headBlock, headBlock, next)
+                    current.addSuccessor(headBlock)
+
+                    // body
+                    val bodyBlock = makeBlock()
+                    runOnBlock(bodyBlock, stmt.instructions)
+                    headBlock.addSuccessor(bodyBlock)
+
+                    // end
+                    popScope()
                 }
 
                 is Block -> {
-                    pushBlock(stmt.printHeader(), stmt.instructions, instructions.after(i, next))
+                    // next
+                    val next = makeNext(i, instructions)
+
+                    // current
+                    val block = makeBlock()
+                    pushScope(block, next, next)
+                    runOnBlock(block, stmt.instructions)
+                    current.addSuccessor(block)
+
+                    // end
+                    popScope()
                 }
 
                 else -> {
-                    currentBlock.statements.add(stmt)
+                    current.statements.add(stmt)
+                    continue
                 }
             }
+            return
         }
-        if(next.isNotEmpty()){
-            pushBlock(null, next, mutableListOf())
-        }
-        return newBlock
     }
 
-    private fun removeEmptyBlocks(){
-        for (i in 0 until blocks.size){
+    private fun removeEmptyBlocks() {
+        for (i in 0 until blocks.size) {
             val block = blocks[i]
             val empty = block.statements.isEmpty()
-            val singleOut = block.successors.size <= 1
-            if(i == start && empty){
+            if (i == start && empty) {
                 start++
-            } else if(empty && singleOut){
-                for (otherBlock in blocks){
-                    if(otherBlock.successors.contains(i)){
-                        otherBlock.successors.remove(i)
+            } else if (!block.valid) {
+                for (otherBlock in blocks) {
+                    if (otherBlock.successors.map { it.target }.contains(i)) {
+                        otherBlock.successors.removeIf { it.target == i }
                         otherBlock.successors.addAll(block.successors)
                     }
                 }
@@ -84,8 +178,6 @@ class CfgBuilder(val function: Function) {
     }
 }
 
-private fun MutableList<Statement>.after(i: Int, leftOver: List<Statement>): MutableList<Statement> {
-    val next = this.subList(i + 1, this.size).toMutableList()
-    this.removeAll(next)
-    return (next + leftOver).toMutableList()
+private fun List<Statement>.after(i: Int): List<Statement> {
+    return this.subList(i + 1, this.size)
 }

@@ -7,8 +7,7 @@ import restructure.ShiftToMultiply
 import java.io.File
 
 fun main(args: Array<String>) {
-    val test = "seq"
-    val functionIndex = 2
+    val (test, functionIndex) = Pair("simple_loop", 1)
     val sample = "./samples/$test.wat"
 
     val parseTree = Wat.parse(sample)
@@ -23,10 +22,10 @@ fun main(args: Array<String>) {
 
 
     // ir
-    val cOut = File("./out/c_$test.c")
+    /*val cOut = File("./out/c_$test.c")
     val cWriter = cOut.writer()
     program.write(cWriter)
-    cWriter.close()
+    cWriter.close()*/
 
     // cfg
     val dotOut = File("./out/cfg_${test}_$functionIndex.dot")

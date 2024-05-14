@@ -13,46 +13,41 @@ class ConditionalLoopRestructure : Restructure() {
 
     private fun refineLoop(loop: Loop) {
         val conditions = loop.breakConditions()
-        if(conditions.isNotEmpty()){
+        if (conditions.isNotEmpty()) {
             doWhileConditionStyle(loop, conditions)
         } else {
-            //whileConditionStyle(loop)
+            whileConditionStyle(loop)
         }
     }
 
-/*    private fun whileConditionStyle(loop: Loop){
+    private fun whileConditionStyle(loop: Loop) {
         val f = loop.instructions.first()
-        val l = loop.instructions.last()
-        if(f is If && f.elseBody == null && f.instructions.last() is Br && l is *//*Break*//* Br){
-            // remove break
-            loop.instructions.removeLast()
-
-            // move condition to loop
-            loop.condition = f.condition
-
+        if (f is If && f.elseBody == null && f.instructions.last() is Br && (f.instructions.last() as Br).depth == 1) {
+            // make conditional loop
             // move true block to loop instructions
-            val instr = (f.trueBody as Block).instructions
-            loop.instructions.addAll(instr)
+            val conditionLoop = ConditionLoop(f.condition, f.instructions)
 
-            // remove last instructions (Br)
-            loop.instructions.removeLast()
+            // change last Br depth to 0
+            (conditionLoop.instructions.last() as Br).depth = 0
+
+            // remove if
+            conditionLoop.instructions.removeFirst()
 
             // move sub-block parent pointers to loop
-            loop.instructions.forEachIndexed { i, stmt ->
-                if(stmt is Block){
+            conditionLoop.instructions.forEachIndexed { i, stmt ->
+                if (stmt is Block) {
                     stmt.parent = loop
                     stmt.indexInParent = i
                 }
             }
 
-            // remove if
-            loop.instructions.removeFirst()
+            replaceCurrentBlock(conditionLoop)
         }
-    }*/
+    }
 
-    private fun doWhileConditionStyle(loop: Loop, conditions: List<IndexedValue<BrIf>>){
+    private fun doWhileConditionStyle(loop: Loop, conditions: List<IndexedValue<BrIf>>) {
         val continueConditions = conditions.filter {
-            it.value.trueBody is Br && (it.value.trueBody as Br).depth == 0
+            it.value.onTrue is Br && (it.value.onTrue as Br).depth == 0
         }
         if (continueConditions.size == 1) {
             val indexedCondition = continueConditions.last()
@@ -68,7 +63,7 @@ class ConditionalLoopRestructure : Restructure() {
 
             // update parent
             conditionLoop.instructions.forEach {
-                if(it is Block){
+                if (it is Block) {
                     it.parent = conditionLoop
                 }
             }

@@ -50,7 +50,7 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
                 newScope(Block())
                 super.visitInstr_list(ctx.instr_list())
                 val falseBody = exitScope()
-                ifMain.elseBody = falseBody
+                ifMain.elseBody = falseBody.instructions
             }
             stack.push(ifMain)
         }
@@ -70,8 +70,7 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
             val brif = BrIf(ifCondition, target, depth)
             stack.push(brif)
         } else if (ctx.RETURN() != null) {
-            // TODO: jump to outer most block
-            stack.push(Placeholder("Return"))
+            stack.push(Return())
         } else if (ctx.CONST() != null) {
             val type = WasmValueType.parse(ctx.CONST()!!.text.substring(0, 3))
             stack.push(Value(type, ctx.literal().text))

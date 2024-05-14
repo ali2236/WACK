@@ -1,11 +1,11 @@
 package ir
 
-import ir.statement.Block
+import ir.expression.Symbol
+import ir.expression.Value
+import ir.statement.*
 import ir.statement.Function
-import ir.statement.Program
-import ir.statement.Statement
-import org.antlr.v4.runtime.tree.ParseTree
 import wasm.Index
+import wasm.WasmFunction
 import wasm.WasmModule
 
 class IRConstructor(val module: WasmModule) {
@@ -18,7 +18,7 @@ class IRConstructor(val module: WasmModule) {
 
     fun function(index: Index): Statement {
         val function = module.functions.first { it.index == index }
-        val functionBlock = if (function.code != null) {
+        val functionBlock : List<Statement> = if (function.code != null) {
             val visitor = FunctionVisitor(
                 module,
                 function,
@@ -28,10 +28,34 @@ class IRConstructor(val module: WasmModule) {
                 )
             )
             visitor.visit(function.code)
-            visitor.stack
+            getFunctionInitSection(function) + visitor.stack.instructions
         } else {
-            Block(hasReturn = false, brackets = false)
+            listOf()
         }
-        return Function(function, functionBlock)
+        return Function(function, functionBlock.toMutableList())
+    }
+
+    private fun getFunctionInitSection(functionData: WasmFunction) : List<Statement>{
+        val inst = mutableListOf<Statement>()
+        // Local Variables
+        // declaration
+        val paramCount = functionData.type.params.size
+        val localCount = functionData.locals.size
+        for (i in paramCount until localCount) {
+            val localType = functionData.locals[i]
+            val symbol = Symbol(localType, Names.local + "${paramCount + i}")
+            val dec = Declaration(localType, symbol)
+            inst.add(dec)
+        }
+        // assignment
+        for (i in paramCount until localCount) {
+            val localType = functionData.locals[i]
+            val symbol = Symbol(localType, Names.local + "${paramCount + i}")
+            val value = Value(localType, localType.defaultValue())
+            val assignment = Assignment(symbol, value)
+            inst.add(assignment)
+        }
+
+        return inst
     }
 }

@@ -8,40 +8,17 @@ import wasm.WasmFunction
 
 class Function(
     val functionData: WasmFunction,
-    private val body: Block
-) : Block(
-    hasReturn = false,
-    brackets = false,
-) {
+    instructions: MutableList<Statement>
+) : Block(instructions, false, false) {
 
-    override val instructions: MutableList<Statement>
-        get() {
-            val inst = mutableListOf<Statement>()
-            // Local Variables
-            // declaration
-            val paramCount = functionData.type.params.size
-            val localCount = functionData.locals.size
-            for (i in paramCount until localCount) {
-                val localType = functionData.locals[i]
-                val symbol = Symbol(localType, Names.local + "${paramCount + i}")
-                val dec = Declaration(localType, symbol)
-                inst.add(dec)
+    init {
+        instructions.forEachIndexed { i, stmt ->
+            if(stmt is Block){
+                stmt.parent = this
+                stmt.indexInParent = i
             }
-            // assignment
-            for (i in paramCount until localCount) {
-                val localType = functionData.locals[i]
-                val symbol = Symbol(localType, Names.local + "${paramCount + i}")
-                val value = Value(localType, localType.defaultValue())
-                val assignment = Assignment(symbol, value)
-                inst.add(assignment)
-            }
-
-            body.parent = this
-            body.indexInParent = inst.size
-            inst.add(body)
-            return inst
         }
-
+    }
     override fun write(out: Appendable) {
 
         // Return Type
@@ -87,14 +64,6 @@ class Function(
 
         // Close
         out.append("}\n")
-    }
-
-    override fun symbols(): List<Symbol> {
-        return body.symbols()
-    }
-
-    override fun expressions(): List<ChildExpression> {
-        return body.expressions()
     }
 
 }
