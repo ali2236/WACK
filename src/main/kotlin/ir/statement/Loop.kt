@@ -1,37 +1,18 @@
 package ir.statement
 
-import ir.ChildExpression
-import ir.expression.Break
-import ir.expression.Expression
-import ir.expression.Symbol
-import ir.expression.Value
-import wasm.WasmValueType
-
-open class Loop(var condition: Expression = Value(WasmValueType.I32,"1")) : Block() {
+open class Loop : Block() {
 
     fun breakConditions(): List<IndexedValue<BrIf>> {
         return instructions.withIndex()
             .filter { it.value is BrIf }
             .filterIsInstance<IndexedValue<BrIf>>()
     }
-    override fun c(out: Appendable) {
-        out.append("while(")
-        condition.c(out)
-        out.append(")")
-        super.c(out)
-    }
-
-    override fun symbols(): List<Symbol> {
-        return condition.symbols() + super.symbols()
-    }
-
-    override fun expressions(): List<ChildExpression> {
-        return listOf(
-            ChildExpression(condition){condition = it}
-        )
+    override fun write(out: Appendable) {
+        out.append("loop ")
+        super.write(out)
     }
 
     override fun close() {
-        push(Break())
+//         push(End())
     }
 }

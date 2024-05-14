@@ -5,29 +5,29 @@ import ir.statement.*
 import wasm.WasmValueType
 import java.lang.Exception
 
-class ForLoopRestructure : Restructure() {
+class RangeLoopRestructure : Restructure() {
 
     override fun restructureBlock(block: Block) {
         super.restructureBlock(block)
-        if (block is Loop && block.condition !is Value && block.condition.symbols().isNotEmpty()) {
+        if (block is ConditionLoop && block.condition !is Value && block.condition.symbols().isNotEmpty()) {
             try {
-                transformIntoForLoop(block)
+                transformIntoRangeLoop(block)
             } catch (e : Exception){
 
             }
         }
     }
 
-    private fun transformIntoForLoop(loop: Loop) {
+    private fun transformIntoRangeLoop(loop: ConditionLoop) {
         val condition = loop.condition
         val symbol = condition.symbols().first()
-        val init = findForLoopInitInParent(symbol)
-        val step = findForLoopStep(loop, symbol)
-        val forLoop = ForLoop(init, condition, step, loop.instructions)
-        replaceCurrentBlock(forLoop)
+        val init = findRangeLoopInitInParent(symbol)
+        val step = findRangeLoopStep(loop, symbol)
+        val rangeLoop = RangeLoop(init, condition, step, loop.instructions)
+        replaceCurrentBlock(rangeLoop)
     }
 
-    private fun findForLoopInitInParent(symbol: Symbol): Statement {
+    private fun findRangeLoopInitInParent(symbol: Symbol): Statement {
         var current = currentBlock
         var parent = current.parent
         var blockIndex = current.indexInParent
@@ -49,7 +49,7 @@ class ForLoopRestructure : Restructure() {
         return Assignment(symbol, Value(WasmValueType.Unknown,"??"), inline = true)
     }
 
-    private fun findForLoopStep(loop: Loop, symbol: Symbol): Statement {
+    private fun findRangeLoopStep(loop: ConditionLoop, symbol: Symbol): Statement {
         val (i, step) = loop.instructions.withIndex()
             .filter { it.value is Increment }
             .last() as IndexedValue<Increment>

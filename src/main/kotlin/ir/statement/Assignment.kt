@@ -6,10 +6,10 @@ import ir.expression.Symbol
 
 
 open class Assignment(val symbol: Symbol, var value: Expression, var inline: Boolean = false) : Statement {
-    override fun c(out: Appendable) {
-        symbol.c(out)
+    override fun write(out: Appendable) {
+        symbol.write(out)
         out.append(" = ")
-        value.c(out)
+        value.write(out)
         if(!inline){
             out.append(";\n")
         }
@@ -27,7 +27,7 @@ open class Assignment(val symbol: Symbol, var value: Expression, var inline: Boo
 
     override fun toString(): String {
         val buffer = StringBuffer()
-        this.c(buffer)
+        this.write(buffer)
         return buffer.toString()
     }
 }

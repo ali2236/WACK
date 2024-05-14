@@ -7,7 +7,7 @@ open class Symbol(val type: WasmValueType, val symbol: String) : Expression() {
         return listOf(this)
     }
 
-    override fun c(out: Appendable) {
+    override fun write(out: Appendable) {
         out.append(symbol)
     }
 

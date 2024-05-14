@@ -61,20 +61,13 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
             stack.push(Unreachable())
         } else if (ctx.BR() != null) {
             val depth = ctx.var_().first().text.toInt()
-            stack.push(Br(depth))
+            val target = blocks[blocks.size - depth - 1]
+            stack.push(Br(target, depth))
         } else if (ctx.BR_IF() != null) {
             val depth = ctx.var_().first().text.toInt()
             val ifCondition = stack.pop()
             val target = blocks[blocks.size - depth - 1]
-            val ifBody = if (target is Loop && depth == 0) {
-                Continue()
-            } else if (target is Block && depth == 0) {
-                Break()
-            } else {
-                //throw Error()
-                Placeholder("br_if $depth")
-            }
-            val brif = BrIf(ifCondition, ifBody, depth)
+            val brif = BrIf(ifCondition, target, depth)
             stack.push(brif)
         } else if (ctx.RETURN() != null) {
             // TODO: jump to outer most block
@@ -88,7 +81,8 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
             val (paramsTypes, resultTypes) = calledFunction.type.getParamsAndResults(module)
             val params = paramsTypes.map { stack.pop() }
             val hasReturn = resultTypes.isNotEmpty()
-            stack.push(FunctionCall("f${functionIndex}", params, hasReturn))
+            val name = if(functionIndex < module.functions.size) module.functions[functionIndex].prettyName else "f${functionIndex}"
+            stack.push(FunctionCall(name, params, hasReturn))
         } else if (ctx.LOCAL_GET() != null) {
             val index = ctx.var_().first().text.toInt()
             val type = function.locals[index]

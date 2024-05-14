@@ -5,10 +5,10 @@ import ir.expression.Symbol
 import wasm.WasmValueType
 
 class Declaration(val type : WasmValueType, val symbol: Symbol) : Statement {
-    override fun c(out: Appendable) {
+    override fun write(out: Appendable) {
         out.append(type.cType())
         out.append(' ')
-        symbol.c(out)
+        symbol.write(out)
         out.append(";\n")
     }
 

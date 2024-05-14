@@ -14,17 +14,17 @@ class Store(
     val load: Load
         get() = Load(type, address, offset)
 
-    override fun c(out: Appendable) {
+    override fun write(out: Appendable) {
         out.append(Names.memory)
         //out.append("_$type")
         out.append("[")
         if (offset != 0) {
-            BinaryOP(Operator.add, address, Value(WasmValueType.I32, offset.toString())).c(out)
+            BinaryOP(Operator.add, address, Value(WasmValueType.I32, offset.toString())).write(out)
         } else {
-            address.c(out)
+            address.write(out)
         }
         out.append("] = ")
-        data.c(out)
+        data.write(out)
         out.append(";\n")
     }
 

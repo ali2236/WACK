@@ -1,10 +1,13 @@
 package ir.statement
 
-import ir.ChildExpression
-import ir.expression.Symbol
-
-class Br(val depth: Int) : BasicStatement() {
-    override fun c(out: Appendable) {
-        Comment("Br $depth").c(out)
+class Br(val target: Block, val depth: Int) : BasicStatement() {
+    override fun write(out: Appendable) {
+        if (target is Loop && depth == 0) {
+            out.append("continue;\n")
+        } else if (target is Block && depth == 0) {
+            out.append("break;\n")
+        } else {
+            out.append("Br $depth")
+        }
     }
 }

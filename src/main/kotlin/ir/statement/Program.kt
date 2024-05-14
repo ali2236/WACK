@@ -4,9 +4,9 @@ import ir.ChildExpression
 import ir.expression.Symbol
 
 class Program(val statements: List<Statement>) : Statement {
-    override fun c(out: Appendable) {
+    override fun write(out: Appendable) {
         for (statement in statements) {
-            statement.c(out)
+            statement.write(out)
             out.append('\n')
         }
     }

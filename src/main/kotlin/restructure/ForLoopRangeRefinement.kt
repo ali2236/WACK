@@ -6,14 +6,14 @@ import ir.expression.Operator
 import ir.expression.Value
 import ir.statement.Assignment
 import ir.statement.Block
-import ir.statement.ForLoop
+import ir.statement.RangeLoop
 import java.lang.Exception
 
 class ForLoopRangeRefinement : Restructure() {
 
     override fun restructureBlock(block: Block) {
         super.restructureBlock(block)
-        if (block is ForLoop) {
+        if (block is RangeLoop) {
             try {
             refineForLoop(block)
             } catch (e: NotRangeLoopException){
@@ -22,7 +22,7 @@ class ForLoopRangeRefinement : Restructure() {
         }
     }
 
-    private fun refineForLoop(loop: ForLoop) {
+    private fun refineForLoop(loop: RangeLoop) {
         // pattern: <symbol>=<start>;<symbol><cond><end>;<step>
 
         // is it already a range loop

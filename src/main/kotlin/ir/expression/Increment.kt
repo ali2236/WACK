@@ -5,8 +5,8 @@ import wasm.WasmValueType
 
 class Increment(symbol: Symbol, operator: Operator = Operator.add) :
     Assignment(symbol, BinaryOP(operator, symbol, Value(WasmValueType.I32,"1"))) {
-    override fun c(out: Appendable) {
-        symbol.c(out)
+    override fun write(out: Appendable) {
+        symbol.write(out)
         val op = when ((value as BinaryOP).operator) {
             Operator.add -> "++"
             Operator.sub -> "--"

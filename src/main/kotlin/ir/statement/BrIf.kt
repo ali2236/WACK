@@ -4,11 +4,11 @@ import ir.expression.Expression
 
 class BrIf(
     condition: Expression,
-    trueBody: Statement,
+    val target: Block,
     val depth: Int,
 ) : If(
     condition,
-    mutableListOf(trueBody),
+    mutableListOf(Br(target, depth)),
     brackets = false,
 ){
 

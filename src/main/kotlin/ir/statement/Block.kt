@@ -30,18 +30,23 @@ open class Block(
         throw Error()
     }
 
-    override fun c(out: Appendable) {
+    open fun writeHeader(out: Appendable){
+
+    }
+
+    override fun write(out: Appendable) {
         val len = instructions.size
+        writeHeader(out)
         if (brackets) out.append("{\n")
         for (i in 0 until len) {
             val expr = instructions[i]
             if(i == len - 1 && hasReturn){
                 out.append("return ")
-                expr.c(out)
+                expr.write(out)
                 out.append(";\n")
                 continue
             }
-            expr.c(out)
+            expr.write(out)
         }
         if (brackets) out.append("}\n")
     }

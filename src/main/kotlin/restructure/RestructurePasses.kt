@@ -2,14 +2,14 @@ package restructure
 
 import ir.statement.Program
 
-object RefinerPasses {
+object RestructurePasses {
 
     fun all(program: Program) {
         val passes = listOf(
-            WhileLoopRestructure(),
+            ConditionalLoopRestructure(),
             LoopMemoryCounterAlias(),
             IncrementRestructure(),
-            ForLoopRestructure(),
+            RangeLoopRestructure(),
             ShiftToMultiply(),
             ForLoopRangeRefinement(),
             LoopVariableFlattening(),

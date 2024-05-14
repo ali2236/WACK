@@ -21,7 +21,7 @@ class LoopMemoryCounterAlias : Restructure() {
 
     override fun restructureBlock(block: Block) {
         // call every instruction in loop body
-        if (block is Loop) {
+        if (block is ConditionLoop) {
             refineLoop(block)
             memRef.forEach{ (load, symbol) ->
                 // pre
@@ -51,7 +51,7 @@ class LoopMemoryCounterAlias : Restructure() {
         }
     }
 
-    private fun refineLoop(loop: Loop) {
+    private fun refineLoop(loop: ConditionLoop) {
         restructureInstruction(loop.condition)
         // call every instruction
         for (i in 0 until loop.instructions.size) {

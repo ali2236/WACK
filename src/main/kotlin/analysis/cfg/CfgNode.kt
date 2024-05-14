@@ -1,19 +1,17 @@
 package analysis.cfg
 
-import ir.expression.Expression
 import ir.statement.Statement
 
 class CfgNode(
-    val name: String,
-    val statements: List<Statement>,
-    val successors: List<CfgNode>,
-) {
-    companion object {
-        fun from(stmt: Statement){
-            // TODO: put [changesControlFlow] on [Statement] Class
-            if(stmt is Expression){
+    val id : Int,
+    val label: String?,
+    val statements: MutableList<Statement> = mutableListOf(),
+    val successors: MutableList<Int> = mutableListOf(),
+){
+    val valid : Boolean
+        get() = statements.isNotEmpty() || successors.size > 1
 
-            }
-        }
+    override fun toString(): String {
+        return label ?: "$id"
     }
 }

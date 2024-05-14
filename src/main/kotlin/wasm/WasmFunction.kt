@@ -10,4 +10,15 @@ data class WasmFunction(
     val import: WasmImport? = null,
     val exportName: String? = null,
     val code: ParseTree? = null,
-)
+) {
+    val prettyName: String
+        get() {
+            if(import != null){
+                return import.name.replace("\"","")
+            } else if(exportName != null){
+                return exportName.replace("\"","")
+            } else {
+                return "f${index.number}"
+            }
+        }
+}

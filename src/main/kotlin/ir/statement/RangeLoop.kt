@@ -4,16 +4,16 @@ import ir.ChildExpression
 import ir.expression.Expression
 import ir.expression.Symbol
 
-class ForLoop(val init: Statement, var condition: Expression, val step: Statement, instructions : MutableList<Statement>) : Block(instructions) {
-    override fun c(out: Appendable) {
-        out.append("for(")
-        init.c(out)
+class RangeLoop(val init: Statement, condition: Expression, val step: Statement, instructions: MutableList<Statement>) : ConditionLoop(condition, instructions) {
+    override fun write(out: Appendable) {
+        out.append("range loop(")
+        init.write(out)
         out.append(';')
-        condition.c(out)
+        condition.write(out)
         out.append(';')
-        step.c(out)
+        step.write(out)
         out.append(')')
-        super.c(out)
+        super.write(out)
     }
 
     override fun symbols(): List<Symbol> {

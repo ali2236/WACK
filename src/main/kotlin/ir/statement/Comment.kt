@@ -4,7 +4,7 @@ import ir.ChildExpression
 import ir.expression.Symbol
 
 class Comment(val text: String) : BasicStatement() {
-    override fun c(out: Appendable) {
+    override fun write(out: Appendable) {
         out.append("/* $text */\n")
     }
 

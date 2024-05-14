@@ -3,7 +3,7 @@ package ir.expression
 import wasm.WasmValueType
 
 open class Value(val type: WasmValueType, val value: String) : Expression() {
-    override fun c(out: Appendable) {
+    override fun write(out: Appendable) {
         out.append(value)
     }
 

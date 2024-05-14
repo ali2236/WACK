@@ -4,15 +4,15 @@ import ir.ChildExpression
 
 class BinaryOP(var operator: Operator, var left: Expression,var right: Expression) : Expression() {
 
-    override fun c(out: Appendable) {
+    override fun write(out: Appendable) {
         if (left is BinaryOP) out.append("(")
-        left.c(out)
+        left.write(out)
         if (left is BinaryOP) out.append(")")
 
         out.append(operator.sign)
 
         if (right is BinaryOP) out.append("(")
-        right.c(out)
+        right.write(out)
         if (right is BinaryOP) out.append(")")
     }
 

@@ -2,7 +2,6 @@ package ir.statement
 
 import ir.ChildExpression
 import ir.Names
-import ir.expression.Expression
 import ir.expression.Symbol
 import ir.expression.Value
 import wasm.WasmFunction
@@ -43,7 +42,7 @@ class Function(
             return inst
         }
 
-    override fun c(out: Appendable) {
+    override fun write(out: Appendable) {
 
         // Return Type
         val results = functionData.type.result
@@ -83,7 +82,7 @@ class Function(
 
 
         } else {
-            super.c(out)
+            super.write(out)
         }
 
         // Close

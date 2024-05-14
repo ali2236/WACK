@@ -23,7 +23,7 @@ class LoopVariableFlattening : Restructure(){
 
     override fun restructureBlock(block: Block) {
         // call every instruction in loop body
-        if(block is ForLoop){
+        if(block is RangeLoop){
             refineForLoop(block)
             while (inserts.isNotEmpty()){
                 val (index, expression) = inserts.pop()
@@ -44,7 +44,7 @@ class LoopVariableFlattening : Restructure(){
         }
     }
 
-    private fun refineForLoop(loop: ForLoop){
+    private fun refineForLoop(loop: RangeLoop){
         // call every instruction
         for (i in 0 until loop.instructions.size) {
             currentInstrIndex = i
