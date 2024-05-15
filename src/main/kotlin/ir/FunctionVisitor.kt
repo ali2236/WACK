@@ -116,14 +116,16 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
             val symbol = Symbol( type,Names.global + index)
             stack.push(Assignment(symbol, stack.pop()))
         } else if (ctx.TEST() != null) {
-            val operatorName = ctx.TEST()!!.text.substring(4)
+            val (typeString, operatorName) = ctx.TEST()!!.text.split(".")
+            val type = WasmValueType.parse(typeString)
             val expr = when (operatorName) {
-                "eqz" -> BinaryOP(Operator.eq, stack.pop(), Value(WasmValueType.I32,"0"))
+                "eqz" -> BinaryOP(type, Operator.eq, stack.pop(), Value(WasmValueType.I32,"0"))
                 else -> throw Error()
             }
             stack.push(expr)
         } else if (ctx.COMPARE() != null) {
-            val operatorName = ctx.COMPARE()!!.text.substring(4)
+            val (typeString, operatorName) = ctx.TEST()!!.text.split(".")
+            val type = WasmValueType.parse(typeString)
             val operatorSign = when (operatorName) {
                 "eq" -> Operator.eq
                 "ne" -> Operator.neq
@@ -135,9 +137,10 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
             }
             val second = stack.pop()
             val first = stack.pop()
-            stack.push(BinaryOP(operatorSign, first, second))
+            stack.push(BinaryOP(type, operatorSign, first, second))
         } else if (ctx.BINARY() != null) {
-            val operatorName = ctx.BINARY()!!.text.substring(4)
+            val (typeString, operatorName) = ctx.TEST()!!.text.split(".")
+            val type = WasmValueType.parse(typeString)
             val operatorSign = when (operatorName) {
                 "add" -> Operator.add
                 "sub" -> Operator.sub
@@ -147,7 +150,7 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
             }
             val second = stack.pop()
             val first = stack.pop()
-            stack.push(BinaryOP(operatorSign, first, second))
+            stack.push(BinaryOP(type, operatorSign, first, second))
         } else if (ctx.LOAD() != null) {
             val type = WasmValueType.parse(ctx.LOAD()!!.text.substring(0, 3))
             val offset = ctx.OFFSET_EQ_NAT()?.text?.toIntOrNull() ?: 0

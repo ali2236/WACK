@@ -1,5 +1,6 @@
 package analysis.cfg
 
+import ir.expression.FunctionCall
 import ir.expression.Increment
 import ir.statement.*
 import ir.statement.Function
@@ -62,13 +63,9 @@ class CfgBuilder(val function: Function) {
         instructions: List<Statement>,
     ) {
         for ((i, stmt) in instructions.withIndex()) {
-            // elements that changes control flow: Block, If, Br, Br_if, Return
             when (stmt) {
-                is Unreachable -> {
-                    current.statements.add(stmt)
-                }
-
-                is Return -> {
+                // TODO: is switch
+                is Return, is Unreachable, is FunctionCall /*TODO: indirect call*/ -> {
                     current.statements.add(stmt)
                 }
 

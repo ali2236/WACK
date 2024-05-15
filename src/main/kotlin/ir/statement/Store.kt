@@ -19,7 +19,7 @@ class Store(
         //out.append("_$type")
         out.append("[")
         if (offset != 0) {
-            BinaryOP(Operator.add, address, Value(WasmValueType.I32, offset.toString())).write(out)
+            BinaryOP(type, Operator.add, address, Value(WasmValueType.I32, offset.toString())).write(out)
         } else {
             address.write(out)
         }

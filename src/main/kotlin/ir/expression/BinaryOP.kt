@@ -1,8 +1,9 @@
 package ir.expression
 
 import ir.ChildExpression
+import wasm.WasmValueType
 
-class BinaryOP(var operator: Operator, var left: Expression,var right: Expression) : Expression() {
+class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expression, var right: Expression) : Expression() {
 
     override fun write(out: Appendable) {
         if (left is BinaryOP) out.append("(")
@@ -21,11 +22,6 @@ class BinaryOP(var operator: Operator, var left: Expression,var right: Expressio
             ChildExpression(left){ this.left = it },
             ChildExpression(right){ this.right = it }
         )
-    }
-
-    fun invert(): Expression {
-        val invertedOperator = Operator(operator.invertSign, operator.sign)
-        return BinaryOP(invertedOperator, left, right)
     }
 
     override fun symbols(): List<Symbol> {
