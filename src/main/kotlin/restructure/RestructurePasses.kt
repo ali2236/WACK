@@ -10,7 +10,7 @@ object RestructurePasses {
             LoopMemoryCounterAlias(),
             IncrementRestructure(),
             //RangeLoopRestructure(),
-            ShiftToMultiply(),
+            // ShiftToMultiply(),
             //RangeLoopRangeRefinement(),
             // LoopVariableFlattening(),
         )

@@ -3,8 +3,8 @@ import ir.IRConstructor
 import ir.statement.Function
 import parser.Wat
 import restructure.RestructurePasses
-import restructure.ShiftToMultiply
 import java.io.File
+import java.lang.Appendable
 
 fun main(args: Array<String>) {
     val (test, functionIndex) = Pair("simple_loop", 1)

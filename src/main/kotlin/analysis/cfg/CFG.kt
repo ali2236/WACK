@@ -3,6 +3,7 @@ package analysis.cfg
 class CFG(val nodes : List<CfgBlock>) {
 
     fun dot(out: Appendable){
+        val dot = DotSanitizer(out)
         out.append("strict digraph {\n")
 
         // nodes
@@ -21,11 +22,11 @@ class CFG(val nodes : List<CfgBlock>) {
 
             // label & statement
             cfgNode.label?.let {
-                out.append(it.replace("<","&lt;").replace(">", "&gt;"))
+                dot.append(it)
                 out.append("<BR ALIGN=\"LEFT\"/>")
             }
             cfgNode.statements.forEach {
-                it.write(out)
+                it.write(dot)
                 out.append("<BR ALIGN=\"LEFT\"/>")
             }
 
@@ -48,3 +49,30 @@ class CFG(val nodes : List<CfgBlock>) {
     }
 
 }
+
+class DotSanitizer(private val appendable: java.lang.Appendable) : java.lang.Appendable {
+
+    override fun append(csq: CharSequence): java.lang.Appendable {
+        return appendable.append(
+            csq.replace(Regex("<"), "&lt;")
+                .replace(Regex(">"), "&gt;")
+        )
+    }
+
+    override fun append(csq: CharSequence, start: Int, end: Int): java.lang.Appendable {
+        return appendable.append(
+            csq.replace(Regex("<"), "&lt;")
+                .replace(Regex(">"), "&gt;"), start, end
+        )
+    }
+
+    override fun append(c: Char): java.lang.Appendable {
+        return when (c) {
+            '<' -> appendable.append("&lt;")
+            '>' -> appendable.append("&gt;")
+            else -> appendable.append(c)
+        }
+    }
+
+}
+

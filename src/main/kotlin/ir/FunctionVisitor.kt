@@ -124,7 +124,7 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
             }
             stack.push(expr)
         } else if (ctx.COMPARE() != null) {
-            val (typeString, operatorName) = ctx.TEST()!!.text.split(".")
+            val (typeString, operatorName) = ctx.COMPARE()!!.text.split(".")
             val type = WasmValueType.parse(typeString)
             val operatorSign = when (operatorName) {
                 "eq" -> Operator.eq
@@ -139,7 +139,7 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
             val first = stack.pop()
             stack.push(BinaryOP(type, operatorSign, first, second))
         } else if (ctx.BINARY() != null) {
-            val (typeString, operatorName) = ctx.TEST()!!.text.split(".")
+            val (typeString, operatorName) = ctx.BINARY()!!.text.split(".")
             val type = WasmValueType.parse(typeString)
             val operatorSign = when (operatorName) {
                 "add" -> Operator.add
