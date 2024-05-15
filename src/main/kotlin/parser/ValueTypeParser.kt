@@ -1,6 +1,5 @@
 package parser
 
-import dev.aligator.parser.WatParser
 import wasm.WasmValueType
 
 fun <E : WatParser.Value_typeContext> List<E>.toValueTypes(): MutableList<WasmValueType> {

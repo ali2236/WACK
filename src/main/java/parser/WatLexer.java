@@ -1,5 +1,5 @@
 // Generated from C:/Users/Aligator/Projects/WACK/src/main/java/dev/aligator/parser/WatLexer.g4 by ANTLR 4.13.1
-package dev.aligator.parser;
+package parser;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

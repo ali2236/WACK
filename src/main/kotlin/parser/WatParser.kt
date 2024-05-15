@@ -1,10 +1,7 @@
 package parser
 
-import dev.aligator.parser.WatLexer
-import dev.aligator.parser.WatParser
-import dev.aligator.parser.WatParser.SimportContext
-import dev.aligator.parser.WatParser.Type_defContext
-import dev.aligator.parser.WatParserBaseListener
+import parser.WatParser.SimportContext
+import parser.WatParser.Type_defContext
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree

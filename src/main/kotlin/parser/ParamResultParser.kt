@@ -1,6 +1,5 @@
 package parser
 
-import dev.aligator.parser.WatParser
 import wasm.WasmValueType
 
 data class WasmParamResult(val params: MutableList<WasmValueType>, val results: MutableList<WasmValueType>)

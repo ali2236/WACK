@@ -1,7 +1,7 @@
 package ir
 
-import dev.aligator.parser.WatParser
-import dev.aligator.parser.WatParserBaseVisitor
+import parser.WatParser
+import parser.WatParserBaseVisitor
 import ir.expression.*
 import ir.statement.*
 import wasm.Index

@@ -1,13 +1,10 @@
 // Generated from C:/Users/Aligator/Projects/WACK/src/main/java/dev/aligator/parser/WatParser.g4 by ANTLR 4.13.1
-package dev.aligator.parser;
+package parser;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.runtime.tree.*;
 import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
 public class WatParser extends Parser {
