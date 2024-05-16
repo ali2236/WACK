@@ -1,6 +1,7 @@
 package ir.expression
 
 import ir.ChildExpression
+import ir.finder.Visitor
 import wasm.WasmValueType
 
 class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expression, var right: Expression) : Expression() {
@@ -24,8 +25,9 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
         )
     }
 
-    override fun symbols(): List<Symbol> {
-        return left.symbols() + right.symbols()
+    override fun visit(v: Visitor) {
+        v.visit(left)
+        v.visit(right)
     }
 }
 

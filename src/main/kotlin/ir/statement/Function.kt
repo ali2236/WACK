@@ -1,9 +1,5 @@
 package ir.statement
 
-import ir.ChildExpression
-import ir.Names
-import ir.expression.Symbol
-import ir.expression.Value
 import wasm.WasmFunction
 
 class Function(

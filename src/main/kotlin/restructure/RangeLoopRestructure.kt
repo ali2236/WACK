@@ -1,6 +1,8 @@
 package restructure
 
 import ir.expression.*
+import ir.finder.ExpressionFinder
+import ir.finder.Finders
 import ir.statement.*
 import wasm.WasmValueType
 import java.lang.Exception
@@ -9,7 +11,7 @@ class RangeLoopRestructure : Restructure() {
 
     override fun restructureBlock(block: Block) {
         super.restructureBlock(block)
-        if (block is ConditionLoop && block.condition !is Value && block.condition.symbols().isNotEmpty()) {
+        if (block is ConditionLoop && block.condition !is Value && Finders.symbols(block.condition).isNotEmpty()) {
             try {
                 transformIntoRangeLoop(block)
             } catch (e : Exception){
@@ -20,7 +22,7 @@ class RangeLoopRestructure : Restructure() {
 
     private fun transformIntoRangeLoop(loop: ConditionLoop) {
         val condition = loop.condition
-        val symbol = condition.symbols().first()
+        val symbol = Finders.symbols(condition).first()
         val init = findRangeLoopInitInParent(symbol)
         val step = findRangeLoopStep(loop, symbol)
         val rangeLoop = RangeLoop(init, condition, step, loop.instructions)

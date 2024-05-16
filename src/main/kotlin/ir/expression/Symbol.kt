@@ -3,10 +3,6 @@ package ir.expression
 import wasm.WasmValueType
 
 open class Symbol(val type: WasmValueType, val symbol: String) : Expression() {
-    override fun symbols(): List<Symbol> {
-        return listOf(this)
-    }
-
     override fun write(out: Appendable) {
         out.append(symbol)
     }

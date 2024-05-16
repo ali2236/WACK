@@ -2,6 +2,7 @@ package ir.statement
 
 import ir.ChildExpression
 import ir.expression.Symbol
+import ir.finder.Visitor
 import wasm.WasmValueType
 
 class Declaration(val type : WasmValueType, val symbol: Symbol) : Statement {
@@ -12,11 +13,11 @@ class Declaration(val type : WasmValueType, val symbol: Symbol) : Statement {
         out.append(";\n")
     }
 
-    override fun symbols(): List<Symbol> {
-        return symbol.symbols()
-    }
-
     override fun expressions(): List<ChildExpression> {
         return listOf()
+    }
+
+    override fun visit(v: Visitor) {
+        v.visit(symbol)
     }
 }

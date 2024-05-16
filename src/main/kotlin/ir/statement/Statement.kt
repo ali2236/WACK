@@ -2,11 +2,10 @@ package ir.statement
 
 import ir.ChildExpression
 import ir.expression.Symbol
+import ir.finder.Visitable
 
-interface Statement {
+interface Statement : Visitable {
     fun write(out: Appendable)
-
-    fun symbols(): List<Symbol>
 
     fun expressions(): List<ChildExpression>
 

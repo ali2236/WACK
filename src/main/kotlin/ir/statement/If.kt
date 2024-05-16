@@ -3,6 +3,7 @@ package ir.statement
 import ir.ChildExpression
 import ir.expression.Expression
 import ir.expression.Symbol
+import ir.finder.Visitor
 
 open class If(
     var condition: Expression,
@@ -30,14 +31,16 @@ open class If(
         }
     }
 
-    override fun symbols(): List<Symbol> {
-        return condition.symbols() + super.symbols() + elseBody.orEmpty().map { it.symbols() }.reduce { a, b -> a + b }
-    }
-
     override fun expressions(): List<ChildExpression> {
         return listOf(
             ChildExpression(condition) { condition = it }
         )
+    }
+
+    override fun visit(v: Visitor) {
+        v.visit(condition)
+        super.visit(v)
+        elseBody.orEmpty().forEach(v::visit)
     }
 }
 

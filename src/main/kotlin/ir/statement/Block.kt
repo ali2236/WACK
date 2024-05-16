@@ -3,6 +3,7 @@ package ir.statement
 import ir.ChildExpression
 import ir.expression.Expression
 import ir.expression.Symbol
+import ir.finder.Visitor
 
 open class Block(
     open val instructions: MutableList<Statement> = mutableListOf(),
@@ -60,11 +61,11 @@ open class Block(
 
     open fun close() {}
 
-    override fun symbols(): List<Symbol> {
-        return instructions.map { it.symbols() }.reduce { a, b -> a + b }
-    }
-
     override fun expressions(): List<ChildExpression> {
         return listOf()
+    }
+
+    override fun visit(v: Visitor) {
+        instructions.forEach(v::visit)
     }
 }

@@ -1,7 +1,6 @@
 package analysis.cfg
 
 import ir.expression.FunctionCall
-import ir.expression.Increment
 import ir.statement.*
 import ir.statement.Function
 import java.util.*

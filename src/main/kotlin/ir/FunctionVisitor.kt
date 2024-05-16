@@ -3,6 +3,8 @@ package ir
 import parser.WatParser
 import parser.WatParserBaseVisitor
 import ir.expression.*
+import ir.finder.ExpressionFinder
+import ir.finder.Finders
 import ir.statement.*
 import wasm.Index
 import wasm.WasmFunction
@@ -98,7 +100,7 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
             val type = function.locals[index]
             val symbol = Symbol(type, Names.local + index)
             val value = stack.pop()
-            val dependant = value.symbols().any { it == symbol }
+            val dependant = Finders.symbols(value).any { it == symbol }
             stack.push(Assignment(symbol, value))
             if (dependant) {
                 stack.push(symbol)

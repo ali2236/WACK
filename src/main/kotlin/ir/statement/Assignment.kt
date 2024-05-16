@@ -3,6 +3,7 @@ package ir.statement
 import ir.ChildExpression
 import ir.expression.Expression
 import ir.expression.Symbol
+import ir.finder.Visitor
 
 
 open class Assignment(val symbol: Symbol, var value: Expression, var inline: Boolean = false) : Statement {
@@ -15,14 +16,15 @@ open class Assignment(val symbol: Symbol, var value: Expression, var inline: Boo
         }
     }
 
-    override fun symbols(): List<Symbol> {
-        return symbol.symbols() + value.symbols()
-    }
-
     override fun expressions(): List<ChildExpression> {
         return listOf(
             ChildExpression(value){value = it}
         )
+    }
+
+    override fun visit(v: Visitor) {
+        v.visit(symbol)
+        v.visit(value)
     }
 
     override fun toString(): String {

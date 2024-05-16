@@ -2,6 +2,7 @@ package ir.expression
 
 import ir.ChildExpression
 import ir.Names
+import ir.finder.Visitor
 import wasm.WasmValueType
 
 class Load(val type: WasmValueType, var address: Expression, val offset: Int = 0) : Expression() {
@@ -21,6 +22,10 @@ class Load(val type: WasmValueType, var address: Expression, val offset: Int = 0
         return listOf(
             ChildExpression(address){address = it}
         )
+    }
+
+    override fun visit(v: Visitor) {
+        v.visit(address)
     }
 
     override fun equals(other: Any?): Boolean {

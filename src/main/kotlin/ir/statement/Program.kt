@@ -2,6 +2,7 @@ package ir.statement
 
 import ir.ChildExpression
 import ir.expression.Symbol
+import ir.finder.Visitor
 
 class Program(val statements: List<Statement>) : Statement {
     override fun write(out: Appendable) {
@@ -11,11 +12,11 @@ class Program(val statements: List<Statement>) : Statement {
         }
     }
 
-    override fun symbols(): List<Symbol> {
-        return statements.map { it.symbols() }.reduce { a, b -> a + b }
-    }
-
     override fun expressions(): List<ChildExpression> {
         return listOf()
+    }
+
+    override fun visit(v: Visitor) {
+        statements.forEach(v::visit)
     }
 }

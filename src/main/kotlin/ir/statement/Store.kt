@@ -3,6 +3,7 @@ package ir.statement
 import ir.ChildExpression
 import ir.Names
 import ir.expression.*
+import ir.finder.Visitor
 import wasm.WasmValueType
 
 class Store(
@@ -28,15 +29,17 @@ class Store(
         out.append(";\n")
     }
 
-    override fun symbols(): List<Symbol> {
-        return address.symbols() + data.symbols()
-    }
 
     override fun expressions(): List<ChildExpression> {
         return listOf(
             ChildExpression(data){data = it},
             ChildExpression(address){address = it}
         )
+    }
+
+    override fun visit(v: Visitor) {
+        v.visit(address)
+        v.visit(data)
     }
 
 }
