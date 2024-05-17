@@ -1,12 +1,11 @@
 package ir.statement
 
-import ir.ChildExpression
 import ir.expression.Expression
 import ir.expression.Symbol
 import ir.finder.Visitor
 
 
-open class Assignment(val symbol: Symbol, var value: Expression, var inline: Boolean = false) : Statement {
+open class Assignment(var symbol: Symbol, var value: Expression, var inline: Boolean = false) : Statement {
     override fun write(out: Appendable) {
         symbol.write(out)
         out.append(" = ")
@@ -16,15 +15,9 @@ open class Assignment(val symbol: Symbol, var value: Expression, var inline: Boo
         }
     }
 
-    override fun expressions(): List<ChildExpression> {
-        return listOf(
-            ChildExpression(value){value = it}
-        )
-    }
-
     override fun visit(v: Visitor) {
-        v.visit(symbol)
-        v.visit(value)
+        v.visit(symbol){symbol = it as Symbol}
+        v.visit(value){value = it as Expression}
     }
 
     override fun toString(): String {

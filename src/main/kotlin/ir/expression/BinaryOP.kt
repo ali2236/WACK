@@ -1,6 +1,5 @@
 package ir.expression
 
-import ir.ChildExpression
 import ir.finder.Visitor
 import wasm.WasmValueType
 
@@ -18,16 +17,9 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
         if (right is BinaryOP) out.append(")")
     }
 
-    override fun expressions(): List<ChildExpression> {
-        return listOf(
-            ChildExpression(left){ this.left = it },
-            ChildExpression(right){ this.right = it }
-        )
-    }
-
     override fun visit(v: Visitor) {
-        v.visit(left)
-        v.visit(right)
+        v.visit(left){ this.left = it as Expression}
+        v.visit(right){ this.right = it  as Expression}
     }
 }
 

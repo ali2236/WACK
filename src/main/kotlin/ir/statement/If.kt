@@ -1,14 +1,12 @@
 package ir.statement
 
-import ir.ChildExpression
 import ir.expression.Expression
-import ir.expression.Symbol
 import ir.finder.Visitor
 
 open class If(
     var condition: Expression,
     trueBody: MutableList<Statement> = mutableListOf(),
-    var elseBody: List<Statement>? = null,
+    var elseBody: MutableList<Statement>? = null,
     brackets: Boolean = true
 ) : Block(trueBody, brackets = brackets) {
     open val trueBody: List<Statement>
@@ -31,16 +29,12 @@ open class If(
         }
     }
 
-    override fun expressions(): List<ChildExpression> {
-        return listOf(
-            ChildExpression(condition) { condition = it }
-        )
-    }
-
     override fun visit(v: Visitor) {
-        v.visit(condition)
+        v.visit(condition){ condition = it as Expression}
         super.visit(v)
-        elseBody.orEmpty().forEach(v::visit)
+        if(elseBody != null){
+            v.visit(elseBody!!, elseBody!!::set)
+        }
     }
 }
 

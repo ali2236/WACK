@@ -1,7 +1,8 @@
 package restructure
 
-import ir.ChildExpression
+import ir.finder.Replaceable
 import ir.expression.*
+import ir.finder.Finders
 import ir.statement.Statement
 import wasm.WasmValueType
 import kotlin.math.pow
@@ -9,13 +10,13 @@ import kotlin.math.pow
 class ShiftToMultiply : Restructure() {
 
     override fun restructureInstruction(stmt: Statement) {
-        for (child in stmt.expressions()) {
+        for (child in Finders.expressions(stmt)) {
             refineChildExpression(child)
             restructureInstruction(child.statement)
         }
     }
 
-    private fun refineChildExpression(expr: ChildExpression) {
+    private fun refineChildExpression(expr: Replaceable<Expression>) {
         if (expr.statement is BinaryOP) {
             val binOp = expr.statement
             if (binOp.operator == Operator.shl && binOp.right is Value) {

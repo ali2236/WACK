@@ -1,11 +1,9 @@
 package restructure
 
-import ir.ChildExpression
 import ir.Names
-import ir.expression.ConstLoad
-import ir.expression.Load
-import ir.expression.Symbol
-import ir.expression.Value
+import ir.expression.*
+import ir.finder.Finders
+import ir.finder.Replaceable
 import ir.statement.Assignment
 import ir.statement.Statement
 import ir.statement.Store
@@ -30,7 +28,7 @@ class ConstMemoryRef : Restructure() {
     }
 
     override fun restructureInstruction(stmt: Statement) {
-        for (child in stmt.expressions()) {
+        for (child in Finders.expressions(stmt)) {
             refineChildExpression(child)
             restructureInstruction(child.statement)
         }
@@ -45,7 +43,7 @@ class ConstMemoryRef : Restructure() {
         }
     }
 
-    private fun refineChildExpression(expr: ChildExpression){
+    private fun refineChildExpression(expr: Replaceable<Expression>){
         if(expr.statement is Load){
             val load = expr.statement
             if(load.address is Value){

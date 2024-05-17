@@ -1,8 +1,9 @@
 package restructure
 
-import ir.ChildExpression
+import ir.finder.Replaceable
 import ir.Names
 import ir.expression.*
+import ir.finder.Finders
 import ir.statement.*
 
 class LoopMemoryCounterAlias : Restructure() {
@@ -62,7 +63,7 @@ class LoopMemoryCounterAlias : Restructure() {
     }
 
     override fun restructureInstruction(stmt: Statement) {
-        for (child in stmt.expressions()) {
+        for (child in Finders.expressions(stmt)) {
             refineChildExpression(child)
             restructureInstruction(child.statement)
         }
@@ -72,7 +73,7 @@ class LoopMemoryCounterAlias : Restructure() {
         }
     }
 
-    private fun refineChildExpression(expr: ChildExpression) {
+    private fun refineChildExpression(expr: Replaceable<Expression>) {
         if (expr.statement is Load && expr.statement.address is Symbol) {
             val load = expr.statement
             val smbl = getMemRef(load)

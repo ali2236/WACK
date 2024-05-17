@@ -1,11 +1,10 @@
 package ir.statement
 
-import ir.ChildExpression
 import ir.expression.Expression
-import ir.expression.Symbol
 import ir.finder.Visitor
 
-class RangeLoop(val init: Statement, condition: Expression, val step: Statement, instructions: MutableList<Statement>) : ConditionLoop(condition, instructions) {
+class RangeLoop(var init: Statement, condition: Expression, var step: Statement, instructions: MutableList<Statement>) :
+    ConditionLoop(condition, instructions) {
 
     override fun writeHeader(out: Appendable) {
         out.append("range-loop(")
@@ -17,15 +16,9 @@ class RangeLoop(val init: Statement, condition: Expression, val step: Statement,
         out.append(')')
     }
 
-    override fun expressions(): List<ChildExpression> {
-        return listOf(
-            ChildExpression(condition){condition = it}
-        ) + init.expressions() + step.expressions()
-    }
-
     override fun visit(v: Visitor) {
-        v.visit(init)
-        v.visit(step)
+        v.visit(init) { this.init = it }
+        v.visit(step) { this.step = it }
         super.visit(v)
     }
 }

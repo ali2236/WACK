@@ -1,8 +1,9 @@
 package restructure
 
-import ir.ChildExpression
+import ir.finder.Replaceable
 import ir.expression.Expression
 import ir.expression.Symbol
+import ir.finder.Finders
 import ir.statement.*
 import java.util.Stack
 
@@ -65,13 +66,13 @@ class LoopVariableFlattening : Restructure(){
             replaceCurrentInstruction(Nop())
         }
 
-        for (child in stmt.expressions()) {
+        for (child in Finders.expressions(stmt)) {
             refineChildExpression(child)
             restructureInstruction(child.statement)
         }
     }
 
-    private fun refineChildExpression(expr: ChildExpression) {
+    private fun refineChildExpression(expr: Replaceable<Expression>) {
         if (expr.statement is Symbol){
             val replacement = getSymbolAssignment(expr.statement)
             if(replacement != null){

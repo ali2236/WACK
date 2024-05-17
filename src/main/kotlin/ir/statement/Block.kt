@@ -1,8 +1,6 @@
 package ir.statement
 
-import ir.ChildExpression
 import ir.expression.Expression
-import ir.expression.Symbol
 import ir.finder.Visitor
 
 open class Block(
@@ -61,11 +59,8 @@ open class Block(
 
     open fun close() {}
 
-    override fun expressions(): List<ChildExpression> {
-        return listOf()
-    }
 
     override fun visit(v: Visitor) {
-        instructions.forEach(v::visit)
+        v.visit(instructions, instructions::set)
     }
 }

@@ -1,10 +1,15 @@
 package ir.finder
 
+import ir.statement.Statement
+
 abstract class Visitor {
 
-    open fun visit(v: Visitable) : Visitor{
+    fun visit(vs: Iterable<Statement>, replace: ((Int, Statement) -> Unit)?) {
+        vs.forEachIndexed { i, stmt -> visit(stmt) { replace?.let { it(i,stmt) } } }
+    }
+
+    open fun visit(v: Statement, replace: ((Statement) -> Unit)?) {
         v.visit(this)
-        return this
     }
 }
 

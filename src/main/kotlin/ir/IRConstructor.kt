@@ -11,9 +11,7 @@ import wasm.WasmModule
 class IRConstructor(val module: WasmModule) {
 
     fun program(): Program {
-        return Program(
-            module.functions.map { function(it.index) }
-        )
+        return Program(module, module.functions.map { function(it.index) }.toMutableList())
     }
 
     fun function(index: Index): Statement {

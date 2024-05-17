@@ -1,10 +1,9 @@
 package ir.statement
 
-import ir.ChildExpression
-import ir.expression.Symbol
 import ir.finder.Visitor
+import wasm.WasmModule
 
-class Program(val statements: List<Statement>) : Statement {
+class Program(val module: WasmModule, val statements: MutableList<Statement>) : Statement {
     override fun write(out: Appendable) {
         for (statement in statements) {
             statement.write(out)
@@ -12,11 +11,7 @@ class Program(val statements: List<Statement>) : Statement {
         }
     }
 
-    override fun expressions(): List<ChildExpression> {
-        return listOf()
-    }
-
     override fun visit(v: Visitor) {
-        statements.forEach(v::visit)
+        v.visit(statements, statements::set)
     }
 }

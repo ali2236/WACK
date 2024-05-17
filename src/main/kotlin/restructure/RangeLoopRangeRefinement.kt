@@ -40,8 +40,8 @@ class RangeLoopRangeRefinement : Restructure() {
 
         // loop direction
         val direction: LoopStepDirection
-        if (loop.step is Increment && loop.step.value is BinaryOP) {
-            val binOp = loop.step.value as BinaryOP
+        if (loop.step is Increment && (loop.step as Increment).value is BinaryOP) {
+            val binOp = (loop.step as Increment).value as BinaryOP
             direction = when (binOp.operator) {
                 Operator.add -> LoopStepDirection.Up
                 Operator.sub -> LoopStepDirection.Down
@@ -53,8 +53,8 @@ class RangeLoopRangeRefinement : Restructure() {
 
         // where does the loop start
         var from: Int = 0
-        if (loop.init is Assignment && loop.init.value is Value) {
-            val v = loop.init.value as Value
+        if (loop.init is Assignment && (loop.init as Assignment).value is Value) {
+            val v = (loop.init as Assignment).value as Value
             from = v.value.toInt()
         } else {
             throw NotRangeLoopException("No Const Init")

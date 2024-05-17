@@ -1,6 +1,5 @@
 package ir.statement
 
-import ir.ChildExpression
 import ir.Names
 import ir.expression.*
 import ir.finder.Visitor
@@ -29,17 +28,9 @@ class Store(
         out.append(";\n")
     }
 
-
-    override fun expressions(): List<ChildExpression> {
-        return listOf(
-            ChildExpression(data){data = it},
-            ChildExpression(address){address = it}
-        )
-    }
-
     override fun visit(v: Visitor) {
-        v.visit(address)
-        v.visit(data)
+        v.visit(address){address = it as Expression}
+        v.visit(data){data = it as Expression}
     }
 
 }
