@@ -41,7 +41,7 @@ data class Operator(val sign: String, val watName: String, var signed: BitSign? 
 
     companion object {
         val eq = Operator("==", "eq")
-        val neq = Operator("!=", "neq")
+        val neq = Operator("!=", "ne")
         val lt = Operator("<", "lt")
         val le = Operator("<=", "le")
         val gt = Operator(">", "gt")

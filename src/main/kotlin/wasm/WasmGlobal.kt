@@ -2,10 +2,15 @@ package wasm
 
 import generation.WatWriter
 import generation.WebAssemblyInstruction
+import ir.statement.Statement
 
-data class WasmGlobal(val index: Index, val type: WasmGlobalType, val buffer: WasmBuffer) : WebAssemblyInstruction {
+data class WasmGlobal(val index: Index, val type: WasmGlobalType, val constExpr: MutableList<Statement>) : WebAssemblyInstruction {
     override fun wat(wat: WatWriter) {
-        wat.writeLine("(global (;$index;) ($type) ($buffer))")
+        wat.writeLine("(global (;$index;) ($type) (")
+        wat.indent++
+        constExpr.map { it.wat(wat) }
+        wat.indent--
+        wat.writeLine("))")
     }
 
 }

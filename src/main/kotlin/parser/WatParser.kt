@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.ParseTreeWalker
+import parser.visitor.WatVisitor
 import wasm.*
 import java.io.File
 
@@ -98,8 +99,9 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
         val type = WasmValueType.parse(typeCtx.value_type().text)
         val mutable = typeCtx.MUT() != null
         val globalType = WasmGlobalType(type, mutable)
-        val instructions = ctx.global_fields().const_expr().instr_list().instr()
-        val global = WasmGlobal(Index.next(module.globals), globalType, WasmBuffer(instructions))
+        val expr = ctx.global_fields().const_expr()
+        val instructions = WatVisitor(module).visitArbitrary(expr).toMutableList()
+        val global = WasmGlobal(Index.next(module.globals), globalType, instructions)
         module.globals.add(global)
     }
 

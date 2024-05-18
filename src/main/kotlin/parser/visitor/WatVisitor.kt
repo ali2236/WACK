@@ -1,18 +1,19 @@
-package ir
+package parser.visitor
 
-import parser.WatParser
-import parser.WatParserBaseVisitor
 import ir.expression.*
-import ir.finder.ExpressionFinder
 import ir.finder.Finders
 import ir.statement.*
+import ir.statement.Function
+import org.antlr.v4.runtime.tree.ParseTree
+import parser.WatParser
+import parser.WatParserBaseVisitor
 import wasm.*
 import java.lang.Exception
 
-class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstBlock: Block) :
-    WatParserBaseVisitor<Unit>() {
+class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
 
-    private val blocks = mutableListOf(firstBlock)
+    private var function: WasmFunction? = null
+    private val blocks = mutableListOf<Block>()
 
     private val currentBlock: Block
         get() = blocks.last()
@@ -28,6 +29,29 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
         val block = blocks.removeLast()
         return block
     }
+
+    fun visitFunction(function: WasmFunction) : List<Statement>{
+        this.function = function
+        blocks.add(Block(
+            hasReturn = function.type.result.isNotEmpty(),
+            brackets = false
+        ))
+        visit(function.code)
+        this.function = null
+        val result = stack.instructions
+        blocks.clear()
+        return result
+    }
+
+    fun visitArbitrary(tree: ParseTree): List<Statement> {
+        blocks.add(Block())
+        visit(tree)
+        val result = stack.instructions
+        blocks.clear()
+        return result
+    }
+
+
 
     override fun visitBlock_instr(ctx: WatParser.Block_instrContext) {
         if (ctx.LOOP() != null) {
@@ -82,18 +106,18 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
             stack.push(FunctionCall(functionIndex, params, hasReturn))
         } else if (ctx.LOCAL_GET() != null) {
             val index = ctx.var_().first().text.toInt()
-            val type = function.locals[index]
+            val type = function!!.locals[index]
             val symbol = Symbol(WasmScope.local, type, Index(index))
             stack.push(symbol)
         } else if (ctx.LOCAL_SET() != null) {
             val index = ctx.var_().first().text.toInt()
-            val type = function.locals[index]
+            val type = function!!.locals[index]
             val symbol = Symbol(WasmScope.local, type, Index(index))
             val value = stack.pop()
             stack.push(Assignment(symbol, value))
         } else if (ctx.LOCAL_TEE() != null) {
             val index = ctx.var_().first().text.toInt()
-            val type = function.locals[index]
+            val type = function!!.locals[index]
             val symbol = Symbol(WasmScope.local, type, Index(index))
             val value = stack.pop()
             val dependant = Finders.symbols(value).any { it == symbol }

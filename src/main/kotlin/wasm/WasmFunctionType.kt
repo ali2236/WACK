@@ -23,7 +23,7 @@ data class WasmFunctionType(
     }
 
     fun resultWat() : String {
-        return  if(result.isNotEmpty()) " (result ${params.joinToString(" ")})" else ""
+        return  if(result.isNotEmpty()) " (result ${result.joinToString(" ")})" else ""
     }
 
     override fun wat(wat: WatWriter) {
