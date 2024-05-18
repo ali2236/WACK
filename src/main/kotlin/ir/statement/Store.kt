@@ -10,7 +10,8 @@ class Store(
     val type: WasmValueType,
     var data: Expression,
     var address: Expression,
-    val offset: Int = 0
+    val offset: Int = 0,
+    val align: Int = 0,
 ) : Statement {
     val load: Load
         get() = Load(type, address, offset)
@@ -38,7 +39,8 @@ class Store(
         address.wat(wat)
         data.wat(wat)
         val ofst = if(offset!=0)" offset=$offset" else ""
-        wat.writeLine("${type}.store$ofst")
+        val algn = if(align!=0)" align=$align" else ""
+        wat.writeLine("${type}.store${ofst}${algn}")
     }
 
 }

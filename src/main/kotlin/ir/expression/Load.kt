@@ -5,7 +5,12 @@ import ir.Names
 import ir.finder.Visitor
 import wasm.WasmValueType
 
-class Load(val type: WasmValueType, var address: Expression, val offset: Int = 0) : Expression() {
+class Load(
+    val type: WasmValueType,
+    var address: Expression,
+    val offset: Int = 0,
+    val align: Int = 0,
+) : Expression() {
     override fun write(out: Appendable) {
         out.append(Names.memory)
         //out.append("_${type}")
@@ -43,7 +48,8 @@ class Load(val type: WasmValueType, var address: Expression, val offset: Int = 0
     override fun wat(wat: WatWriter) {
         address.wat(wat)
         val ofst = if(offset!=0)" offset=$offset" else ""
-        wat.writeLine("${type}.load${ofst}")
+        val algn = if(align!=0)" align=$align" else ""
+        wat.writeLine("${type}.load${ofst}${algn}")
     }
 
 
