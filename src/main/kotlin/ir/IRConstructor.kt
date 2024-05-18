@@ -4,7 +4,7 @@ import ir.expression.Symbol
 import ir.expression.Value
 import ir.statement.*
 import ir.statement.Function
-import parser.visitor.WatVisitor
+import parser.WatVisitor
 import wasm.Index
 import wasm.WasmFunction
 import wasm.WasmModule

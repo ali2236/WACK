@@ -6,7 +6,6 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.ParseTreeWalker
-import parser.visitor.WatVisitor
 import wasm.*
 import java.io.File
 
@@ -125,6 +124,10 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
         val index = Index(desc.var_().text.toInt())
         val export = WasmExport(name, kind, index)
         module.exports.add(export)
+    }
+
+    override fun enterElem(ctx: WatParser.ElemContext?) {
+        // TODO: Fix Element Grammar
     }
 
 }

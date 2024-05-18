@@ -36,6 +36,7 @@ class Store(
 
     override fun wat(wat: WatWriter) {
         address.wat(wat)
+        data.wat(wat)
         val ofst = if(offset!=0)" offset=$offset" else ""
         wat.writeLine("${type}.store$ofst")
     }

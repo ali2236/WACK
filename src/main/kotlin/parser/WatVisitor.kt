@@ -1,12 +1,9 @@
-package parser.visitor
+package parser
 
 import ir.expression.*
 import ir.finder.Finders
 import ir.statement.*
-import ir.statement.Function
 import org.antlr.v4.runtime.tree.ParseTree
-import parser.WatParser
-import parser.WatParserBaseVisitor
 import wasm.*
 import java.lang.Exception
 
@@ -121,11 +118,11 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val symbol = Symbol(WasmScope.local, type, Index(index))
             val value = stack.pop()
             val dependant = Finders.symbols(value).any { it == symbol }
-            stack.push(Assignment(symbol, value))
+            stack.push(Assignment(symbol, value, tee = true))
             if (dependant) {
-                stack.push(symbol)
+                stack.push(TeeValue(symbol))
             } else {
-                stack.push(value)
+                stack.push(TeeValue(value))
             }
         } else if (ctx.GLOBAL_GET() != null) {
             val index = ctx.var_().first().text.toInt()
