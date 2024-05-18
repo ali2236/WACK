@@ -174,13 +174,13 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             stack.push(BinaryOP(type, operatorSign, first, second))
         } else if (ctx.LOAD() != null) {
             val type = WasmValueType.parse(ctx.LOAD()!!.text.substring(0, 3))
-            val offset = ctx.OFFSET_EQ_NAT()?.text?.toIntOrNull() ?: 0
+            val offset = ctx.OFFSET_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val addr = stack.pop()
             val load = Load(type, addr, offset)
             stack.push(load)
         } else if (ctx.STORE() != null) {
             val type = WasmValueType.parse(ctx.STORE()!!.text.substring(0, 3))
-            val offset = ctx.OFFSET_EQ_NAT()?.text?.toIntOrNull() ?: 0
+            val offset = ctx.OFFSET_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val data = stack.pop()
             val addr = stack.pop()
             val store = Store(type, data, addr, offset)
