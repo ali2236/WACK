@@ -61,7 +61,9 @@ open class Block(
 
 
     override fun visit(v: Visitor) {
-        v.visit(instructions, instructions::set)
+        v.visit(instructions){i , stmt ->
+            instructions[i] = stmt
+        }
     }
 
     override fun watHeader(wat: WatWriter) {

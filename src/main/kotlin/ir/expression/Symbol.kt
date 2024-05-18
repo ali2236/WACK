@@ -14,4 +14,22 @@ open class Symbol(val scope: WasmScope, val type: WasmValueType, val index : Ind
         wat.writeLine("${scope.name}.get $index")
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Symbol) return false
+
+        if (scope != other.scope) return false
+        if (type != other.type) return false
+        if (index != other.index) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = scope.hashCode()
+        result = 31 * result + type.hashCode()
+        result = 31 * result + index.hashCode()
+        return result
+    }
+
 }

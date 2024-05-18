@@ -9,7 +9,7 @@ import java.io.File
 import java.lang.Appendable
 
 fun main(args: Array<String>) {
-    val (test, functionIndex) = Pair("scalar", 1)// Pair("simple_loop", 1)
+    val (test, functionIndex) = Pair("seq", 1)// Pair("simple_loop", 1)
     val sample = "./samples/$test.wat"
 
     val parseTree = Wat.parse(sample)
@@ -26,17 +26,15 @@ fun main(args: Array<String>) {
     OptimizationPasses.apply(program)
 
     // code generation
-
-
-    //val cfg = CfgBuilder(program.statements.filterIsInstance<Function>()[functionIndex]).build()
-
-    // wat
     val watOut = File("./out/wat_$test.wat")
     val outWriter = watOut.writer()
     val watWriter = WatWriter(outWriter)
     program.wat(watWriter)
     outWriter.flush()
     outWriter.close()
+
+    //val cfg = CfgBuilder(program.statements.filterIsInstance<Function>()[functionIndex]).build()
+
 
     // ir
     /*val cOut = File("./out/c_$test.c")
