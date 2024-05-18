@@ -42,7 +42,8 @@ class Load(val type: WasmValueType, var address: Expression, val offset: Int = 0
 
     override fun wat(wat: WatWriter) {
         address.wat(wat)
-        wat.writeLine("${type}.load offset=$offset")
+        val ofst = if(offset!=0)" offset=$offset" else ""
+        wat.writeLine("${type}.load${ofst}")
     }
 
 

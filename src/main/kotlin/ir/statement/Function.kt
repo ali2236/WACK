@@ -66,16 +66,26 @@ class Function(
     }
 
     override fun watHeader(wat: WatWriter) {
-        wat.writeLine("(func ;${functionData.index}; (type ${functionData.type})${functionData.type.paramsWat()}${functionData.type.resultWat()}")
-        wat.writeLine("${Names.indent}(local ${functionData.locals.joinToString(" ") { it.name }})")
+        val funcStart =
+            "(func (;${functionData.index};) (type ${functionData.type.index})${functionData.type.paramsWat()}${functionData.type.resultWat()}"
+        if (functionData.import == null) {
+            wat.writeLine(funcStart)
+            wat.writeLine("${Names.indent}(local ${functionData.locals.joinToString(" ") { it.name }})")
+        } else {
+            // imported
+            val import = functionData.import
+            wat.writeLine("(import ${import.module} ${import.name} $funcStart))")
+        }
     }
 
     override fun wat(wat: WatWriter) {
         watHeader(wat)
-        wat.indent++
-        wat.writeAll(instructions)
-        wat.writeLine(")")
-        wat.indent--
+        if(functionData.import == null) {
+            wat.indent++
+            wat.writeAll(instructions)
+            wat.writeLine(")")
+            wat.indent--
+        }
     }
 
 }

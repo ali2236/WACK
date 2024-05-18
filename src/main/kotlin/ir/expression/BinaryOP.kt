@@ -21,9 +21,14 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
     }
 
     override fun wat(wat: WatWriter) {
-        left.wat(wat)
-        right.wat(wat)
-        wat.writeLine("${type}.${operator}")
+        if (right is Value && (right as Value).value == "0" && operator == Operator.eq) {
+            left.wat(wat)
+            wat.writeLine("${(right as Value).type}.eqz")
+        } else {
+            left.wat(wat)
+            right.wat(wat)
+            wat.writeLine("${type}.${operator.wat()}")
+        }
     }
 
     override fun visit(v: Visitor) {
@@ -32,13 +37,13 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
     }
 }
 
-data class Operator(val sign: String, val watName : String) {
+data class Operator(val sign: String, val watName: String, var signed: BitSign? = null) {
 
     companion object {
         val eq = Operator("==", "eq")
         val neq = Operator("!=", "neq")
         val lt = Operator("<", "lt")
-        val le = Operator("<=","le")
+        val le = Operator("<=", "le")
         val gt = Operator(">", "gt")
         val ge = Operator(">=", "ge")
         val add = Operator("+", "add")
@@ -50,4 +55,16 @@ data class Operator(val sign: String, val watName : String) {
         val and = Operator("&", "and")
         val or = Operator("|", "or")
     }
+
+    fun wat(): String {
+        if (signed != null) {
+            return "${watName}_$signed"
+        } else {
+            return watName
+        }
+    }
+}
+
+enum class BitSign {
+    s, u
 }

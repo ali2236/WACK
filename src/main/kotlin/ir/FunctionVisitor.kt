@@ -133,9 +133,11 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
                 "ge", "ge_s", "ge_u" -> Operator.ge
                 else -> throw Error()
             }
+            val signed = if (operatorName.length > 2) BitSign.valueOf(operatorName.last().toString()) else null
+            val operator = Operator(operatorSign.sign, operatorSign.watName, signed)
             val second = stack.pop()
             val first = stack.pop()
-            stack.push(BinaryOP(type, operatorSign, first, second))
+            stack.push(BinaryOP(type, operator, first, second))
         } else if (ctx.BINARY() != null) {
             val (typeString, operatorName) = ctx.BINARY()!!.text.split(".")
             val type = WasmValueType.parse(typeString)

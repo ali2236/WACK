@@ -24,7 +24,7 @@ object Wat {
         return parser.module()
     }
 
-    fun module(parseTree: ParseTree) : WasmModule {
+    fun module(parseTree: ParseTree): WasmModule {
         val module = WasmModule()
         ParseTreeWalker.DEFAULT.walk(WasmModuleRecorder(module), parseTree)
         return module
@@ -101,6 +101,28 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
         val instructions = ctx.global_fields().const_expr().instr_list().instr()
         val global = WasmGlobal(Index.next(module.globals), globalType, WasmBuffer(instructions))
         module.globals.add(global)
+    }
+
+    override fun enterMemory(ctx: WatParser.MemoryContext) {
+        val range = ctx.memory_fields().memory_type().NAT()
+        val min = range.first().text.toInt()
+        val max = if (range.size > 1) range.last().text.toInt() else null
+        val shared = false
+        val memory = WasmMemory(Index.next(module.memories), min, max, shared)
+        module.memories.add(memory)
+    }
+
+    override fun enterExport_(ctx: WatParser.Export_Context) {
+        val name = ctx.name().text
+        val desc = ctx.export_desc()
+        val kind = if (desc.FUNC() != null) WasmExportKind.func
+        else if (desc.TABLE() != null) WasmExportKind.table
+        else if (desc.MEMORY() != null) WasmExportKind.memory
+        else if (desc.GLOBAL() != null) WasmExportKind.global
+        else throw Error()
+        val index = Index(desc.var_().text.toInt())
+        val export = WasmExport(name, kind, index)
+        module.exports.add(export)
     }
 
 }

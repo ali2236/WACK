@@ -1,4 +1,5 @@
 import analysis.cfg.CfgBuilder
+import generation.WatWriter
 import ir.IRConstructor
 import ir.statement.Function
 import optimization.OptimizationPasses
@@ -27,8 +28,15 @@ fun main(args: Array<String>) {
     // code generation
 
 
-    val cfg = CfgBuilder(program.statements.filterIsInstance<Function>()[functionIndex]).build()
+    //val cfg = CfgBuilder(program.statements.filterIsInstance<Function>()[functionIndex]).build()
 
+    // wat
+    val watOut = File("./out/wat_$test.wat")
+    val outWriter = watOut.writer()
+    val watWriter = WatWriter(outWriter)
+    program.wat(watWriter)
+    outWriter.flush()
+    outWriter.close()
 
     // ir
     /*val cOut = File("./out/c_$test.c")
@@ -37,9 +45,9 @@ fun main(args: Array<String>) {
     cWriter.close()*/
 
     // cfg
-    val dotOut = File("./out/cfg_${test}_$functionIndex.dot")
+    /*val dotOut = File("./out/cfg_${test}_$functionIndex.dot")
     val dotWriter = dotOut.writer()
     cfg.dot(dotWriter)
-    dotWriter.close()
+    dotWriter.close()*/
 }
 

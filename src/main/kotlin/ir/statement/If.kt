@@ -31,6 +31,7 @@ open class If(
     }
 
     override fun watHeader(wat: WatWriter) {
+        condition.wat(wat)
         wat.writeLine("if")
     }
 

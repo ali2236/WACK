@@ -22,7 +22,7 @@ open class Value(val type: WasmValueType, val value: String) : Expression() {
     }
 
     override fun wat(wat: WatWriter) {
-        wat.writeLine("const.$type $value")
+        wat.writeLine("${type}.const $value")
     }
 
 
