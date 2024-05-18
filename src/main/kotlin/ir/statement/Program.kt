@@ -26,10 +26,10 @@ class Program(val module: WasmModule, val statements: MutableList<Statement>) : 
         wat.writeAll(statements)
         // tables
         module.tables.forEach { it.wat(wat) }
-        // globals
-        module.globals.forEach { it.wat(wat) }
         // memories
         module.memories.forEach { it.wat(wat) }
+        // globals
+        module.globals.forEach { it.wat(wat) }
         // exports
         module.exports.forEach { it.wat(wat) }
         // elements

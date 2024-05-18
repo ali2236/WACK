@@ -9,7 +9,7 @@ import java.io.File
 import java.lang.Appendable
 
 fun main(args: Array<String>) {
-    val (test, functionIndex) = Pair("seq", 2)// Pair("simple_loop", 1)
+    val (test, functionIndex) = Pair("scalar", 1)// Pair("simple_loop", 1)
     val sample = "./samples/$test.wat"
 
     val parseTree = Wat.parse(sample)

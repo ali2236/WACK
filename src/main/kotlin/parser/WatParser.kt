@@ -130,6 +130,15 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
         // TODO: Fix Element Grammar
     }
 
+    override fun enterTable(ctx: WatParser.TableContext) {
+        val range = ctx.table_fields().table_type().NAT()
+        val min = range.first().text.toInt()
+        val max = if (range.size > 1) range.last().text.toInt() else null
+        val shared = false
+        val table = WasmTable(Index.next(module.tables),min, max, shared)
+        module.tables.add(table)
+    }
+
 }
 
 
