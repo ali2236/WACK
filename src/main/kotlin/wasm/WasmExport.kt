@@ -1,10 +1,18 @@
 package wasm
 
-data class WasmExport(val name: String, val kind: WasmExportKind, val index: Index)
+import generation.WatWriter
+import generation.WebAssemblyInstruction
+
+data class WasmExport(val name: String, val kind: WasmExportKind, val index: Index) : WebAssemblyInstruction {
+    override fun wat(wat: WatWriter) {
+        wat.writeLine("(export $name ($kind $index))")
+    }
+
+}
 
 enum class WasmExportKind {
-    Function,
-    Memory,
-    Table,
-    Global
+    func,
+    memory,
+    table,
+    global
 }

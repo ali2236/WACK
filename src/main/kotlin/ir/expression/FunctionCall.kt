@@ -1,12 +1,15 @@
 package ir.expression
 
+import generation.WatWriter
+import wasm.Index
+
 class FunctionCall(
-    val name: String,
+    val functionIndex: Index,
     val params: List<Expression>,
     val hasReturn: Boolean,
 ) : Expression() {
     override fun write(out: Appendable) {
-        out.append(name)
+        out.append("f${functionIndex}")
         out.append("(")
 
         val paramCount = params.size
@@ -22,6 +25,11 @@ class FunctionCall(
         if (!hasReturn) {
             out.append(";\n")
         }
+    }
+
+    override fun wat(wat: WatWriter) {
+        wat.writeAll(params)
+        wat.writeLine("call ${functionIndex}")
     }
 
 }

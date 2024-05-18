@@ -7,6 +7,8 @@ import ir.finder.Replaceable
 import ir.statement.Assignment
 import ir.statement.Statement
 import ir.statement.Store
+import wasm.Index
+import wasm.WasmScope
 
 
 // Shouldn't be used
@@ -17,7 +19,7 @@ class ConstMemoryRef : Restructure() {
         if(!constRef.containsKey(value)){
             // make symbol
             val functionLocals = currentFunction.functionData.locals
-            val symbol = Symbol(value.type, Names.local + "${functionLocals.size}")
+            val symbol = Symbol(WasmScope.local, value.type,  Index.next(functionLocals))
             functionLocals.add(value.type)
             constRef[value] = symbol
 

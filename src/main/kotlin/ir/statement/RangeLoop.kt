@@ -1,8 +1,10 @@
 package ir.statement
 
+import generation.WatWriter
 import ir.expression.Expression
 import ir.finder.Visitor
 
+@Deprecated("Implementation not complete")
 class RangeLoop(var init: Statement, condition: Expression, var step: Statement, instructions: MutableList<Statement>) :
     ConditionLoop(condition, instructions) {
 

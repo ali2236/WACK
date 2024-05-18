@@ -5,4 +5,5 @@ object Names {
     const val local = "l"
     const val global = "g"
     const val constRef = "cr"
+    const val indent = "  "
 }

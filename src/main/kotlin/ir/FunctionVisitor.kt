@@ -6,13 +6,11 @@ import ir.expression.*
 import ir.finder.ExpressionFinder
 import ir.finder.Finders
 import ir.statement.*
-import wasm.Index
-import wasm.WasmFunction
-import wasm.WasmModule
-import wasm.WasmValueType
+import wasm.*
 import java.lang.Exception
 
-class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstBlock: Block) : WatParserBaseVisitor<Unit>() {
+class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstBlock: Block) :
+    WatParserBaseVisitor<Unit>() {
 
     private val blocks = mutableListOf(firstBlock)
 
@@ -28,7 +26,6 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
 
     private fun exitScope(): Block {
         val block = blocks.removeLast()
-        block.close()
         return block
     }
 
@@ -77,28 +74,27 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
             val type = WasmValueType.parse(ctx.CONST()!!.text.substring(0, 3))
             stack.push(Value(type, ctx.literal().text))
         } else if (ctx.CALL() != null) {
-            val functionIndex = ctx.var_().first().text.toInt()
-            val calledFunction = module.functions.first { it.index == Index(functionIndex) }
+            val functionIndex = Index(ctx.var_().first().text.toInt())
+            val calledFunction = module.functions.first { it.index == functionIndex }
             val (paramsTypes, resultTypes) = calledFunction.type.getParamsAndResults(module)
             val params = paramsTypes.map { stack.pop() }
             val hasReturn = resultTypes.isNotEmpty()
-            val name = if(functionIndex < module.functions.size) module.functions[functionIndex].prettyName else "f${functionIndex}"
-            stack.push(FunctionCall(name, params, hasReturn))
+            stack.push(FunctionCall(functionIndex, params, hasReturn))
         } else if (ctx.LOCAL_GET() != null) {
             val index = ctx.var_().first().text.toInt()
             val type = function.locals[index]
-            val symbol = Symbol(type,Names.local + index)
+            val symbol = Symbol(WasmScope.local, type, Index(index))
             stack.push(symbol)
         } else if (ctx.LOCAL_SET() != null) {
             val index = ctx.var_().first().text.toInt()
             val type = function.locals[index]
-            val symbol = Symbol(type, Names.local + index)
+            val symbol = Symbol(WasmScope.local, type, Index(index))
             val value = stack.pop()
             stack.push(Assignment(symbol, value))
         } else if (ctx.LOCAL_TEE() != null) {
             val index = ctx.var_().first().text.toInt()
             val type = function.locals[index]
-            val symbol = Symbol(type, Names.local + index)
+            val symbol = Symbol(WasmScope.local, type, Index(index))
             val value = stack.pop()
             val dependant = Finders.symbols(value).any { it == symbol }
             stack.push(Assignment(symbol, value))
@@ -110,18 +106,18 @@ class FunctionVisitor(val module: WasmModule, val function: WasmFunction, firstB
         } else if (ctx.GLOBAL_GET() != null) {
             val index = ctx.var_().first().text.toInt()
             val type = module.globals[index].type.type
-            val symbol = Symbol(type,Names.global + index)
+            val symbol = Symbol(WasmScope.global, type, Index(index))
             stack.push(symbol)
         } else if (ctx.GLOBAL_SET() != null) {
             val index = ctx.var_().first().text.toInt()
             val type = module.globals[index].type.type
-            val symbol = Symbol( type,Names.global + index)
+            val symbol = Symbol(WasmScope.global, type, Index(index))
             stack.push(Assignment(symbol, stack.pop()))
         } else if (ctx.TEST() != null) {
             val (typeString, operatorName) = ctx.TEST()!!.text.split(".")
             val type = WasmValueType.parse(typeString)
             val expr = when (operatorName) {
-                "eqz" -> BinaryOP(type, Operator.eq, stack.pop(), Value(WasmValueType.I32,"0"))
+                "eqz" -> BinaryOP(type, Operator.eq, stack.pop(), Value(WasmValueType.i32, "0"))
                 else -> throw Error()
             }
             stack.push(expr)

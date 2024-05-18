@@ -1,5 +1,6 @@
 package ir.statement
 
+import generation.WatWriter
 import ir.expression.Expression
 import ir.expression.Symbol
 import ir.finder.Visitor
@@ -24,5 +25,10 @@ open class Assignment(var symbol: Symbol, var value: Expression, var inline: Boo
         val buffer = StringBuffer()
         this.write(buffer)
         return buffer.toString()
+    }
+
+    override fun wat(wat: WatWriter) {
+        value.wat(wat)
+        wat.writeLine("${symbol.scope}.set ${symbol.index}")
     }
 }

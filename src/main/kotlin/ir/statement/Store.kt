@@ -1,5 +1,6 @@
 package ir.statement
 
+import generation.WatWriter
 import ir.Names
 import ir.expression.*
 import ir.finder.Visitor
@@ -19,7 +20,7 @@ class Store(
         //out.append("_$type")
         out.append("[")
         if (offset != 0) {
-            BinaryOP(type, Operator.add, address, Value(WasmValueType.I32, offset.toString())).write(out)
+            BinaryOP(type, Operator.add, address, Value(WasmValueType.i32, offset.toString())).write(out)
         } else {
             address.write(out)
         }
@@ -31,6 +32,11 @@ class Store(
     override fun visit(v: Visitor) {
         v.visit(address){address = it as Expression}
         v.visit(data){data = it as Expression}
+    }
+
+    override fun wat(wat: WatWriter) {
+        address.wat(wat)
+        wat.writeLine("${type}.store offset=$offset")
     }
 
 }

@@ -10,9 +10,10 @@ class ExpressionFinder<T : Visitable>(
 
     private val expr = mutableListOf<T>()
 
-    override fun visit(v: Statement, replace: ((Statement) -> Unit)?) {
-        if (v.javaClass == clazz) {
-          expr.add(v as T)
+    override fun visit(v: Statement, replace: (Statement) -> Unit) {
+        if (clazz.isInstance(v)) {
+            @Suppress("UNCHECKED_CAST")
+            expr.add(v as T)
         }
         super.visit(v, replace)
     }

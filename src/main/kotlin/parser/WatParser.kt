@@ -99,7 +99,7 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
         val mutable = typeCtx.MUT() != null
         val globalType = WasmGlobalType(type, mutable)
         val instructions = ctx.global_fields().const_expr().instr_list().instr()
-        val global = WasmGlobal(globalType, WasmBuffer(instructions))
+        val global = WasmGlobal(Index.next(module.globals), globalType, WasmBuffer(instructions))
         module.globals.add(global)
     }
 

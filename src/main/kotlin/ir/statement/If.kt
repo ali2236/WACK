@@ -1,5 +1,6 @@
 package ir.statement
 
+import generation.WatWriter
 import ir.expression.Expression
 import ir.finder.Visitor
 
@@ -27,6 +28,15 @@ open class If(
             }
             out.append("}\n")
         }
+    }
+
+    override fun watHeader(wat: WatWriter) {
+        wat.writeLine("if")
+    }
+
+    override fun wat(wat: WatWriter) {
+        super.wat(wat)
+        // TODO: Else
     }
 
     override fun visit(v: Visitor) {

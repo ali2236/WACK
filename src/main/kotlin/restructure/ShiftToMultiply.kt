@@ -22,7 +22,7 @@ class ShiftToMultiply : Restructure() {
             if (binOp.operator == Operator.shl && binOp.right is Value) {
                 val v = binOp.right as Value
                 binOp.operator = Operator.mul
-                binOp.right = Value(WasmValueType.I32, 2.0.pow(v.value.toDouble()).toInt().toString())
+                binOp.right = Value(WasmValueType.i32, 2.0.pow(v.value.toDouble()).toInt().toString())
             }
         }
     }

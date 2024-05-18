@@ -5,6 +5,8 @@ import ir.Names
 import ir.expression.*
 import ir.finder.Finders
 import ir.statement.*
+import wasm.Index
+import wasm.WasmScope
 
 class LoopMemoryCounterAlias : Restructure() {
 
@@ -13,7 +15,7 @@ class LoopMemoryCounterAlias : Restructure() {
         if (!memRef.containsKey(load)) {
             // make symbol
             val functionLocals = currentFunction.functionData.locals
-            val symbol = Symbol(load.type, Names.local + "${functionLocals.size}")
+            val symbol = Symbol(WasmScope.local, load.type, Index.next(functionLocals))
             functionLocals.add(load.type)
             memRef[load] = symbol
         }

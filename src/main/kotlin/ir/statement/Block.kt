@@ -1,5 +1,7 @@
 package ir.statement
 
+import generation.WatWriter
+import generation.WebAssemblyBlock
 import ir.expression.Expression
 import ir.finder.Visitor
 
@@ -9,7 +11,7 @@ open class Block(
     val brackets : Boolean = true,
     var parent : Block? = null,
     var indexInParent : Int? = null,
-) : Statement {
+) : Statement, WebAssemblyBlock {
 
     open fun push(stmt: Statement) {
         if(stmt is Block){
@@ -57,10 +59,21 @@ open class Block(
         if (brackets) out.append("}\n")
     }
 
-    open fun close() {}
-
 
     override fun visit(v: Visitor) {
         v.visit(instructions, instructions::set)
+    }
+
+    override fun watHeader(wat: WatWriter) {
+        wat.writeLine("block")
+
+    }
+
+    override fun wat(wat: WatWriter) {
+        watHeader(wat)
+        wat.indent++
+        wat.writeAll(instructions)
+        wat.indent--
+        wat.writeLine("end")
     }
 }

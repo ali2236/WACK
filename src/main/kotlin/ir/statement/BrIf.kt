@@ -1,5 +1,6 @@
 package ir.statement
 
+import generation.WatWriter
 import ir.expression.Expression
 
 class BrIf(
@@ -12,13 +13,17 @@ class BrIf(
     brackets = false,
 ) {
 
+    val onTrue: Statement
+        get() = instructions.first()
     override fun writeHeader(out: Appendable) {
         out.append("if(")
         condition.write(out)
         out.append(") br $depth")
     }
 
-    val onTrue: Statement
-        get() = instructions.first()
+    override fun wat(wat: WatWriter) {
+        condition.wat(wat)
+        wat.writeLine("br_if $depth")
+    }
 
 }

@@ -1,5 +1,6 @@
 package ir.expression
 
+import generation.WatWriter
 import ir.Names
 import ir.finder.Visitor
 import wasm.WasmValueType
@@ -10,7 +11,7 @@ class Load(val type: WasmValueType, var address: Expression, val offset: Int = 0
         //out.append("_${type}")
         out.append("[")
         if (offset != 0) {
-            BinaryOP(type, Operator.add, address, Value(WasmValueType.I32, offset.toString())).write(out)
+            BinaryOP(type, Operator.add, address, Value(WasmValueType.i32, offset.toString())).write(out)
         } else {
             address.write(out)
         }
@@ -37,6 +38,11 @@ class Load(val type: WasmValueType, var address: Expression, val offset: Int = 0
         result = 31 * result + address.hashCode()
         result = 31 * result + offset
         return result
+    }
+
+    override fun wat(wat: WatWriter) {
+        address.wat(wat)
+        wat.writeLine("${type}.load offset=$offset")
     }
 
 

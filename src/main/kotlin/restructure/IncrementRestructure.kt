@@ -19,7 +19,7 @@ class IncrementRestructure : Restructure() {
         if (stmt.value is BinaryOP) {
             val opr = stmt.value as BinaryOP
             if (
-                (opr.left == Value(WasmValueType.I32, "1") || opr.right == Value(WasmValueType.I32, "1")) &&
+                (opr.left == Value(WasmValueType.i32, "1") || opr.right == Value(WasmValueType.i32, "1")) &&
                 (opr.left == stmt.symbol || opr.right == stmt.symbol)
             ){
                 if (opr.operator == Operator.add){

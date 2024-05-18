@@ -5,11 +5,11 @@ import ir.statement.Statement
 
 class LoopFinder(private val topLevelOnly : Boolean = false) : Visitor() {
 
-    private val loops = mutableListOf<Loop>()
+    private val loops = mutableListOf<Replaceable<Loop>>()
 
-    override fun visit(v: Statement, replace: ((Statement) -> Unit)?) {
+    override fun visit(v: Statement, replace: (Statement) -> Unit) {
         if (v is Loop){
-            loops.add(v)
+            loops.add(Replaceable(v, replace))
             if(!topLevelOnly){
                 super.visit(v, replace)
             }
@@ -18,7 +18,7 @@ class LoopFinder(private val topLevelOnly : Boolean = false) : Visitor() {
         }
     }
 
-    fun result(): List<Loop> {
+    fun result(): List<Replaceable<Loop>> {
         return loops
     }
 

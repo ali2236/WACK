@@ -3,6 +3,7 @@ package ir.statement
 import ir.expression.Expression
 import ir.finder.Visitor
 
+@Deprecated("Implementation not complete")
 open class ConditionLoop(var condition: Expression, instructions: MutableList<Statement>) : Loop(instructions) {
 
     override fun visit(v: Visitor) {

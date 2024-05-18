@@ -1,5 +1,7 @@
 package ir.statement
 
+import generation.WatWriter
+import ir.Names
 import wasm.WasmFunction
 
 class Function(
@@ -9,12 +11,13 @@ class Function(
 
     init {
         instructions.forEachIndexed { i, stmt ->
-            if(stmt is Block){
+            if (stmt is Block) {
                 stmt.parent = this
                 stmt.indexInParent = i
             }
         }
     }
+
     override fun write(out: Appendable) {
 
         // Return Type
@@ -60,6 +63,19 @@ class Function(
 
         // Close
         out.append("}\n")
+    }
+
+    override fun watHeader(wat: WatWriter) {
+        wat.writeLine("(func ;${functionData.index}; (type ${functionData.type})${functionData.type.paramsWat()}${functionData.type.resultWat()}")
+        wat.writeLine("${Names.indent}(local ${functionData.locals.joinToString(" ") { it.name }})")
+    }
+
+    override fun wat(wat: WatWriter) {
+        watHeader(wat)
+        wat.indent++
+        wat.writeAll(instructions)
+        wat.writeLine(")")
+        wat.indent--
     }
 
 }

@@ -1,5 +1,7 @@
 package ir.statement
 
+import generation.WatWriter
+
 class Br(val target: Block, var depth: Int) : BasicStatement() {
     override fun write(out: Appendable) {
         if (target is Loop && depth == 0) {
@@ -9,5 +11,9 @@ class Br(val target: Block, var depth: Int) : BasicStatement() {
         } else {
             out.append("Br $depth")
         }
+    }
+
+    override fun wat(wat: WatWriter) {
+        wat.writeLine("br $depth")
     }
 }

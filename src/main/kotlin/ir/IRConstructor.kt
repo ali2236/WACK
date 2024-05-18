@@ -7,6 +7,7 @@ import ir.statement.Function
 import wasm.Index
 import wasm.WasmFunction
 import wasm.WasmModule
+import wasm.WasmScope
 
 class IRConstructor(val module: WasmModule) {
 
@@ -16,7 +17,7 @@ class IRConstructor(val module: WasmModule) {
 
     fun function(index: Index): Statement {
         val function = module.functions.first { it.index == index }
-        val functionBlock : List<Statement> = if (function.code != null) {
+        val functionBlock: List<Statement> = if (function.code != null) {
             val visitor = FunctionVisitor(
                 module,
                 function,
@@ -33,7 +34,7 @@ class IRConstructor(val module: WasmModule) {
         return Function(function, functionBlock.toMutableList())
     }
 
-    private fun getFunctionInitSection(functionData: WasmFunction) : List<Statement>{
+    private fun getFunctionInitSection(functionData: WasmFunction): List<Statement> {
         val inst = mutableListOf<Statement>()
         // Local Variables
         // declaration
@@ -41,14 +42,14 @@ class IRConstructor(val module: WasmModule) {
         val localCount = functionData.locals.size
         for (i in paramCount until localCount) {
             val localType = functionData.locals[i]
-            val symbol = Symbol(localType, Names.local + "${paramCount + i}")
+            val symbol = Symbol(WasmScope.local, localType, Index(paramCount + i))
             val dec = Declaration(localType, symbol)
             inst.add(dec)
         }
         // assignment
         for (i in paramCount until localCount) {
             val localType = functionData.locals[i]
-            val symbol = Symbol(localType, Names.local + "${paramCount + i}")
+            val symbol = Symbol(WasmScope.local, localType, Index(paramCount + i))
             val value = Value(localType, localType.defaultValue())
             val assignment = Assignment(symbol, value)
             inst.add(assignment)

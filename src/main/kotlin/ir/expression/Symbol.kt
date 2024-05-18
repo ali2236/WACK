@@ -1,21 +1,17 @@
 package ir.expression
 
+import generation.WatWriter
+import wasm.Index
+import wasm.WasmScope
 import wasm.WasmValueType
 
-open class Symbol(val type: WasmValueType, val symbol: String) : Expression() {
+open class Symbol(val scope: WasmScope, val type: WasmValueType, val index : Index) : Expression() {
     override fun write(out: Appendable) {
-        out.append(symbol)
+        out.append("${scope.name[0]}$index")
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is Symbol) return false
-        return symbol == other.symbol
+    override fun wat(wat: WatWriter) {
+        wat.writeLine("${scope.name}.get $index")
     }
-
-    override fun hashCode(): Int {
-        return symbol.hashCode()
-    }
-
 
 }

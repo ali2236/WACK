@@ -1,5 +1,6 @@
 package ir.expression
 
+import generation.WatWriter
 import wasm.WasmValueType
 
 open class Value(val type: WasmValueType, val value: String) : Expression() {
@@ -18,6 +19,10 @@ open class Value(val type: WasmValueType, val value: String) : Expression() {
 
     override fun hashCode(): Int {
         return value.hashCode()
+    }
+
+    override fun wat(wat: WatWriter) {
+        wat.writeLine("const.$type $value")
     }
 
 

@@ -1,6 +1,7 @@
 import analysis.cfg.CfgBuilder
 import ir.IRConstructor
 import ir.statement.Function
+import optimization.OptimizationPasses
 import parser.Wat
 import restructure.RestructurePasses
 import java.io.File
@@ -17,6 +18,14 @@ fun main(args: Array<String>) {
 
     // restructure pass
     RestructurePasses.all(program)
+
+    // analysis passes
+
+    // optimization passes
+    OptimizationPasses.apply(program)
+
+    // code generation
+
 
     val cfg = CfgBuilder(program.statements.filterIsInstance<Function>()[functionIndex]).build()
 
