@@ -4,13 +4,12 @@ import generation.WatWriter
 import ir.statement.*
 import wasm.WasmValueType
 
-// TODO: support increments bigger than 1
-class Increment(val operation: Assignee, val operator: Operator = Operator.add) : BasicStatement() {
+class Increment(val operation: Assignee, val operator: Operator = Operator.add, val amount: Value) : BasicStatement() {
     override fun write(out: Appendable) {
         operation.assignedTo().write(out)
         val op = when (operator) {
-            Operator.add -> "++"
-            Operator.sub -> "--"
+            Operator.add -> "++$amount"
+            Operator.sub -> "--$amount"
             else -> throw Error()
         }
         out.append(op)

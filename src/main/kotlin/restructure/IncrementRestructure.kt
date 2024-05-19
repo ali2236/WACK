@@ -16,17 +16,17 @@ class IncrementRestructure : Restructure() {
         }
     }
 
-    private fun checkAssignmentStyleIncrement(stmt: Assignee){
+    private fun checkAssignmentStyleIncrement(stmt: Assignee) {
         if (stmt.assignedWith() is BinaryOP) {
             val opr = stmt.assignedWith() as BinaryOP
             if (
-                (opr.left == Value(WasmValueType.i32, "1") || opr.right == Value(WasmValueType.i32, "1")) &&
-                (opr.left == stmt.assignedTo() || opr.right == stmt.assignedTo())
-            ){
-                if (opr.operator == Operator.add){
-                    replaceCurrentInstruction(Increment(stmt, Operator.add))
-                } else if(opr.operator == Operator.sub){
-                    replaceCurrentInstruction(Increment(stmt, Operator.sub))
+                (opr.right is Value && opr.left == stmt.assignedTo())
+            ) {
+                val v = opr.right as Value
+                if (opr.operator == Operator.add) {
+                    replaceCurrentInstruction(Increment(stmt, Operator.add, v))
+                } else if (opr.operator == Operator.sub) {
+                    replaceCurrentInstruction(Increment(stmt, Operator.sub, v))
                 }
             }
         }
