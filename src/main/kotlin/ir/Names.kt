@@ -1,9 +1,9 @@
 package ir
 
 object Names {
-    const val memory = "m"
-    const val local = "l"
-    const val global = "g"
+    const val memory = "M"
+    const val local = "L"
+    const val global = "G"
     const val constRef = "cr"
     const val indent = "  "
 }

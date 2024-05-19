@@ -6,12 +6,12 @@ import wasm.WasmValueType
 
 class Increment(val operation: Assignee, val operator: Operator = Operator.add, val amount: Value) : BasicStatement() {
     override fun write(out: Appendable) {
-        operation.assignedTo().write(out)
         val op = when (operator) {
-            Operator.add -> "++$amount"
-            Operator.sub -> "--$amount"
+            Operator.add -> "increment ${operation.assignedTo()} by $amount"
+            Operator.sub -> "decrement ${operation.assignedTo()} by $amount"
             else -> throw Error()
         }
+
         out.append(op)
         out.append(";\n")
     }

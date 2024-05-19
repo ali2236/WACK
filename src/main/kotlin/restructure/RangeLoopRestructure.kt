@@ -12,7 +12,7 @@ class RangeLoopRestructure : Restructure() {
 
     override fun restructureBlock(block: Block) {
         super.restructureBlock(block)
-        if (block is ConditionLoop && block.condition !is Value && Finders.symbols(block.condition).isNotEmpty()) {
+        if (block is ConditionLoop) {
             try {
                 transformIntoRangeLoop(block)
             } catch (e: Exception) {

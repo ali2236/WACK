@@ -121,7 +121,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val dependant = Finders.symbols(value).any { it == symbol }
             stack.push(Assignment(symbol, value, tee = true))
             if (dependant) {
-                stack.push(TeeValue(symbol))
+                stack.push(TeeSymbol(symbol))
             } else {
                 stack.push(TeeValue(value))
             }
