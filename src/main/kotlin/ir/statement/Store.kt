@@ -15,6 +15,8 @@ class Store(
     val load: Load
         get() = symbol
 
+
+
     override fun write(out: Appendable) {
         out.append(Names.memory)
         //out.append("_$type")
@@ -45,6 +47,14 @@ class Store(
         val ofst = if (symbol.offset != 0) " offset=${symbol.offset}" else ""
         val algn = if (symbol.align != 0) " align=${symbol.align}" else ""
         wat.writeLine("${symbol.type}.store${ofst}${algn}")
+    }
+
+    override fun assignedWith(): Expression {
+        return data
+    }
+
+    override fun assignedTo(): Assignable {
+        return symbol
     }
 
 }

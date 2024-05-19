@@ -25,7 +25,7 @@ class ConditionalLoopRestructure : Restructure() {
         if (f is If && f.elseBody == null && f.instructions.last() is Br && (f.instructions.last() as Br).depth == 1) {
             // make conditional loop
             // move true block to loop instructions
-            val conditionLoop = ConditionLoop(f, loop.instructions)
+            val conditionLoop = ConditionLoop(f.condition, loop.instructions)
 
             // change last Br depth to 0
             //(conditionLoop.instructions.last() as Br).depth = 0

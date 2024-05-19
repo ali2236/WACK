@@ -1,20 +1,22 @@
 package ir.expression
 
-import ir.statement.Assignment
+import generation.WatWriter
+import ir.statement.*
 import wasm.WasmValueType
 
-class Increment(symbol: Symbol, operator: Operator = Operator.add) :
-    Assignment(symbol, BinaryOP(symbol.type, operator, symbol, Value(symbol.type,"1"))) {
+class Increment(val operation: Assignee, val operator: Operator = Operator.add) : BasicStatement() {
     override fun write(out: Appendable) {
-        symbol.write(out)
-        val op = when ((value as BinaryOP).operator) {
+        operation.assignedTo().write(out)
+        val op = when (operator) {
             Operator.add -> "++"
             Operator.sub -> "--"
             else -> throw Error()
         }
         out.append(op)
-        if(!inline){
-            out.append(";\n")
-        }
+        out.append(";\n")
+    }
+
+    override fun wat(wat: WatWriter) {
+        operation.wat(wat)
     }
 }

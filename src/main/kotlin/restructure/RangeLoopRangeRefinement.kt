@@ -40,9 +40,8 @@ class RangeLoopRangeRefinement : Restructure() {
 
         // loop direction
         val direction: LoopStepDirection
-        if (loop.step is Increment && (loop.step as Increment).value is BinaryOP) {
-            val binOp = (loop.step as Increment).value as BinaryOP
-            direction = when (binOp.operator) {
+        if (loop.step is Increment) {
+            direction = when ((loop.step as Increment).operator) {
                 Operator.add -> LoopStepDirection.Up
                 Operator.sub -> LoopStepDirection.Down
                 else -> throw NotRangeLoopException("No Direction!")

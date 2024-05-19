@@ -1,5 +1,10 @@
 package ir.statement
 
+import ir.expression.Expression
+
 // Assignment, store
-interface Assignee {
+interface Assignee : Statement{
+    fun assignedWith() : Expression
+
+    fun assignedTo() : Assignable
 }

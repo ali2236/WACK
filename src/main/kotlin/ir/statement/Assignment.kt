@@ -12,6 +12,8 @@ open class Assignment(
     var inline: Boolean = false,
     var tee: Boolean = false
 ) : Statement, Assignee {
+
+
     override fun write(out: Appendable) {
         symbol.write(out)
         out.append(" = ")
@@ -35,6 +37,14 @@ open class Assignment(
     override fun visit(v: Visitor) {
         v.visit(symbol) { symbol = it as Symbol }
         v.visit(value) { value = it as Expression }
+    }
+
+    override fun assignedWith(): Expression {
+        return value
+    }
+
+    override fun assignedTo(): Assignable {
+        return symbol
     }
 
     override fun toString(): String {

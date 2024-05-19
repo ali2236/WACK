@@ -1,6 +1,7 @@
 package restructure
 
 import ir.expression.*
+import ir.statement.Assignee
 import ir.statement.Assignment
 import ir.statement.Statement
 import wasm.WasmValueType
@@ -10,22 +11,22 @@ import wasm.WasmValueType
 class IncrementRestructure : Restructure() {
 
     override fun restructureInstruction(stmt: Statement) {
-        if (stmt is Assignment) {
+        if (stmt is Assignee) {
             checkAssignmentStyleIncrement(stmt)
         }
     }
 
-    private fun checkAssignmentStyleIncrement(stmt: Assignment){
-        if (stmt.value is BinaryOP) {
-            val opr = stmt.value as BinaryOP
+    private fun checkAssignmentStyleIncrement(stmt: Assignee){
+        if (stmt.assignedWith() is BinaryOP) {
+            val opr = stmt.assignedWith() as BinaryOP
             if (
                 (opr.left == Value(WasmValueType.i32, "1") || opr.right == Value(WasmValueType.i32, "1")) &&
-                (opr.left == stmt.symbol || opr.right == stmt.symbol)
+                (opr.left == stmt.assignedTo() || opr.right == stmt.assignedTo())
             ){
                 if (opr.operator == Operator.add){
-                    replaceCurrentInstruction(Increment(stmt.symbol, Operator.add))
+                    replaceCurrentInstruction(Increment(stmt, Operator.add))
                 } else if(opr.operator == Operator.sub){
-                    replaceCurrentInstruction(Increment(stmt.symbol, Operator.sub))
+                    replaceCurrentInstruction(Increment(stmt, Operator.sub))
                 }
             }
         }
