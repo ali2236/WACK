@@ -7,23 +7,27 @@ import ir.finder.Visitor
 import wasm.WasmValueType
 
 class Store(
-    val type: WasmValueType,
+    val symbol: Load,
     var data: Expression,
-    var address: Expression,
-    val offset: Int = 0,
-    val align: Int = 0,
-) : Statement {
+) : Statement, Assignee {
+
+    @Deprecated("Use symbol instead")
     val load: Load
-        get() = Load(type, address, offset)
+        get() = symbol
 
     override fun write(out: Appendable) {
         out.append(Names.memory)
         //out.append("_$type")
         out.append("[")
-        if (offset != 0) {
-            BinaryOP(type, Operator.add, address, Value(WasmValueType.i32, offset.toString())).write(out)
+        if (symbol.offset != 0) {
+            BinaryOP(
+                symbol.type,
+                Operator.add,
+                symbol.address,
+                Value(WasmValueType.i32, symbol.offset.toString())
+            ).write(out)
         } else {
-            address.write(out)
+            symbol.address.write(out)
         }
         out.append("] = ")
         data.write(out)
@@ -31,16 +35,16 @@ class Store(
     }
 
     override fun visit(v: Visitor) {
-        v.visit(address){address = it as Expression}
-        v.visit(data){data = it as Expression}
+        v.visit(symbol.address) { symbol.address = it as Expression }
+        v.visit(data) { data = it as Expression }
     }
 
     override fun wat(wat: WatWriter) {
-        address.wat(wat)
+        symbol.address.wat(wat)
         data.wat(wat)
-        val ofst = if(offset!=0)" offset=$offset" else ""
-        val algn = if(align!=0)" align=$align" else ""
-        wat.writeLine("${type}.store${ofst}${algn}")
+        val ofst = if (symbol.offset != 0) " offset=${symbol.offset}" else ""
+        val algn = if (symbol.align != 0) " align=${symbol.align}" else ""
+        wat.writeLine("${symbol.type}.store${ofst}${algn}")
     }
 
 }

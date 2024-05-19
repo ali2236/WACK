@@ -3,6 +3,7 @@ package ir.expression
 import generation.WatWriter
 import ir.Names
 import ir.finder.Visitor
+import ir.statement.Assignable
 import wasm.WasmValueType
 
 class Load(
@@ -10,10 +11,9 @@ class Load(
     var address: Expression,
     val offset: Int = 0,
     val align: Int = 0,
-) : Expression() {
+) : Expression(), Assignable {
     override fun write(out: Appendable) {
         out.append(Names.memory)
-        //out.append("_${type}")
         out.append("[")
         if (offset != 0) {
             BinaryOP(type, Operator.add, address, Value(WasmValueType.i32, offset.toString())).write(out)

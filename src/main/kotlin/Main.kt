@@ -9,43 +9,45 @@ import java.io.File
 import java.lang.Appendable
 
 fun main(args: Array<String>) {
-    val (test, functionIndex) = Pair("seq", 1)// Pair("simple_loop", 1)
-    val sample = "./samples/$test.wat"
+    val file = listOf(Pair("seq", 2), Pair("simple_loop", 1))
+    for ((test, functionIndex) in file){
+        val sample = "./samples/$test.wat"
 
-    val parseTree = Wat.parse(sample)
-    val module = Wat.module(parseTree)
-    val ir = IRConstructor(module)
-    val program = ir.program()
+        val parseTree = Wat.parse(sample)
+        val module = Wat.module(parseTree)
+        val ir = IRConstructor(module)
+        val program = ir.program()
 
-    // restructure pass
-    RestructurePasses.all(program)
+        // restructure pass
+        RestructurePasses.all(program)
 
-    // analysis passes
+        // analysis passes
 
-    // optimization passes
-    OptimizationPasses.apply(program)
+        // optimization passes
+        //OptimizationPasses.apply(program)
 
-    // code generation
-    val watOut = File("./out/wat_$test.wat")
-    val outWriter = watOut.writer()
-    val watWriter = WatWriter(outWriter)
-    program.wat(watWriter)
-    outWriter.flush()
-    outWriter.close()
+        // code generation
+        //val watOut = File("./out/wat_$test.wat")
+        //val outWriter = watOut.writer()
+        //val watWriter = WatWriter(outWriter)
+        //program.wat(watWriter)
+        //outWriter.flush()
+        //outWriter.close()
 
-    //val cfg = CfgBuilder(program.statements.filterIsInstance<Function>()[functionIndex]).build()
+        val cfg = CfgBuilder(program.statements.filterIsInstance<Function>()[functionIndex]).build()
 
 
-    // ir
-    /*val cOut = File("./out/c_$test.c")
-    val cWriter = cOut.writer()
-    program.write(cWriter)
-    cWriter.close()*/
+        // ir
+        /*val cOut = File("./out/c_$test.c")
+        val cWriter = cOut.writer()
+        program.write(cWriter)
+        cWriter.close()*/
 
-    // cfg
-    /*val dotOut = File("./out/cfg_${test}_$functionIndex.dot")
-    val dotWriter = dotOut.writer()
-    cfg.dot(dotWriter)
-    dotWriter.close()*/
+        // cfg
+        val dotOut = File("./out/cfg_${test}_$functionIndex.dot")
+        val dotWriter = dotOut.writer()
+        cfg.dot(dotWriter)
+        dotWriter.close()
+    }
 }
 

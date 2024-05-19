@@ -1,11 +1,12 @@
 package ir.expression
 
 import generation.WatWriter
+import ir.statement.Assignable
 import wasm.Index
 import wasm.WasmScope
 import wasm.WasmValueType
 
-open class Symbol(val scope: WasmScope, val type: WasmValueType, val index : Index) : Expression() {
+open class Symbol(val scope: WasmScope, val type: WasmValueType, val index : Index) : Expression(), Assignable {
     override fun write(out: Appendable) {
         out.append("${scope.name[0]}$index")
     }

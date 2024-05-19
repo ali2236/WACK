@@ -36,8 +36,8 @@ class ConstMemoryRef : Restructure() {
         }
 
         if (stmt is Store) {
-            if (stmt.address is Value) {
-                val address = stmt.address as Value
+            if (stmt.symbol.address is Value) {
+                val address = stmt.symbol.address as Value
                 val smbl = getConstRef(address)
                 replaceCurrentInstruction(Assignment(smbl, stmt.data))
             }

@@ -11,6 +11,8 @@ class CfgBuilder(val function: Function) {
     private val blocks = Stack<CfgBlock>()
     private val scope = Stack<CfgBlock>()
 
+    private val startBlock = makeBlock("START")
+    private val endBlock = makeBlock("END")
     private val previousBlock: CfgBlock
         get() = blocks.elementAt(blocks.size - 2)
     private val currentBlock: CfgBlock
@@ -21,6 +23,7 @@ class CfgBuilder(val function: Function) {
     fun build(): CFG {
         val body = function.instructions
         val function = makeBlock()
+        startBlock.addSuccessor(function)
         pushScope(function, null, null)
         runOnBlock(function, body)
         popScope()
@@ -66,6 +69,7 @@ class CfgBuilder(val function: Function) {
                 // TODO: is switch
                 is Return, is Unreachable, is FunctionCall /*TODO: indirect call*/ -> {
                     current.statements.add(stmt)
+                    current.addSuccessor(endBlock)
                 }
 
                 is BrIf -> {

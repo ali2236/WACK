@@ -21,7 +21,7 @@ class IRConstructor(val module: WasmModule) {
         val functionBlock: List<Statement> = if (function.code != null) {
             val visitor = WatVisitor(module)
             val instructions = visitor.visitFunction(function)
-            /*for C Only: getFunctionInitSection(function) +*/ instructions
+            getFunctionInitSection(function) + instructions
         } else {
             listOf()
         }
@@ -45,7 +45,7 @@ class IRConstructor(val module: WasmModule) {
             val localType = functionData.locals[i]
             val symbol = Symbol(WasmScope.local, localType, Index(paramCount + i))
             val value = Value(localType, localType.defaultValue())
-            val assignment = Assignment(symbol, value)
+            val assignment = Assignment(symbol, value) // TODO: fake assignment
             inst.add(assignment)
         }
 

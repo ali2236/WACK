@@ -25,13 +25,13 @@ class ConditionalLoopRestructure : Restructure() {
         if (f is If && f.elseBody == null && f.instructions.last() is Br && (f.instructions.last() as Br).depth == 1) {
             // make conditional loop
             // move true block to loop instructions
-            val conditionLoop = ConditionLoop(f.condition, f.instructions)
+            val conditionLoop = ConditionLoop(f, loop.instructions)
 
             // change last Br depth to 0
-            (conditionLoop.instructions.last() as Br).depth = 0
+            //(conditionLoop.instructions.last() as Br).depth = 0
 
             // remove if
-            conditionLoop.instructions.removeFirst()
+            //conditionLoop.instructions.removeFirst()
 
             // move sub-block parent pointers to loop
             conditionLoop.instructions.forEachIndexed { i, stmt ->
@@ -55,10 +55,10 @@ class ConditionalLoopRestructure : Restructure() {
 
 
             // remove original condition from code
-            loop.instructions.removeAt(indexedCondition.index)
+            //loop.instructions.removeAt(indexedCondition.index)
 
             // update loop condition
-            val conditionLoop = ConditionLoop(condition.condition, loop.instructions)
+            val conditionLoop = ConditionLoop(condition, loop.instructions)
             replaceCurrentBlock(conditionLoop)
 
             // update parent

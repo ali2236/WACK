@@ -25,6 +25,7 @@ class KernelExtraction : Optimizer {
         val module = program.module
         val ddt = DdgBuilder(function).build()
 
+        // TODO: should only look for range loops
         val loops = LoopFinder(true).apply { visit(function){ } }.result()
         for ((loop, replace) in loops) {
             val loopIsParallelizable = true
@@ -76,6 +77,5 @@ class KernelExtraction : Optimizer {
                 program.statements.add(kernel)
             }
         }
-
     }
 }

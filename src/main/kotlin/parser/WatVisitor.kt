@@ -27,12 +27,14 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
         return block
     }
 
-    fun visitFunction(function: WasmFunction) : List<Statement>{
+    fun visitFunction(function: WasmFunction): List<Statement> {
         this.function = function
-        blocks.add(Block(
-            hasReturn = function.type.result.isNotEmpty(),
-            brackets = false
-        ))
+        blocks.add(
+            Block(
+                hasReturn = function.type.result.isNotEmpty(),
+                brackets = false
+            )
+        )
         visit(function.code)
         this.function = null
         val result = stack.instructions
@@ -47,7 +49,6 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
         blocks.clear()
         return result
     }
-
 
 
     override fun visitBlock_instr(ctx: WatParser.Block_instrContext) {
@@ -185,7 +186,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val data = stack.pop()
             val addr = stack.pop()
-            val store = Store(type, data, addr, offset, align)
+            val store = Store(Load(type, addr, offset, align), data)
             stack.push(store)
         } else {
             throw Exception("No Case found for: " + ctx.text)

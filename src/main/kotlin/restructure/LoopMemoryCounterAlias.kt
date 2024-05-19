@@ -8,6 +8,8 @@ import ir.statement.*
 import wasm.Index
 import wasm.WasmScope
 
+// replaces load with constload/symbol around loops
+@Deprecated("Doesn't work correctly")
 class LoopMemoryCounterAlias : Restructure() {
 
     private val memRef = mutableMapOf<Load, Symbol>()
@@ -34,7 +36,7 @@ class LoopMemoryCounterAlias : Restructure() {
                     .add(currentBlock.indexInParent!!-1, assign)
                 currentBlock.indexInParent = currentBlock.indexInParent!! + 1
                 // post
-                val store = Store(load.type, symbol, load.address, load.offset)
+                val store = Store(load, symbol)
                 currentBlock.parent!!
                     .instructions
                     .add(currentBlock.indexInParent!!+1, store)
@@ -69,8 +71,8 @@ class LoopMemoryCounterAlias : Restructure() {
             refineChildExpression(child)
             restructureInstruction(child.statement)
         }
-        if (stmt is Store && stmt.address is Symbol) {
-            val smbl = getMemRef(stmt.load)
+        if (stmt is Store && stmt.symbol.address is Symbol) {
+            val smbl = getMemRef(stmt.symbol)
             replaceCurrentInstruction(ConstStore(stmt, smbl, stmt.data))
         }
     }

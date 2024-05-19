@@ -14,7 +14,7 @@ class RangeLoopRestructure : Restructure() {
         if (block is ConditionLoop && block.condition !is Value && Finders.symbols(block.condition).isNotEmpty()) {
             try {
                 transformIntoRangeLoop(block)
-            } catch (e : Exception){
+            } catch (e: Exception) {
 
             }
         }
@@ -22,43 +22,58 @@ class RangeLoopRestructure : Restructure() {
 
     private fun transformIntoRangeLoop(loop: ConditionLoop) {
         val condition = loop.condition
-        val symbol = Finders.symbols(condition).first()
-        val init = findRangeLoopInitInParent(symbol)
-        val step = findRangeLoopStep(loop, symbol)
-        val rangeLoop = RangeLoop(init, condition, step, loop.instructions)
-        replaceCurrentBlock(rangeLoop)
-    }
+        if (condition is BinaryOP && condition.left is Assignable) {
+            val left = condition.left as Assignable
+            val init = findRangeLoopInitInParent(left)
+            val step = findRangeLoopStep(loop, left)
+            val rangeLoop = RangeLoop(init, condition, step, loop.instructions)
+            replaceCurrentBlock(rangeLoop)
+            }
+        }
 
-    private fun findRangeLoopInitInParent(symbol: Symbol): Statement {
+    private fun findRangeLoopInitInParent(symbol: Assignable): Statement {
         var current = currentBlock
         var parent = current.parent
         var blockIndex = current.indexInParent
         while (parent != null) {
             for (i in (blockIndex!! - 1) downTo 0) {
                 val stmt = parent.instructions[i]
-                if (stmt is Assignment && stmt.symbol == symbol) {
-                    // TODO: Check Forward Dependencies (if you use ssa you dont need this)
-                    parent.instructions.removeAt(i)
-                    current.indexInParent = blockIndex - 1
-                    stmt.inline = true
-                    return stmt
+                when(symbol) {
+                    is Symbol -> {
+                        if (stmt is Assignment && stmt.symbol == symbol) {
+                            // TODO: Check Forward Dependencies (if you use ssa you dont need this)
+                            // parent.instructions.removeAt(i)
+                            // current.indexInParent = blockIndex - 1
+                            // stmt.inline = true
+                            return stmt
+                        }
+                    }
+                    is Load -> {
+                        if (stmt is Store && stmt.symbol == symbol) {
+                            // TODO: Check Forward Dependencies (if you use ssa you dont need this)
+                            // parent.instructions.removeAt(i)
+                            // current.indexInParent = blockIndex - 1
+                            // stmt.inline = true
+                            return stmt
+                        }
+                    }
                 }
             }
             current = parent
             parent = current.parent
             blockIndex = current.indexInParent
         }
-        return Assignment(symbol, Value(WasmValueType.Unknown,"??"), inline = true)
+        throw Error()
     }
 
-    private fun findRangeLoopStep(loop: ConditionLoop, symbol: Symbol): Statement {
+    private fun findRangeLoopStep(loop: ConditionLoop, symbol: Assignable): Statement {
         val (i, step) = loop.instructions.withIndex()
             .filter { it.value is Increment }
             .last() as IndexedValue<Increment>
 
-        loop.instructions.removeAt(i)
+        //loop.instructions.removeAt(i)
 
-        step.inline = true
+        // step.inline = true
         return step
     }
 
