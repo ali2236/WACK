@@ -4,6 +4,7 @@ import generation.WatWriter
 import ir.statement.*
 import wasm.WasmValueType
 
+// TODO: support increments bigger than 1
 class Increment(val operation: Assignee, val operator: Operator = Operator.add) : BasicStatement() {
     override fun write(out: Appendable) {
         operation.assignedTo().write(out)

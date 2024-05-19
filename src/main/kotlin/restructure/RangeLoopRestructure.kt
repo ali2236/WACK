@@ -1,6 +1,7 @@
 package restructure
 
 import ir.expression.*
+import ir.finder.BreadthFirstExpressionFinder
 import ir.finder.ExpressionFinder
 import ir.finder.Finders
 import ir.statement.*
@@ -31,7 +32,7 @@ class RangeLoopRestructure : Restructure() {
             }
         }
 
-    private fun findRangeLoopInitInParent(symbol: Assignable): Statement {
+    private fun findRangeLoopInitInParent(symbol: Assignable): Assignee {
         var current = currentBlock
         var parent = current.parent
         var blockIndex = current.indexInParent
@@ -66,15 +67,9 @@ class RangeLoopRestructure : Restructure() {
         throw Error()
     }
 
-    private fun findRangeLoopStep(loop: ConditionLoop, symbol: Assignable): Statement {
-        val (i, step) = loop.instructions.withIndex()
-            .filter { it.value is Increment }
-            .last() as IndexedValue<Increment>
-
-        //loop.instructions.removeAt(i)
-
-        // step.inline = true
-        return step
+    private fun findRangeLoopStep(loop: ConditionLoop, symbol: Assignable): Increment {
+        val steps = BreadthFirstExpressionFinder(Increment::class.java).also { it.visit(loop.instructions) { i, stmt -> } }.result()
+        return steps.first()
     }
 
 }

@@ -4,7 +4,7 @@ import ir.statement.Statement
 
 abstract class Visitor {
 
-    fun visit(vs: Iterable<Statement>, replace: (Int, Statement) -> Unit) {
+    open fun visit(vs: Iterable<Statement>, replace: (Int, Statement) -> Unit) {
         vs.forEachIndexed { i, stmt -> visit(stmt) { replace(i,it) } }
     }
 
