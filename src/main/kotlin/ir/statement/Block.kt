@@ -1,5 +1,6 @@
 package ir.statement
 
+import ir.annotations.WackAnnotation
 import generation.WatWriter
 import generation.WebAssemblyBlock
 import ir.expression.Expression
@@ -11,6 +12,7 @@ open class Block(
     val brackets : Boolean = true,
     var parent : Block? = null,
     var indexInParent : Int? = null,
+    open val annotations: MutableList<WackAnnotation> = mutableListOf()
 ) : Statement, WebAssemblyBlock {
 
     open fun push(stmt: Statement) {

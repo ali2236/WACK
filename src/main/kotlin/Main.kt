@@ -27,21 +27,14 @@ fun main(args: Array<String>) {
         //OptimizationPasses.apply(program)
 
         // code generation
-        //val watOut = File("./out/wat_$test.wat")
-        //val outWriter = watOut.writer()
-        //val watWriter = WatWriter(outWriter)
-        //program.wat(watWriter)
-        //outWriter.flush()
-        //outWriter.close()
+        val watOut = File("./out/wat_$test.wat")
+        val outWriter = watOut.writer()
+        val watWriter = WatWriter(outWriter)
+        program.wat(watWriter)
+        outWriter.flush()
+        outWriter.close()
 
         val cfg = CfgBuilder(program.statements.filterIsInstance<Function>()[functionIndex]).build()
-
-
-        // ir
-        /*val cOut = File("./out/c_$test.c")
-        val cWriter = cOut.writer()
-        program.write(cWriter)
-        cWriter.close()*/
 
         // cfg
         val dotOut = File("./out/cfg_${test}_$functionIndex.dot")

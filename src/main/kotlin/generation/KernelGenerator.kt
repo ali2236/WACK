@@ -1,4 +1,4 @@
-package optimization
+package generation
 
 import analysis.ddt.DdgBuilder
 import ir.expression.FunctionCall
@@ -12,10 +12,10 @@ import wasm.Index
 import wasm.WasmFunction
 import wasm.WasmFunctionType
 
-class KernelExtraction : Optimizer {
+class KernelGenerator  {
 
 
-    override fun apply(program: Program) {
+    fun apply(program: Program) {
         program.statements
             .filterIsInstance<Function>()
             .forEach { applyToFunction(program, it) }
@@ -25,8 +25,7 @@ class KernelExtraction : Optimizer {
         val module = program.module
         val ddt = DdgBuilder(function).build()
 
-        // TODO: should only look for range loops
-        val loops = LoopFinder(true).apply { visit(function){ } }.result()
+        val loops = LoopFinder(RangeLoop::class.java, true).apply { visit(function){ } }.result()
         for ((loop, replace) in loops) {
             val loopIsParallelizable = true
             if (loopIsParallelizable) {

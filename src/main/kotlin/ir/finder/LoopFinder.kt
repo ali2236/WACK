@@ -3,13 +3,13 @@ package ir.finder
 import ir.statement.Loop
 import ir.statement.Statement
 
-class LoopFinder(private val topLevelOnly : Boolean = false) : Visitor() {
+class LoopFinder<T : Loop>(private val loopType: Class<T>, private val topLevelOnly : Boolean = false) : Visitor() {
 
-    private val loops = mutableListOf<Replaceable<Loop>>()
+    private val loops = mutableListOf<Replaceable<T>>()
 
     override fun visit(v: Statement, replace: (Statement) -> Unit) {
-        if (v is Loop){
-            loops.add(Replaceable(v, replace))
+        if (loopType.isInstance(v)){
+            loops.add(Replaceable(v as T, replace))
             if(!topLevelOnly){
                 super.visit(v, replace)
             }
@@ -18,7 +18,7 @@ class LoopFinder(private val topLevelOnly : Boolean = false) : Visitor() {
         }
     }
 
-    fun result(): List<Replaceable<Loop>> {
+    fun result(): List<Replaceable<T>> {
         return loops
     }
 

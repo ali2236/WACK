@@ -8,7 +8,7 @@ import wasm.WasmValueType
 
 open class Symbol(val scope: WasmScope, val type: WasmValueType, val index : Index) : Expression(), Assignable {
     override fun write(out: Appendable) {
-        out.append("${scope}$index")
+        out.append("${scope.prefix()}$index")
     }
 
     override fun wat(wat: WatWriter) {

@@ -24,7 +24,7 @@ class CfgBuilder(val function: Function) {
         val body = function.instructions
         val function = makeBlock()
         startBlock.addSuccessor(function)
-        pushScope(function, null, null)
+        pushScope(function, endBlock, endBlock)
         runOnBlock(function, body)
         popScope()
         removeEmptyBlocks()
@@ -67,9 +67,16 @@ class CfgBuilder(val function: Function) {
         for ((i, stmt) in instructions.withIndex()) {
             when (stmt) {
                 // TODO: is switch
-                is Return, is Unreachable, is FunctionCall /*TODO: indirect call*/ -> {
+                is Return, is Unreachable -> {
                     current.statements.add(stmt)
                     current.addSuccessor(endBlock)
+                }
+
+                is FunctionCall /*TODO: indirect call*/ -> {
+                    val next = makeNext(i, instructions)
+
+                    current.statements.add(stmt)
+                    current.addSuccessor(next)
                 }
 
                 is BrIf -> {

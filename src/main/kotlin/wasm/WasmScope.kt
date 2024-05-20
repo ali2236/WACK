@@ -6,7 +6,7 @@ enum class WasmScope {
     local,
     global;
 
-    override fun toString(): String {
+    fun prefix(): String {
         return when(this){
             local -> Names.local
             global -> Names.global
