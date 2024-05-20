@@ -24,7 +24,7 @@ fun main(args: Array<String>) {
         // analysis passes
 
         // optimization passes
-        //OptimizationPasses.apply(program)
+        OptimizationPasses.apply(program)
 
         // code generation
         val watOut = File("./out/wat_$test.wat")

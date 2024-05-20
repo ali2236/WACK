@@ -4,7 +4,10 @@ import ir.statement.Program
 
 object OptimizationPasses {
     fun apply(program: Program){
-        val passes = listOf<Optimizer>()
+        val passes = listOf<Optimizer>(
+            ParallelForAnnotator(),
+            KernelGenerator(),
+        )
         for (pass in passes){
             pass.apply(program)
         }
