@@ -1,15 +1,14 @@
-package optimization
+package generation.wasi.threads
 
-import analysis.ddt.DdgBuilder
 import ir.annotations.For
 import ir.expression.FunctionCall
 import ir.expression.Symbol
 import ir.finder.AnnotationFinder
 import ir.finder.Finders
-import ir.finder.LoopFinder
 import ir.finder.ReplaceableFinder
 import ir.statement.*
 import ir.statement.Function
+import optimization.Optimizer
 import wasm.Index
 import wasm.WasmFunction
 import wasm.WasmFunctionType
@@ -17,7 +16,7 @@ import wasm.WasmFunctionType
 // kernel is called by every thread
 // kernel should not care about creating threads and how it is called
 // just call it once
-class KernelGenerator : Optimizer {
+class WasiThreadsKernelGenerator : Optimizer {
 
     override fun apply(program: Program) {
         program.statements
