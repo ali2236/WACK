@@ -5,13 +5,13 @@ import generation.WebAssemblyInstruction
 
 data class WasmElementSegment(
     val tableIndex: Index,
-    val buffer: WasmBuffer,
+    val offset: Int,
     val functionIndexes: List<Index>,
 ) :
     WebAssemblyInstruction {
     val funIndxs = if(functionIndexes.isNotEmpty()) " func ${functionIndexes.joinToString(" ")}" else ""
     override fun wat(wat: WatWriter) {
-        wat.writeLine("(elem (;0;) ($buffer)$funIndxs)")
+        wat.writeLine("(elem (;0;) (i32.const $offset)$funIndxs)")
     }
 
 }

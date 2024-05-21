@@ -6,7 +6,7 @@ import wasm.WasmFunction
 
 class Function(
     val functionData: WasmFunction,
-    instructions: MutableList<Statement>
+    instructions: MutableList<Statement> = mutableListOf()
 ) : Block(instructions, false, false) {
 
     init {
