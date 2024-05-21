@@ -28,6 +28,7 @@ class WasiThreadsKernelGenerator : Optimizer {
         val module = program.module
         val forLoops = AnnotationFinder(For::class.java).apply { visit(function) { } }.result()
 
+        // TODO: needs to change a lot
         for ((forLoop, replace) in forLoops) {
             val kernelType = WasmFunctionType(Index.next(module.functionTypes))
             val block = Block(annotations = forLoop.annotations.apply { removeIf { it is For } })
@@ -38,12 +39,13 @@ class WasiThreadsKernelGenerator : Optimizer {
             // make function type
             localsAccessed.forEach { kernelType.params.add(it.type) }
 
-            // optimally determine value for local or just pass them as function parameters
+            // optimally determine value for local or have runtime evaluation
 
             // make function definition
             val kernelFunction = WasmFunction(Index.next(module.functions), type = kernelType)
 
             // TODO: Kernel init
+
             // get thread_id
             // calculate start and end
             // start loop
