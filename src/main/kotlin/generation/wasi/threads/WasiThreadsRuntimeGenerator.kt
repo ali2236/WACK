@@ -26,7 +26,12 @@ class WasiThreadsRuntimeGenerator : Generator {
         val threadStartType = module.addType(params = listOf(WasmValueType.i32, WasmValueType.i32), result = listOf())
 
         // table
-        val kernelTable = WasmTable(Index.next(module.tables), kernels.size, kernels.size)
+        val kernelTable = WasmTable(
+            Index.next(module.tables),
+            kernels.size,
+            kernels.size,
+            WasmRefType.funcref,
+        )
         module.tables.add(kernelTable)
 
         // elements
@@ -79,7 +84,7 @@ class WasiThreadsRuntimeGenerator : Generator {
                         BrIf(
                             FunctionCall(
                                 tryLockMutex.functionData.index,
-                                listOf(Symbol(WasmScope.local, WasmValueType.i32, 0)),
+                                listOf(Symbol(WasmScope.local, WasmValueType.i32, Index(0))),
                                 true,
                             ), block, 1
                         ),
