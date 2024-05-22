@@ -1,5 +1,8 @@
 package wasm
 
+import ir.expression.Expression
+import ir.expression.FunctionCall
+import ir.statement.Statement
 import org.antlr.v4.runtime.tree.ParseTree
 
 data class WasmFunction(
@@ -11,6 +14,10 @@ data class WasmFunction(
     val exportName: String? = null,
     val code: ParseTree? = null,
 ) {
+    fun call(vararg params : Expression): FunctionCall {
+        return FunctionCall(index, listOf(*params) ,type.result.isNotEmpty())
+    }
+
     val prettyName: String
         get() {
             if(import != null){

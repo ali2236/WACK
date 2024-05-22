@@ -1,10 +1,10 @@
 package generation.wack
 
 import ir.annotations.For
-import ir.expression.BinaryOP
-import ir.expression.FunctionCall
-import ir.expression.Operator
-import ir.expression.Symbol
+import ir.annotations.Kernel
+import ir.annotations.ThreadId
+import ir.annotations.WackAnnotation
+import ir.expression.*
 import ir.finder.AnnotationFinder
 import ir.finder.Finders
 import ir.finder.ReplaceableFinder
@@ -13,8 +13,9 @@ import ir.statement.Function
 import wasm.*
 
 object ThreadKernelGenerator {
-    fun generate(program: Program, threadCount: WasmGlobal) {
+    fun generate(program: Program, threadCount: WasmGlobal, threadSpawn: WasmFunction, arg: ThreadArg) {
         val module = program.module
+        var kernels = 0
         program.statements.filterIsInstance<Function>().forEach { function ->
             val forBlocks = AnnotationFinder(For::class.java).apply { visit(function) { } }.result()
             for ((forLoop, replace) in forBlocks) {
@@ -40,17 +41,27 @@ object ThreadKernelGenerator {
                     // from & to are constants!
 
                     // make function definition
-                    val kernelFunction = WasmFunction(Index.next(module.functions), type = kernelType)
-                    kernelFunction.locals.addAll(listOf(WasmValueType.i32, WasmValueType.i32))
+                    val kernelFunction = WasmFunction(
+                        Index.next(module.functions),
+                        type = kernelType,
+                        locals = mutableListOf(WasmValueType.i32, WasmValueType.i32),
+                    )
 
                     // put loop as function body
                     val kernel = Function(kernelFunction).apply {
                         val threadId = Symbol(WasmScope.local, WasmValueType.i32, Index(0))
                         val start = Symbol(WasmScope.local, WasmValueType.i32, Index(1))
                         val end = Symbol(WasmScope.local, WasmValueType.i32, Index(2))
+                        // size = to - from
+                        val size = BinaryOP(
+                            WasmValueType.i32,
+                            Operator.sub,
+                            rangeTo,
+                            rangeFrom,
+                        )
 
                         // calculate start
-                        // int start = ((to - from) / num_threads) * thread_num;
+                        // int start = (size / num_threads) * thread_num;
                         instructions.add(
                             Assignment(
                                 start, BinaryOP(
@@ -59,12 +70,7 @@ object ThreadKernelGenerator {
                                     BinaryOP(
                                         WasmValueType.i32,
                                         Operator.div,
-                                        BinaryOP(
-                                            WasmValueType.i32,
-                                            Operator.sub,
-                                            rangeTo,
-                                            rangeFrom,
-                                        ),
+                                        size,
                                         threadCount.symbol,
                                     ),
                                     threadId,
@@ -76,13 +82,49 @@ object ThreadKernelGenerator {
                         // int end = (thread_num == num_threads - 1) ? size : (size / num_threads) * (thread_num + 1);
                         instructions.add(
                             Assignment(
-                                end,
-                                // TODO: select
+                                end, Select(
+                                    BinaryOP(
+                                        WasmValueType.i32,
+                                        Operator.mul,
+                                        BinaryOP(
+                                            WasmValueType.i32,
+                                            Operator.div,
+                                            size,
+                                            threadCount.symbol,
+                                        ),
+                                        BinaryOP(
+                                            WasmValueType.i32,
+                                            Operator.add,
+                                            threadId,
+                                            Value(WasmValueType.i32, "1"),
+                                        ),
+                                    ),
+                                    size,
+                                    BinaryOP(
+                                        WasmValueType.i32, Operator.eq, threadId, BinaryOP(
+                                            WasmValueType.i32,
+                                            Operator.sub,
+                                            threadCount.symbol,
+                                            Value(WasmValueType.i32, "1")
+                                        )
+                                    ),
+                                    WasmValueType.i32,
+                                )
                             )
                         )
 
+                        // TODO: replace locals with new boundaries
+                        // replace init with start
+                        rangeLoop.init.assignedTo() // what to replace with start
+                        // replace condition.right with end
+                        (rangeLoop.condition as BinaryOP).right // what to replace with end
                         instructions.add(forLoop)
                     }
+                    val kernelId = kernels++
+                    val kernelAnnotation = Kernel(kernelId)
+                    kernel.annotations.add(kernelAnnotation)
+                    module.functions.add(kernelFunction)
+                    program.statements.add(kernel)
 
                     // replace locals with new locals
                     ReplaceableFinder(Symbol::class.java).also { it.visit(kernel) {} }.result().forEach {
@@ -92,13 +134,27 @@ object ThreadKernelGenerator {
                         it.replace(newSmbl)
                     }
 
-                    // call kernel function with each thread portion
-                    parallelBlock.push(FunctionCall(kernelFunction.index, localsAccessed.toList(), false))
+                    // call kernel function with thread-spawn
+                    // check if error code -> trap
 
-                    // commit change
+                    val threadId = Symbol(WasmScope.local, WasmValueType.i32, Index.next(function.functionData.locals))
+                    function.functionData.locals.add(threadId.type)
+                    function.annotations.add(ThreadId(threadId))
+
+                    parallelBlock.apply {
+                        instructions.add(
+                            If(
+                                BinaryOP(
+                                    WasmValueType.i32,
+                                    Operator.lt,
+                                    threadSpawn.call(arg.encode.call(threadId, Value(WasmValueType.i32, "$kernelId"))),
+                                    Value(WasmValueType.i32, "0")
+                                ),
+                                mutableListOf(Unreachable())
+                            ),
+                        )
+                    }
                     replace(parallelBlock)
-                    module.functions.add(kernelFunction)
-                    program.statements.add(kernel)
                 } catch (e: Exception) {
 
                 }

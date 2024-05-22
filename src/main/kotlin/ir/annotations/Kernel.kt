@@ -1,4 +1,4 @@
 package ir.annotations
 
-class Kernel : Annotation {
+class Kernel(val kernelId: Int) : WackAnnotation {
 }

@@ -7,7 +7,6 @@ import ir.statement.Function
 import wasm.*
 import java.awt.image.Kernel
 
-/*
 class WasiThreadsRuntimeGenerator : Generator {
     override fun apply(program: Program) {
         val module = program.module
@@ -17,9 +16,8 @@ class WasiThreadsRuntimeGenerator : Generator {
             program.statements.filterIsInstance<Function>().filter { it.annotations.any { ann -> ann is Kernel } }
 
         // types
-        val kernelType = module.addType(params = listOf(WasmValueType.i32), result = listOf())
-        val threadSpawnType = module.addType(params = listOf(WasmValueType.i32), result = listOf(WasmValueType.i32))
-        val threadStartType = module.addType(params = listOf(WasmValueType.i32, WasmValueType.i32), result = listOf())
+        val kernelType = module.findOraddType(params = listOf(WasmValueType.i32), result = listOf())
+        val threadStartType = module.findOraddType(params = listOf(WasmValueType.i32, WasmValueType.i32), result = listOf())
 
 
         // table
@@ -34,13 +32,6 @@ class WasiThreadsRuntimeGenerator : Generator {
         // elements
         val kernelsElementSegment = WasmElementSegment(kernelTable.index, 0, kernels.map { it.functionData.index })
         module.elementSegments.add(kernelsElementSegment)
-
-
-        // imports
-        val wasiThreadSpawnImport = WasmFunction(
-            Index.next(module.functions), type = threadSpawnType, import = WasmImport("wasi", "thread-spawn")
-        )
-        module.functions.add(wasiThreadSpawnImport)
 
         // function headers
 
@@ -120,4 +111,4 @@ class WasiThreadsRuntimeGenerator : Generator {
 
     }
 
-}*/
+}
