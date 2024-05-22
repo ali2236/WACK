@@ -14,10 +14,10 @@ object MutexLibraryGenerator {
         module.memories.add(mutexMemory)
 
         // types
-        val kernelType = module.addType(params = listOf(WasmValueType.i32), result = listOf())
-        val threadSpawnType = module.addType(params = listOf(WasmValueType.i32), result = listOf(WasmValueType.i32))
+        val kernelType = module.findOraddType(params = listOf(WasmValueType.i32), result = listOf())
+        val threadSpawnType = module.findOraddType(params = listOf(WasmValueType.i32), result = listOf(WasmValueType.i32))
         val argEncodeType =
-            module.addType(params = listOf(WasmValueType.i32, WasmValueType.i32), result = listOf(WasmValueType.i32))
+            module.findOraddType(params = listOf(WasmValueType.i32, WasmValueType.i32), result = listOf(WasmValueType.i32))
 
 
         // function headers

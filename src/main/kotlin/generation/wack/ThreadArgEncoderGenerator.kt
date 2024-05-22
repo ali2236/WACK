@@ -14,12 +14,12 @@ object ThreadArgEncoderGenerator {
         val module = program.module
 
         // types
-        val argEncodeType = module.addType(
+        val argEncodeType = module.findOraddType(
             params = listOf(WasmValueType.i32, WasmValueType.i32),
             result = listOf(WasmValueType.i32)
         )
 
-        val argDecodeType = module.addType(
+        val argDecodeType = module.findOraddType(
             params = listOf(WasmValueType.i32),
             result = listOf(WasmValueType.i32, WasmValueType.i32)
         )
