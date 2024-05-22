@@ -3,6 +3,7 @@ package ir.statement
 import generation.WatWriter
 import ir.Names
 import wasm.WasmFunction
+import wasm.WasmValueType
 
 class Function(
     val functionData: WasmFunction,

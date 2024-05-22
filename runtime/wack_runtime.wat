@@ -5,6 +5,8 @@
   (type $kernel_type (func (param i32)))
   (type $thread_spawn_type (func (param i32) (result i32)))
   (type $thread_start_type (func (param i32 i32)))
+  (type $arg_encode_type (func (param i32 i32) (result i32)))
+  (type $arg_decode_type (func (param i32) (result i32 i32)))
   (import "wasi" "thread-spawn" (func $thread_spawn (type $thread_spawn_type)))
   (func $try_lock_mutex (type $thread_spawn_type) (param $mutex_address i32) (result i32)
     local.get $mutex_address
@@ -49,6 +51,31 @@
     call $lock_mutex
     local.get 0
     call $unlock_mutex
+  )
+  ;; thread_id ^ (kernel_id << 16)
+  (func $encode_arg (type $arg_encode_type) (param i32 i32) (result i32)
+    local.get 0
+    local.get 1
+    i32.const 16
+    i32.shl
+    i32.xor
+  )
+  (func $decode_arg (type $arg_decode_type) (param i32) (result i32 i32)
+    ;; unsigned int thread_id = args & 0x0000FFFF;
+    local.get 1
+    i32.const 0x0000FFFF
+    i32.and
+    local.set 2
+    ;; thread_num param
+    ;; unsigned int kernel_id = (args & 0xFFFF0000) >> 16;
+    local.get 1
+    i32.const 0xFFFF0000
+    i32.and
+    i32.const 16
+    i32.shr_u
+    local.set 3
+    ;; function index
+
   )
   (func $wasi_thread_start (type $thread_start_type) (param i32 i32)
     (local i32 i32)

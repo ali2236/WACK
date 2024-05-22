@@ -6,7 +6,7 @@ data class WasmFunction(
     val index: Index,
     val name: String? = null,
     val type : WasmFunctionType,
-    val locals : MutableList<WasmValueType> = mutableListOf(),
+    val locals : MutableList<WasmValueType> = mutableListOf(), // only important when attached to a Function class
     val import: WasmImport? = null,
     val exportName: String? = null,
     val code: ParseTree? = null,

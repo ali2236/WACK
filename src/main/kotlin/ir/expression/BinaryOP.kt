@@ -54,6 +54,7 @@ data class Operator(val sign: String, val watName: String, var signed: BitSign? 
         val shr = Operator(">>", "shr")
         val and = Operator("&", "and")
         val or = Operator("|", "or")
+        val xor = Operator("^", "xor")
     }
 
     fun wat(): String {

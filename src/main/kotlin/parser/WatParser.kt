@@ -86,7 +86,7 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
         val function = WasmFunction(
             Index.next(module.functions),
             type = WasmFunctionType(Index(typeIndex), params, results),
-            locals = (params + locals).toMutableList(),
+            locals = locals.toMutableList(),
             code = code
         )
 
