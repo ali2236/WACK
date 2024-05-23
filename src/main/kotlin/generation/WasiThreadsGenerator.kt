@@ -1,6 +1,7 @@
 package generation
 
 import generation.Generator
+import generation.wack.ParallelBlockGenerator
 import generation.wack.ThreadArgEncoderGenerator
 import generation.wack.ThreadCountGenerator
 import generation.wack.ThreadKernelGenerator
@@ -15,7 +16,8 @@ class WasiThreadsGenerator : Generator {
         val threadArg = ThreadArgEncoderGenerator.generate(program)
         val threadCount = ThreadCountGenerator.generate(program)
         val threadSpawn = WasiThreadSpawnGenerator.generate(program)
-        ThreadKernelGenerator.generate(program, threadCount, threadSpawn, threadArg)
+        val parallelBlocks = ThreadKernelGenerator.generate(program, threadCount, threadSpawn, threadArg, mutex)
         WasiThreadStartGenerator.generate(program, threadArg, mutex)
+        ParallelBlockGenerator.generate(parallelBlocks, threadCount, mutex)
     }
 }

@@ -1,4 +1,6 @@
 package ir.annotations
 
-class Parallel : WackAnnotation {
+import ir.expression.Symbol
+
+class Parallel(var threadId: Symbol? = null) : WackAnnotation {
 }

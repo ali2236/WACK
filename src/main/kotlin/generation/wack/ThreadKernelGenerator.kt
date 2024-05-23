@@ -1,9 +1,7 @@
 package generation.wack
 
-import ir.annotations.For
-import ir.annotations.Kernel
-import ir.annotations.ThreadId
-import ir.annotations.WackAnnotation
+import generation.wasm.threads.MutexLibrary
+import ir.annotations.*
 import ir.expression.*
 import ir.finder.AnnotationFinder
 import ir.finder.Finders
@@ -13,15 +11,21 @@ import ir.statement.Function
 import wasm.*
 
 object ThreadKernelGenerator {
-    fun generate(program: Program, threadCount: WasmGlobal, threadSpawn: WasmFunction, arg: ThreadArg) {
+    fun generate(
+        program: Program, threadCount: WasmGlobal, threadSpawn: WasmFunction, arg: ThreadArg, mutex: MutexLibrary
+    ): List<Block> {
         val module = program.module
         var kernels = 0
+        val parallelBlocks = mutableListOf<Block>()
         program.statements.filterIsInstance<Function>().forEach { function ->
             val forBlocks = AnnotationFinder(For::class.java).apply { visit(function) { } }.result()
             for ((forLoop, replace) in forBlocks) {
                 try {
                     val kernelType = module.findOraddType(listOf(WasmValueType.i32), listOf()).copy()
                     val parallelBlock = Block(annotations = forLoop.annotations.apply { removeIf { it is For } })
+                    parallelBlock.parent = forLoop.parent
+                    parallelBlock.indexInParent = forLoop.indexInParent
+                    val parallelAnnotation = parallelBlock.annotations.filterIsInstance<Parallel>().first()
 
                     // find function locals used
                     val localsAccessed = Finders.symbols(forLoop.instructions).toSet()
@@ -137,11 +141,20 @@ object ThreadKernelGenerator {
                     // call kernel function with thread-spawn
                     // check if error code -> trap
 
-                    val threadId = Symbol(WasmScope.local, WasmValueType.i32, Index.next(function.functionData.locals))
-                    function.functionData.locals.add(threadId.type)
-                    function.annotations.add(ThreadId(threadId))
+                    var threadId = function.annotations.filterIsInstance<ThreadId>().firstOrNull()?.symbol
+                    if (threadId == null) {
+                        threadId = Symbol(WasmScope.local, WasmValueType.i32, Index.next(function.functionData.locals))
+                        function.functionData.locals.add(threadId.type)
+                        function.annotations.add(ThreadId(threadId))
+                    }
 
+                    parallelAnnotation.threadId = threadId
                     parallelBlock.apply {
+                        // lock mutex
+                        instructions.add(
+                            mutex.lock.call(threadId),
+                        )
+                        // spawn thread
                         instructions.add(
                             If(
                                 BinaryOP(
@@ -149,17 +162,18 @@ object ThreadKernelGenerator {
                                     Operator.lt.copy(signed = BitSign.s),
                                     threadSpawn.call(arg.encode.call(threadId, Value(WasmValueType.i32, "$kernelId"))),
                                     Value(WasmValueType.i32, "0")
-                                ),
-                                mutableListOf(Unreachable())
+                                ), mutableListOf(Unreachable())
                             ),
                         )
                     }
                     replace(parallelBlock)
+                    parallelBlocks.add(parallelBlock)
                 } catch (e: Exception) {
 
                 }
             }
         }
+        return parallelBlocks
     }
 
 }

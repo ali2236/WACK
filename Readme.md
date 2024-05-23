@@ -1,7 +1,11 @@
 # TODO
 - [x] Multiple Memory Support
-- [ ] Lock Thread Mutex Before Kernel Lock
-- [ ] Parallel Block Generation
+- [x] Lock Thread Mutex Before Kernel Lock
+- [x] Parallel Block Generation
+- [ ] Block WasmBlockType
+- [ ] Data Dependency Test
+- [ ] DFA+Eval
+- [ ] Runtime limit evaluation
 
 ### How to Run
 ```
