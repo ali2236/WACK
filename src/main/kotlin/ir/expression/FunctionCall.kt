@@ -29,7 +29,7 @@ class FunctionCall(
 
     override fun wat(wat: WatWriter) {
         wat.writeAll(params)
-        wat.writeLine("call ${functionIndex}")
+        wat.writeLine("call \$f${functionIndex}")
     }
 
 }

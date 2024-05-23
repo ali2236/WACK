@@ -28,6 +28,7 @@ object ThreadArgEncoderGenerator {
         val wasmArgEncode = WasmFunction(Index.next(module.functions), "arg_encode", argEncodeType)
         module.functions.add(wasmArgEncode)
         val wasmArgDecode = WasmFunction(Index.next(module.functions), "arg_decode", argDecodeType)
+        module.functions.add(wasmArgDecode)
 
         // functions
         val argEncode = Function(

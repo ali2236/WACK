@@ -68,7 +68,7 @@ class Function(
 
     override fun watHeader(wat: WatWriter) {
         val funcStart =
-            "(func (;${functionData.index};) (type ${functionData.type.index})${functionData.type.paramsWat()}${functionData.type.resultWat()}"
+            "(func \$f${functionData.index} (type ${functionData.type.index})${functionData.type.paramsWat()}${functionData.type.resultWat()}"
         if (functionData.import == null) {
             wat.writeLine(funcStart)
             if (functionData.locals.size > 0) {

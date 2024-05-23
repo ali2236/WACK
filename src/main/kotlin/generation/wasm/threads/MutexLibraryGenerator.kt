@@ -6,7 +6,7 @@ import ir.statement.Function
 import wasm.*
 
 object MutexLibraryGenerator {
-    fun generate(program: Program) : MutexLibrary {
+    fun generate(program: Program): MutexLibrary {
         val module = program.module
 
         // memory
@@ -15,9 +15,13 @@ object MutexLibraryGenerator {
 
         // types
         val kernelType = module.findOraddType(params = listOf(WasmValueType.i32), result = listOf())
-        val threadSpawnType = module.findOraddType(params = listOf(WasmValueType.i32), result = listOf(WasmValueType.i32))
+        val threadSpawnType =
+            module.findOraddType(params = listOf(WasmValueType.i32), result = listOf(WasmValueType.i32))
         val argEncodeType =
-            module.findOraddType(params = listOf(WasmValueType.i32, WasmValueType.i32), result = listOf(WasmValueType.i32))
+            module.findOraddType(
+                params = listOf(WasmValueType.i32, WasmValueType.i32),
+                result = listOf(WasmValueType.i32)
+            )
 
 
         // function headers
@@ -29,8 +33,6 @@ object MutexLibraryGenerator {
         module.functions.add(wasmUnlockMutex)
         val wasmWaitMutexLock = WasmFunction(Index.next(module.functions), "wait_mutex_lock", kernelType)
         module.functions.add(wasmWaitMutexLock)
-        val wasmArgEncode = WasmFunction(Index.next(module.functions), "arg_encode", argEncodeType)
-        module.functions.add(wasmArgEncode)
 
         // functions
         val tryLockMutex = Function(
@@ -56,7 +58,7 @@ object MutexLibraryGenerator {
                         ),
                         Symbol(WasmScope.local, WasmValueType.i32, Index(0)),
                         Value(WasmValueType.i32, "1"),
-                        Value(WasmValueType.i32, "-1"),
+                        Value(WasmValueType.i64, "-1"),
                         RawWat("memory.atomic.wait32 ${mutexMemory.index}"),
                         RawWat("drop"),
                         RawWat("br 0"),
@@ -80,12 +82,8 @@ object MutexLibraryGenerator {
         program.statements.add(unlockMutex)
         val waitMutexLock = Function(
             wasmWaitMutexLock, mutableListOf(
-                FunctionCall(
-                    wasmLockMutex.index, listOf(Symbol(WasmScope.local, WasmValueType.i32, Index(0))), false
-                ),
-                FunctionCall(
-                    wasmUnlockMutex.index, listOf(Symbol(WasmScope.local, WasmValueType.i32, Index(0))), false
-                ),
+                wasmLockMutex.call(Symbol(WasmScope.local, WasmValueType.i32, Index(0))),
+                wasmUnlockMutex.call(Symbol(WasmScope.local, WasmValueType.i32, Index(0))),
             )
         )
         program.statements.add(waitMutexLock)
