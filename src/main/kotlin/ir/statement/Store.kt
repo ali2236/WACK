@@ -11,12 +11,6 @@ class Store(
     var data: Expression,
 ) : Statement, Assignee {
 
-    @Deprecated("Use symbol instead")
-    val load: Load
-        get() = symbol
-
-
-
     override fun write(out: Appendable) {
         out.append(Names.memory)
         //out.append("_$type")
