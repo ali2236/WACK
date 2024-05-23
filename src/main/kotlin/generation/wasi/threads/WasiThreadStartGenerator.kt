@@ -82,7 +82,7 @@ object WasiThreadStartGenerator {
 
         // exports
         val wasiThreadStartExport = WasmExport(
-            "wasi_thread_start",
+            "\"wasi_thread_start\"",
             WasmExportKind.func,
             wasiThreadStart.functionData.index,
         )

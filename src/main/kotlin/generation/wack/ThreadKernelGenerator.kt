@@ -69,7 +69,7 @@ object ThreadKernelGenerator {
                                     Operator.mul,
                                     BinaryOP(
                                         WasmValueType.i32,
-                                        Operator.div,
+                                        Operator.div.copy(signed = BitSign.s),
                                         size,
                                         threadCount.symbol,
                                     ),
@@ -88,7 +88,7 @@ object ThreadKernelGenerator {
                                         Operator.mul,
                                         BinaryOP(
                                             WasmValueType.i32,
-                                            Operator.div,
+                                            Operator.div.copy(signed = BitSign.s),
                                             size,
                                             threadCount.symbol,
                                         ),
@@ -126,13 +126,13 @@ object ThreadKernelGenerator {
                     module.functions.add(kernelFunction)
                     program.statements.add(kernel)
 
-                    // replace locals with new locals
-                    ReplaceableFinder(Symbol::class.java).also { it.visit(kernel) {} }.result().forEach {
+                    // TODO: replace locals with new locals
+                    /*ReplaceableFinder(Symbol::class.java).also { it.visit(kernel) {} }.result().forEach {
                         val smbl = it.statement
                         val newIndex = localsAccessed.indexOf(smbl)
                         val newSmbl = Symbol(smbl.scope, smbl.type, Index(newIndex))
                         it.replace(newSmbl)
-                    }
+                    }*/
 
                     // call kernel function with thread-spawn
                     // check if error code -> trap
@@ -146,7 +146,7 @@ object ThreadKernelGenerator {
                             If(
                                 BinaryOP(
                                     WasmValueType.i32,
-                                    Operator.lt,
+                                    Operator.lt.copy(signed = BitSign.s),
                                     threadSpawn.call(arg.encode.call(threadId, Value(WasmValueType.i32, "$kernelId"))),
                                     Value(WasmValueType.i32, "0")
                                 ),

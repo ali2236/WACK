@@ -19,7 +19,7 @@ object ThreadCountGenerator {
 
         // exports
         val numThreadsExport = WasmExport(
-            "num_threads",
+            "\"num_threads\"",
             WasmExportKind.global,
             numThreads.index,
         )

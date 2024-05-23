@@ -10,9 +10,3 @@ data class WasmExport(val name: String, val kind: WasmExportKind, val index: Ind
 
 }
 
-enum class WasmExportKind {
-    func,
-    memory,
-    table,
-    global
-}

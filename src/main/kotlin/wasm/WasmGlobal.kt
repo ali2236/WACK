@@ -19,10 +19,5 @@ data class WasmGlobal(val index: Index, val type: WasmGlobalType, val constExpr:
 
 }
 
-data class WasmGlobalType(val type: WasmValueType, val mutable: Boolean){
-    override fun toString(): String {
-        val mut = if(mutable) "mut " else ""
-        return "$mut$type"
-    }
-}
+
 
