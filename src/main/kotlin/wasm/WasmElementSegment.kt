@@ -11,7 +11,7 @@ data class WasmElementSegment(
     WebAssemblyInstruction {
     val funIndxs = if(functionIndexes.isNotEmpty()) " func ${functionIndexes.joinToString(" ")}" else ""
     override fun wat(wat: WatWriter) {
-        wat.writeLine("(elem (;0;) (i32.const $offset)$funIndxs)")
+        wat.writeLine("(elem (;0;) (table $tableIndex) (i32.const $offset)$funIndxs)")
     }
 
 }

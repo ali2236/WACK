@@ -113,7 +113,7 @@ plain_instr
     : UNREACHABLE
     | NOP
     | DROP
-    | SELECT
+    | SELECT LPAR RETURN value_type RPAR
     | BR var_
     | BR_IF var_
     | BR_TABLE var_+
@@ -124,10 +124,10 @@ plain_instr
     | LOCAL_TEE var_
     | GLOBAL_GET var_
     | GLOBAL_SET var_
-    | LOAD OFFSET_EQ_NAT? ALIGN_EQ_NAT?
-    | STORE OFFSET_EQ_NAT? ALIGN_EQ_NAT?
-    | MEMORY_SIZE
-    | MEMORY_GROW
+    | LOAD var_? OFFSET_EQ_NAT? ALIGN_EQ_NAT?
+    | STORE var_? OFFSET_EQ_NAT? ALIGN_EQ_NAT?
+    | MEMORY_SIZE var_?
+    | MEMORY_GROW var_?
     | CONST literal
     | TEST
     | COMPARE

@@ -178,7 +178,8 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val offset = ctx.OFFSET_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val addr = stack.pop()
-            val load = Load(type, addr, offset, align)
+            val memoryIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
+            val load = Load(type, addr, memoryIndex, offset, align)
             stack.push(load)
         } else if (ctx.STORE() != null) {
             val type = WasmValueType.parse(ctx.STORE()!!.text.substring(0, 3))
@@ -186,7 +187,8 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val data = stack.pop()
             val addr = stack.pop()
-            val store = Store(Load(type, addr, offset, align), data)
+            val memoryIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
+            val store = Store(Load(type, addr, memoryIndex, offset, align), data)
             stack.push(store)
         } else {
             throw Exception("No Case found for: " + ctx.text)

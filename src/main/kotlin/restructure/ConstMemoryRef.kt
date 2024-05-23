@@ -11,7 +11,8 @@ import wasm.Index
 import wasm.WasmScope
 
 
-// Shouldn't be used
+/*
+@Deprecated("Shouldn't be used")
 class ConstMemoryRef : Restructure() {
 
     private val constRef = mutableMapOf<Value, Symbol>()
@@ -55,4 +56,4 @@ class ConstMemoryRef : Restructure() {
             }
         }
     }
-}
+}*/

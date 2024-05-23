@@ -4,16 +4,18 @@ import generation.WatWriter
 import ir.Names
 import ir.finder.Visitor
 import ir.statement.Assignable
+import wasm.Index
 import wasm.WasmValueType
 
 class Load(
     val type: WasmValueType,
     var address: Expression,
+    val memoryIndex: Index,
     val offset: Int = 0,
     val align: Int = 0,
 ) : Expression(), Assignable {
     override fun write(out: Appendable) {
-        out.append(Names.memory)
+        out.append(Names.memory + memoryIndex)
         out.append("[")
         if (offset != 0) {
             BinaryOP(type, Operator.add, address, Value(WasmValueType.i32, offset.toString())).write(out)
@@ -24,7 +26,7 @@ class Load(
     }
 
     override fun visit(v: Visitor) {
-        v.visit(address){address = it as Expression}
+        v.visit(address) { address = it as Expression }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -47,9 +49,9 @@ class Load(
 
     override fun wat(wat: WatWriter) {
         address.wat(wat)
-        val ofst = if(offset!=0)" offset=$offset" else ""
-        val algn = if(align!=0)" align=$align" else ""
-        wat.writeLine("${type}.load${ofst}${algn}")
+        val ofst = if (offset != 0) " offset=$offset" else ""
+        val algn = if (align != 0) " align=$align" else ""
+        wat.writeLine("${type}.load $memoryIndex${ofst}${algn}")
     }
 
 

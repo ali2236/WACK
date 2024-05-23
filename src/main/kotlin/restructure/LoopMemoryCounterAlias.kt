@@ -9,6 +9,7 @@ import wasm.Index
 import wasm.WasmScope
 
 // replaces load with constload/symbol around loops
+/*
 @Deprecated("Doesn't work correctly")
 class LoopMemoryCounterAlias : Restructure() {
 
@@ -85,4 +86,4 @@ class LoopMemoryCounterAlias : Restructure() {
         }
     }
 
-}
+}*/
