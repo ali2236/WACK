@@ -5,6 +5,7 @@ import generation.wack.ThreadArgEncoderGenerator
 import generation.wack.ThreadCountGenerator
 import generation.wack.ThreadKernelGenerator
 import generation.wasi.threads.WasiThreadSpawnGenerator
+import generation.wasi.threads.WasiThreadStartGenerator
 import generation.wasm.threads.MutexLibraryGenerator
 import ir.statement.Program
 
@@ -14,6 +15,7 @@ class WasiThreadsGenerator : Generator {
         val threadArg = ThreadArgEncoderGenerator.generate(program)
         val threadCount = ThreadCountGenerator.generate(program)
         val threadSpawn = WasiThreadSpawnGenerator.generate(program)
-        val kernels = ThreadKernelGenerator.generate(program, threadCount)
+        ThreadKernelGenerator.generate(program, threadCount, threadSpawn, threadArg)
+        WasiThreadStartGenerator.generate(program, threadArg, mutex)
     }
 }

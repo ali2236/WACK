@@ -46,11 +46,13 @@ object ThreadArgEncoderGenerator {
 
         val argDecode = Function(wasmArgDecode).also {
             val arg = Symbol(WasmScope.local, WasmValueType.i32, Index(0))
+            // thread_id
             it.instructions.add(
                 BinaryOP(
                     WasmValueType.i32, Operator.and, arg, Value(WasmValueType.i32, "0x0000FFFF")
                 )
             )
+            // kernel_id
             it.instructions.add(
                 BinaryOP(
                     WasmValueType.i32, Operator.shr.copy(signed = BitSign.u), BinaryOP(

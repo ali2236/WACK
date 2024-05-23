@@ -57,4 +57,8 @@ class Store(
         return symbol
     }
 
+    override fun replaceAssign(newValue: Expression) {
+        data = newValue
+    }
+
 }

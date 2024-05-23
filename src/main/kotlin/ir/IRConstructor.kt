@@ -34,14 +34,14 @@ class IRConstructor(val module: WasmModule) {
         // declaration
         val paramCount = functionData.type.params.size
         val localCount = functionData.locals.size
-        for (i in paramCount until localCount) {
+        for (i in 0 until localCount) {
             val localType = functionData.locals[i]
             val symbol = Symbol(WasmScope.local, localType, Index(paramCount + i))
             val dec = Declaration(localType, symbol)
             inst.add(dec)
         }
         // assignment
-        for (i in paramCount until localCount) {
+        for (i in 0 until localCount) {
             val localType = functionData.locals[i]
             val symbol = Symbol(WasmScope.local, localType, Index(paramCount + i))
             val value = Value(localType, localType.defaultValue())

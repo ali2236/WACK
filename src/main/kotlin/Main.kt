@@ -1,4 +1,5 @@
 import analysis.cfg.CfgBuilder
+import generation.WasiThreadsGenerator
 import generation.WatWriter
 import ir.IRConstructor
 import ir.statement.Function
@@ -27,6 +28,9 @@ fun main(args: Array<String>) {
         OptimizationPasses.apply(program)
 
         // code generation
+        WasiThreadsGenerator().apply(program)
+
+        // write out
         val watOut = File("./out/wat_$test.wat")
         val outWriter = watOut.writer()
         val watWriter = WatWriter(outWriter)

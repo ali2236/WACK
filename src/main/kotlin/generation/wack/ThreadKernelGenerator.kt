@@ -113,11 +113,11 @@ object ThreadKernelGenerator {
                             )
                         )
 
-                        // TODO: replace locals with new boundaries
+                        // replace locals with new boundaries
                         // replace init with start
-                        rangeLoop.init.assignedTo() // what to replace with start
+                        rangeLoop.init.replaceAssign(start) // what to replace with start
                         // replace condition.right with end
-                        (rangeLoop.condition as BinaryOP).right // what to replace with end
+                        (rangeLoop.condition as BinaryOP).right = end// what to replace with end
                         instructions.add(forLoop)
                     }
                     val kernelId = kernels++

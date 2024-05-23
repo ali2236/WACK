@@ -1,24 +1,30 @@
 package generation.wasi.threads
 
-import generation.Generator
+import generation.wack.ThreadArg
+import generation.wasm.threads.MutexLibrary
+import ir.annotations.Kernel
 import ir.expression.*
-import ir.statement.*
+import ir.statement.Assignment
 import ir.statement.Function
+import ir.statement.Program
+import ir.statement.RawWat
 import wasm.*
-import java.awt.image.Kernel
 
-class WasiThreadsRuntimeGenerator : Generator {
-    override fun apply(program: Program) {
+object WasiThreadStartGenerator {
+    fun generate(program: Program, arg: ThreadArg, mutex: MutexLibrary) {
         val module = program.module
 
         // kernels
         val kernels =
-            program.statements.filterIsInstance<Function>().filter { it.annotations.any { ann -> ann is Kernel } }
+            program.statements
+                .filterIsInstance<Function>()
+                .filter { it.annotations.any { ann -> ann is Kernel } }
+                .sortedBy { it.annotations.filterIsInstance<Kernel>().first().kernelId }
 
         // types
         val kernelType = module.findOraddType(params = listOf(WasmValueType.i32), result = listOf())
-        val threadStartType = module.findOraddType(params = listOf(WasmValueType.i32, WasmValueType.i32), result = listOf())
-
+        val threadStartType =
+            module.findOraddType(params = listOf(WasmValueType.i32, WasmValueType.i32), result = listOf())
 
         // table
         val kernelTable = WasmTable(
@@ -34,7 +40,6 @@ class WasiThreadsRuntimeGenerator : Generator {
         module.elementSegments.add(kernelsElementSegment)
 
         // function headers
-
         val wasmWasiThreadStart = WasmFunction(
             Index.next(module.functions),
             "wasi_thread_start",
@@ -43,40 +48,25 @@ class WasiThreadsRuntimeGenerator : Generator {
         )
         module.functions.add(wasmWasiThreadStart)
 
-
         // functions
         val wasiThreadStart = Function(wasmWasiThreadStart).also {
-            val arg = Symbol(WasmScope.local, WasmValueType.i32, Index(1))
+            val args = Symbol(WasmScope.local, WasmValueType.i32, Index(1))
             val threadId = Symbol(WasmScope.local, WasmValueType.i32, Index(2))
-            val functionIndex = Symbol(WasmScope.local, WasmValueType.i32, Index(3))
+            val kernelIndex = Symbol(WasmScope.local, WasmValueType.i32, Index(3))
 
-            // unsigned int thread_id = args & 0x0000FFFF;
+            // thread_id, kernel_index = decode_arg(args)
             it.instructions.add(
-                Assignment(
-                    threadId, BinaryOP(
-                        WasmValueType.i32, Operator.and, arg, Value(WasmValueType.i32, "0x0000FFFF")
-                    )
-                )
+                Assignment(kernelIndex, arg.decode.call(args))
             )
+            it.instructions.add(RawWat("local.set ${threadId.index}"))
 
-            // unsigned int kernel_id = (args & 0xFFFF0000) >> 16;
-            it.instructions.add(
-                Assignment(
-                    functionIndex,
-                    BinaryOP(
-                        WasmValueType.i32, Operator.shr.copy(signed = BitSign.u), BinaryOP(
-                            WasmValueType.i32, Operator.and, arg, Value(WasmValueType.i32, "0xFFFF0000")
-                        ), Value(WasmValueType.i32, "16")
-                    ),
-                )
-            )
 
             // table[kernel_id](thread_id)
             it.instructions.add(
                 IndirectFunctionCall(
                     kernelTable.index,
                     kernelType.index,
-                    functionIndex,
+                    kernelIndex,
                     listOf(threadId),
                     false,
                 )
@@ -84,22 +74,11 @@ class WasiThreadsRuntimeGenerator : Generator {
 
             // unlock mutex
             it.instructions.add(
-                FunctionCall(
-                    unlockMutex.functionData.index, listOf(threadId), false
-                )
+                mutex.unlock.call(threadId),
             )
 
         }
         program.statements.add(wasiThreadStart)
-
-
-        // globals
-        val numThreads = WasmGlobal(
-            Index.next(module.globals), WasmGlobalType(WasmValueType.i32, true), mutableListOf(
-                Value(WasmValueType.i32, "8")
-            )
-        )
-        module.globals.add(numThreads)
 
         // exports
         val wasiThreadStartExport = WasmExport(
@@ -108,7 +87,5 @@ class WasiThreadsRuntimeGenerator : Generator {
             wasiThreadStart.functionData.index,
         )
         module.exports.add(wasiThreadStartExport)
-
     }
-
 }

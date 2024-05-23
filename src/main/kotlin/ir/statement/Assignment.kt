@@ -47,6 +47,10 @@ open class Assignment(
         return symbol
     }
 
+    override fun replaceAssign(newValue: Expression) {
+        value = newValue
+    }
+
     override fun toString(): String {
         val buffer = StringBuffer()
         this.write(buffer)

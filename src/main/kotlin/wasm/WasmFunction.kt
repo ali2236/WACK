@@ -14,6 +14,8 @@ data class WasmFunction(
     val exportName: String? = null,
     val code: ParseTree? = null,
 ) {
+    val allLocals : List<WasmValueType>
+        get() = type.params + locals
     fun call(vararg params : Expression): FunctionCall {
         return FunctionCall(index, listOf(*params) ,type.result.isNotEmpty())
     }

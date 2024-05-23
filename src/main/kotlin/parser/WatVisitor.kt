@@ -104,18 +104,18 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             stack.push(FunctionCall(functionIndex, params, hasReturn))
         } else if (ctx.LOCAL_GET() != null) {
             val index = ctx.var_().first().text.toInt()
-            val type = function!!.locals[index]
+            val type = function!!.allLocals[index]
             val symbol = Symbol(WasmScope.local, type, Index(index))
             stack.push(symbol)
         } else if (ctx.LOCAL_SET() != null) {
             val index = ctx.var_().first().text.toInt()
-            val type = function!!.locals[index]
+            val type = function!!.allLocals[index]
             val symbol = Symbol(WasmScope.local, type, Index(index))
             val value = stack.pop()
             stack.push(Assignment(symbol, value))
         } else if (ctx.LOCAL_TEE() != null) {
             val index = ctx.var_().first().text.toInt()
-            val type = function!!.locals[index]
+            val type = function!!.allLocals[index]
             val symbol = Symbol(WasmScope.local, type, Index(index))
             val value = stack.pop()
             val dependant = Finders.symbols(value).any { it == symbol }
