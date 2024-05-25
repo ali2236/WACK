@@ -10,7 +10,7 @@ import java.io.File
 import java.lang.Appendable
 
 fun main(args: Array<String>) {
-    val file = listOf(Pair("seq", 2), Pair("simple_loop", 1))
+    val file = listOf(Pair("seq", 2), Pair("simple_loop", 9))
     for ((test, functionIndex) in file){
         val sample = "./samples/$test.wat"
 

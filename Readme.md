@@ -2,10 +2,21 @@
 - [x] Multiple Memory Support
 - [x] Lock Thread Mutex Before Kernel Lock
 - [x] Parallel Block Generation
-- [ ] Block WasmBlockType
+- [ ] DFA
+- [ ] Constant Propagation
+- [ ] GCD Test
+- [ ] Dependence Analysis P54
 - [ ] Data Dependency Test
-- [ ] DFA+Eval
-- [ ] Runtime limit evaluation
+- [ ] Block WasmBlockType
+- [ ] Eval or Runtime Evaluation
+- [ ] Runtime limit evaluation(omp if)
+- [ ] Profitability Analysis
+- [ ] Thread Local Storage (TLS)
+
+Loop Analysis Steps:
+if Pass GCD Test -> parallel
+else test dependence
+else false
 
 ### How to Run
 ```

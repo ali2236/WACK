@@ -12,20 +12,8 @@ class Store(
 ) : Statement, Assignee {
 
     override fun write(out: Appendable) {
-        out.append(Names.memory)
-        //out.append("_$type")
-        out.append("[")
-        if (symbol.offset != 0) {
-            BinaryOP(
-                symbol.type,
-                Operator.add,
-                symbol.address,
-                Value(WasmValueType.i32, symbol.offset.toString())
-            ).write(out)
-        } else {
-            symbol.address.write(out)
-        }
-        out.append("] = ")
+        symbol.write(out)
+        out.append(" = ")
         data.write(out)
         out.append(";\n")
     }
