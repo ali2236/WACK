@@ -2,7 +2,7 @@ package analysis.cfg
 
 import ir.statement.Statement
 
-class CfgBlock(
+open class CfgBlock(
     val id : Int,
     val label: String?,
     val statements: MutableList<Statement> = mutableListOf(),

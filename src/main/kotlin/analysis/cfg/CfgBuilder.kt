@@ -5,7 +5,7 @@ import ir.statement.*
 import ir.statement.Function
 import java.util.*
 
-class CfgBuilder(val function: Function) {
+internal class CfgBuilder(val function: Function) {
 
     private var start = 0
     private val blocks = Stack<CfgBlock>()
