@@ -1,7 +1,5 @@
 import analysis.cfg.CFG
 import analysis.dfa.Dfa
-import generation.WasiThreadsGenerator
-import generation.WatWriter
 import ir.IRConstructor
 import ir.statement.Function
 import optimization.OptimizationPasses
@@ -19,13 +17,15 @@ fun main(args: Array<String>) {
 
         // intermediate
         program.statements.filterIsInstance<Function>().forEach { function ->
+            val fileName = "${sample.nameWithoutExtension}_f" + function.functionData.index
+
             /// cfg
             val cfg = CFG.from(function)
-            cfg.writeToFile()
+            cfg.writeToFile(fileName)
 
             /// dfa
             val dfa = Dfa.from(function, cfg)
-            dfa.writeToFile()
+            dfa.writeToFile(fileName)
         }
 
 
@@ -51,9 +51,9 @@ fun main(args: Array<String>) {
 
 
         // cfg
-        val dotOut = File("./out/cfg_${test}_$functionIndex.dot")
+        /*val dotOut = File("./out/cfg_${test}_$functionIndex.dot")
         val dotWriter = dotOut.writer()
         cfg.dot(dotWriter)
-        dotWriter.close()
+        dotWriter.close()*/
     }
 }

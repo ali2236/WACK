@@ -6,6 +6,8 @@ import ir.statement.Function
 
 class CFG(val nodes : List<CfgBlock>) : DotGraph() {
 
+    override val graphName: String = "cfg"
+
     companion object {
         fun from(function: Function) : CFG{
             return CfgBuilder(function).build()

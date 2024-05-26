@@ -1,13 +1,13 @@
 package analysis.cfg
 
 import ir.expression.FunctionCall
+import ir.expression.IndirectFunctionCall
 import ir.statement.*
 import ir.statement.Function
 import java.util.*
 
 internal class CfgBuilder(val function: Function) {
 
-    private var start = 0
     private val blocks = Stack<CfgBlock>()
     private val scope = Stack<CfgBlock>()
 
@@ -64,6 +64,9 @@ internal class CfgBuilder(val function: Function) {
         current: CfgBlock,
         instructions: List<Statement>,
     ) {
+        if(instructions.isEmpty()){
+            current.addSuccessor(currentScope.next)
+        }
         for ((i, stmt) in instructions.withIndex()) {
             when (stmt) {
                 // TODO: is switch
@@ -72,7 +75,7 @@ internal class CfgBuilder(val function: Function) {
                     current.addSuccessor(endBlock)
                 }
 
-                is FunctionCall /*TODO: indirect call*/ -> {
+                is FunctionCall, is IndirectFunctionCall -> {
                     val next = makeNext(i, instructions)
 
                     current.statements.add(stmt)
@@ -167,12 +170,9 @@ internal class CfgBuilder(val function: Function) {
     }
 
     private fun removeEmptyBlocks() {
-        for (i in 0 until blocks.size) {
+        for (i in 2 until blocks.size) {
             val block = blocks[i]
-            val empty = block.statements.isEmpty()
-            if (i == start && empty) {
-                start++
-            } else if (!block.valid) {
+            if (!block.valid) {
                 for (otherBlock in blocks) {
                     if (otherBlock.successors.map { it.target }.contains(i)) {
                         otherBlock.successors.removeIf { it.target == i }

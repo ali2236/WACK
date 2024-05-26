@@ -6,6 +6,9 @@ import generation.DotSanitizer
 import ir.statement.Function
 
 class Dfa(val nodes : List<DfaNode>) : DotGraph() {
+
+    override val graphName: String = "dfa"
+
     companion object {
         fun from(function: Function, cfg: CFG) : Dfa {
             return DfaBuilder(function, cfg).build()
@@ -35,9 +38,9 @@ class Dfa(val nodes : List<DfaNode>) : DotGraph() {
                 dot.append(it)
                 out.append("<BR ALIGN=\"LEFT\"/>")
             }
-            dfaNode.statements.forEach {
+            dfaNode.statement?.let {
                 it.write(dot)
-                out.append("<BR ALIGN=\"LEFT\"/>")
+                // out.append("<BR ALIGN=\"LEFT\"/>")
             }
 
             // close tag
