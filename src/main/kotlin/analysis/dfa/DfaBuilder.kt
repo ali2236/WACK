@@ -166,7 +166,11 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
                     val value = explainExpression(expr.address, dfaFacts)
                     if (value is DfaValue.Expr) {
                         expr.address = value.value
-                        return DfaValue.Expr(value.value)
+                        val query = dfaFacts.firstOrNull { it.symbol == expr }
+                        if(query != null){
+                            return query.value
+                        }
+                        return DfaValue.Expr(expr)
                     } else {
                         return DfaValue.Undeclared()
                     }
@@ -203,43 +207,17 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
             op.right = evalBinaryOp(op.right as BinaryOP, facts)
         }
 
-        var leftL: DfaValue = DfaValue.Expr(op.left)
-        if (op.left is Assignable) {
-            // lookup value
-            val fact = facts.firstOrNull { it.symbol == op.left }
-            if (fact != null) {
-                val expl = explainFact(fact, facts)
-                leftL = expl.value
-                if (expl.value is DfaValue.Expr) {
-                    op.left = expl.value.value
-                }
-            } else {
-                leftL = DfaValue.Unkown()
-            }
-        }
+        val leftL: DfaValue = explainExpression(op.left, facts)
+        val rightL: DfaValue = explainExpression(op.right, facts)
 
-        var rightL: DfaValue = DfaValue.Expr(op.right)
-        if (op.right is Assignable) {
-            // lookup value
-            val fact = facts.firstOrNull { it.symbol == op.right }
-            if (fact != null) {
-                val expl = explainFact(fact, facts)
-                rightL = expl.value
-                if (expl.value is DfaValue.Expr) {
-                    op.right = expl.value.value
-                }
-            } else {
-                rightL = DfaValue.Unkown()
-            }
-        }
-
-        if (op.left is Value && op.right is Value) {
+        if (leftL is DfaValue.Expr && rightL is DfaValue.Expr
+            && leftL.value is Value && rightL.value is Value) {
             // type
             when (op.type) {
                 WasmValueType.i32, WasmValueType.i64 -> {
                     // calculate
-                    val l = (op.left as Value).value.toLong()
-                    val r = (op.right as Value).value.toLong()
+                    val l = (leftL.value as Value).value.toLong()
+                    val r = (rightL.value as Value).value.toLong()
                     val value = when (op.operator.sign) {
                         "+" -> l + r
                         "-" -> l - r
@@ -263,8 +241,8 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
 
                 WasmValueType.f32, WasmValueType.f64 -> {
                     // calculate
-                    val l = (op.left as Value).value.toDouble()
-                    val r = (op.right as Value).value.toDouble()
+                    val l = (leftL.value as Value).value.toDouble()
+                    val r = (rightL.value as Value).value.toDouble()
                     val value = when (op.operator.sign) {
                         "+" -> l + r
                         "-" -> l - r

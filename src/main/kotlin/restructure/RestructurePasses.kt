@@ -16,4 +16,11 @@ object RestructurePasses {
         )
         passes.forEach { it.run(program) }
     }
+
+    fun basic(program: Program) {
+        val passes = listOf(
+            ShiftToMultiply(),
+        )
+        passes.forEach { it.run(program) }
+    }
 }

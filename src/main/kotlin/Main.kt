@@ -15,6 +15,7 @@ fun main(args: Array<String>) {
         val ir = IRConstructor(module)
         val program = ir.program()
 
+        RestructurePasses.basic(program)
 
         // intermediate outputs
         program.statements.filterIsInstance<Function>().forEach { function ->
@@ -30,7 +31,7 @@ fun main(args: Array<String>) {
         }
 
         // restructure pass
-        RestructurePasses.all(program)
+        // RestructurePasses.all(program)
 
         // analysis passes
 
