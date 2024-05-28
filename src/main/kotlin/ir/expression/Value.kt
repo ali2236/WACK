@@ -3,7 +3,7 @@ package ir.expression
 import generation.WatWriter
 import wasm.WasmValueType
 
-open class Value(val type: WasmValueType, val value: String) : Expression() {
+open class Value(val type: WasmValueType, val value: String) : ImmutableExpression() {
     override fun write(out: Appendable) {
         out.append(value)
     }

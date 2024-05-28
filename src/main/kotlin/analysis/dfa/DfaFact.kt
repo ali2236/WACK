@@ -2,8 +2,7 @@ package analysis.dfa
 
 import ir.statement.Assignable
 
-data class DfaFact(val symbol: Assignable, val value: DfaValue){
-
+class DfaFact(val symbol: Assignable, val value: DfaValue) {
 
     override fun toString(): String {
         return "($symbol, $value)"
@@ -17,6 +16,16 @@ data class DfaFact(val symbol: Assignable, val value: DfaValue){
         if (value != other.value) return false
 
         return true
+    }
+
+    fun clone(): DfaFact {
+        return DfaFact(
+            symbol.clone() as Assignable,
+            when (value) {
+                is DfaValue.Expr -> DfaValue.Expr(value.value.clone())
+                else -> value
+            },
+        )
     }
 
     override fun hashCode(): Int {

@@ -67,7 +67,7 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
     }
 
     // returns changed
-    private fun propegate(node: DfaNode): Boolean{
+    private fun propegate(node: DfaNode): Boolean {
         var changed = false
         // propagate IN -> OUT except those in GEN
         node.IN.facts.filter { inIt -> !node.GEN.any { genIt -> genIt.symbol == inIt.symbol } }.forEach {
@@ -77,7 +77,7 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
         // propagate GEN -> OUT override Symbol From IN
         node.GEN.forEach { gen ->
             try {
-                val fact = explainFact(gen, node.IN.facts)
+                val fact = explainFact(gen.clone(), node.IN.facts)
                 changed = node.OUT.put(fact) || changed
             } catch (e: Exception) {
                 // dont add
@@ -150,8 +150,10 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
             if (block.statement != null) {
                 val stmt = block.statement
                 if (stmt is Assignee) {
+
                     val fact = DfaFact(
-                        symbol = stmt.assignedTo(), value = DfaValue.Expr(stmt.assignedWith())
+                        symbol = stmt.assignedTo().clone() as Assignable,
+                        value = DfaValue.Expr(stmt.assignedWith().clone())
                     )
                     block.GEN.add(fact)
                 }
@@ -163,6 +165,7 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
         if (gen.symbol is Load) {
             val expl = explainExpression(gen.symbol.address, dfaFacts)
             if (expl is DfaValue.Expr) {
+
                 gen.symbol.address = expl.value
             } else {
                 throw java.lang.Exception()

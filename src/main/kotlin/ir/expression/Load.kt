@@ -14,6 +14,7 @@ class Load(
     val offset: Int = 0,
     val align: Int = 0,
 ) : Expression(), Assignable {
+
     override fun write(out: Appendable) {
         out.append(Names.memory + memoryIndex)
         out.append("[")
@@ -54,5 +55,8 @@ class Load(
         wat.writeLine("${type}.load $memoryIndex${ofst}${algn}")
     }
 
+    override fun clone(): Load {
+        return Load(type, address.clone(), memoryIndex, offset, align)
+    }
 
 }

@@ -8,6 +8,10 @@ class FunctionCall(
     val params: List<Expression>,
     val hasReturn: Boolean,
 ) : Expression() {
+    override fun clone(): Expression {
+        return FunctionCall(functionIndex, params.map { it.clone() }, hasReturn)
+    }
+
     override fun write(out: Appendable) {
         out.append("f${functionIndex}")
         out.append("(")

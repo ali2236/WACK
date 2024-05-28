@@ -35,6 +35,10 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
         v.visit(left) { this.left = it as Expression }
         v.visit(right) { this.right = it as Expression }
     }
+
+    override fun clone(): Expression {
+        return BinaryOP(type, operator.copy(), left.clone(), right.clone())
+    }
 }
 
 data class Operator(val sign: String, val watName: String, var signed: BitSign? = null) {

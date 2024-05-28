@@ -13,6 +13,8 @@ abstract class Expression : Statement {
     override fun visit(v: Visitor) {
 
     }
+
+    abstract fun clone(): Expression
 }
 
 

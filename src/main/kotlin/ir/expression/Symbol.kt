@@ -6,7 +6,8 @@ import wasm.Index
 import wasm.WasmScope
 import wasm.WasmValueType
 
-open class Symbol(val scope: WasmScope, val type: WasmValueType, val index : Index) : Expression(), Assignable {
+open class Symbol(val scope: WasmScope, val type: WasmValueType, val index : Index) : ImmutableExpression(), Assignable {
+
     override fun write(out: Appendable) {
         out.append("${scope.prefix()}$index")
     }

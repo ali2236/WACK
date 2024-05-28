@@ -43,4 +43,10 @@ class Store(
         data = newValue
     }
 
+    override fun toString(): String {
+        val buffer = StringBuffer()
+        write(buffer)
+        return buffer.toString()
+    }
+
 }
