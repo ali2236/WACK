@@ -4,7 +4,7 @@ import generation.WatWriter
 import ir.expression.Expression
 import ir.finder.Visitor
 
-class Drop(var value: Expression) : Statement {
+class Drop(var value: Expression) : BasicStatement() {
     override fun write(out: Appendable) {
         value.write(out)
         out.append(";\n")

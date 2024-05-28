@@ -2,11 +2,11 @@
 - [x] Multiple Memory Support
 - [x] Lock Thread Mutex Before Kernel Lock
 - [x] Parallel Block Generation
-- [ ] DFA
-  - [ ] Restructure Constant 
-- [ ] Constant Propagation
-- [ ] GCD Test
+- [x] DFA
+  - [ ] Constant Propagation
+  - [x] Memory Aliasing
 - [ ] Dependence Analysis P54
+- [ ] GCD Test
 - [ ] Data Dependency Test
 - [ ] Block WasmBlockType
 - [ ] Eval or Runtime Evaluation

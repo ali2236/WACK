@@ -9,7 +9,7 @@ import wasm.WasmValueType
 class Store(
     val symbol: Load,
     var data: Expression,
-) : Statement, Assignee {
+) : BasicStatement(), Assignee {
 
     override fun write(out: Appendable) {
         symbol.write(out)

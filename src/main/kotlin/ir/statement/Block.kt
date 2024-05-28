@@ -13,7 +13,7 @@ open class Block(
     var parent : Block? = null,
     var indexInParent : Int? = null,
     open val annotations: MutableList<WackAnnotation> = mutableListOf()
-) : Statement, WebAssemblyBlock {
+) : BasicStatement(), WebAssemblyBlock {
 
     open fun push(stmt: Statement) {
         if(stmt is Block){

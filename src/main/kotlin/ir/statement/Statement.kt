@@ -4,6 +4,15 @@ import generation.WebAssemblyInstruction
 import ir.finder.Visitable
 
 interface Statement : Visitable, WebAssemblyInstruction {
-    fun write(out: Appendable)
 
+    var id: Long?
+    abstract fun write(out: Appendable)
+
+    companion object {
+
+        private var statementId : Long = 0L
+        fun newId() : Long{
+            return statementId++
+        }
+    }
 }

@@ -2,6 +2,8 @@ import analysis.cfg.CFG
 import analysis.dfa.Dfa
 import ir.IRConstructor
 import ir.statement.Function
+import optimization.AliasMemory
+import optimization.ConstantPropagation
 import optimization.OptimizationPasses
 import parser.Wat
 import restructure.RestructurePasses
@@ -16,6 +18,10 @@ fun main(args: Array<String>) {
         val program = ir.program()
 
         RestructurePasses.basic(program)
+
+        ConstantPropagation().apply(program)
+
+        //AliasMemory().apply(program)
 
         // intermediate outputs
         program.statements.filterIsInstance<Function>().forEach { function ->

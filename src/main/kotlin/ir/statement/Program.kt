@@ -4,7 +4,7 @@ import generation.WatWriter
 import ir.finder.Visitor
 import wasm.WasmModule
 
-class Program(val module: WasmModule, val statements: MutableList<Statement>) : Statement {
+class Program(val module: WasmModule, val statements: MutableList<Statement>) : BasicStatement() {
     override fun write(out: Appendable) {
         for (statement in statements) {
             statement.write(out)

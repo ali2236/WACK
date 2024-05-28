@@ -11,59 +11,37 @@ import wasm.WasmScope
 import wasm.WasmValueType
 
 // flow sensitive DFA
-class DfaBuilder(val function: Function, val cfg: CFG) {
+object DfaBuilder {
 
-    private val nodes: MutableList<DfaNode> = mutableListOf()
-
-    fun build(): Dfa {
-        initializeDfaFromCFG()
+    fun build(function: Function, cfg: CFG): Dfa {
+        val dfa = initializeDfaFromCFG(cfg, function)
         var propagated = false
         while (!propagated) {
-            val changed = runPass()
-            propagated = !changed
-        }
+            var changed = false
+            dfa.pass { node ->
+                changed = propegate(node) || changed
+                for (suc in node.successors) {
+                    val successor = dfa.nodes[suc.target]
 
-        return Dfa(nodes)
-    }
-
-    private fun initializeDfaFromCFG() {
-        mapNodesFromCFG()
-        addFunctionLocals()
-        initializeGEN()
-    }
-
-    private fun runPass(): Boolean {
-        // forward analysis
-        var changed = false
-        val q = mutableListOf(nodes.first())
-        val visited = BooleanArray(nodes.size)
-        while (q.isNotEmpty()) {
-            val node = q.removeFirst()
-
-            // check if visited
-            if (visited[node.id]) {
-                continue
-            }
-            visited[node.id] = true
-
-            changed = propegate(node) || changed
-
-
-            for (suc in node.successors) {
-                val successor = nodes[suc.target]
-
-                // set successor IN to predecessor OUT
-                node.OUT.facts.forEach { fact ->
-                    val t = successor.IN.put(fact)
-                    changed = t || changed
+                    // set successor IN to predecessor OUT
+                    node.OUT.facts.forEach { fact ->
+                        val t = successor.IN.put(fact)
+                        changed = t || changed
+                    }
                 }
-
-                // add successors
-                q.add(successor)
+                propagated = !changed
             }
         }
 
-        return changed
+        return dfa
+    }
+
+    private fun initializeDfaFromCFG(cfg: CFG, function: Function): Dfa {
+        val dfa = Dfa(mutableListOf())
+        mapNodesFromCFG(cfg, dfa)
+        addFunctionLocals(dfa, function)
+        initializeGEN(dfa)
+        return dfa
     }
 
     // returns changed
@@ -88,7 +66,7 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
         return changed
     }
 
-    private fun mapNodesFromCFG() {
+    private fun mapNodesFromCFG(cfg: CFG, dfa: Dfa) {
         var idBase = cfg.nodes.size
         for (block in cfg.nodes) {
             if (block.statements.size > 1) {
@@ -101,7 +79,7 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
                     block.statements.firstOrNull(),
                     successors = mutableListOf(CfgEdge(null, idBase))
                 )
-                nodes.add(firstStmt)
+                dfa.nodes.add(firstStmt)
 
                 // then statement 1 to n-1
                 for (i in 1 until blocksNeeded) {
@@ -111,7 +89,7 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
                         statement = block.statements[i],
                         successors = mutableListOf(CfgEdge(null, idBase)),
                     )
-                    nodes.add(stmtNode)
+                    dfa.nodes.add(stmtNode)
                 }
                 // then last carries block successors
                 val lastStmtNode = DfaNode(
@@ -119,22 +97,22 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
                     label = null,
                     statement = block.statements.last(),
                 )
-                nodes.add(lastStmtNode)
+                dfa.nodes.add(lastStmtNode)
                 lastStmtNode.successors.addAll(block.successors)
             } else {
                 val node = DfaNode(
                     block.id, block.label, block.statements.firstOrNull(), successors = block.successors
                 )
-                nodes.add(node)
+                dfa.nodes.add(node)
             }
 
-            nodes.sortBy { it.id }
+            dfa.nodes.sortBy { it.id }
         }
 
     }
 
-    private fun addFunctionLocals() {
-        val start = nodes.first()
+    private fun addFunctionLocals(dfa: Dfa, function: Function) {
+        val start = dfa.nodes.first()
         function.functionData.locals.forEachIndexed { index, localType ->
             start.IN.put(
                 DfaFact(
@@ -145,8 +123,8 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
         }
     }
 
-    private fun initializeGEN() {
-        for (block in nodes) {
+    private fun initializeGEN(dfa: Dfa) {
+        for (block in dfa.nodes) {
             if (block.statement != null) {
                 val stmt = block.statement
                 if (stmt is Assignee) {

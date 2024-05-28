@@ -5,13 +5,27 @@ import generation.DotGraph
 import generation.DotSanitizer
 import ir.statement.Function
 
-class Dfa(val nodes : List<DfaNode>) : DotGraph() {
+class Dfa(val nodes : MutableList<DfaNode>) : DotGraph() {
 
     override val graphName: String = "dfa"
 
     companion object {
-        fun from(function: Function, cfg: CFG) : Dfa {
-            return DfaBuilder(function, cfg).build()
+        fun from(function: Function, cfg: CFG? = null) : Dfa {
+            return DfaBuilder.build(function, cfg ?: CFG.from(function))
+        }
+    }
+
+    fun pass(pass: (DfaNode) -> Unit){
+        val q = mutableListOf(nodes.first())
+        val visited = Array(nodes.size) { false }
+        while (q.isNotEmpty()){
+            val node = q.removeFirst()
+            if(visited[node.id]){
+                continue
+            }
+            pass(node)
+            visited[node.id] = true
+            q.addAll(node.successors.map { nodes[it.target] })
         }
     }
 

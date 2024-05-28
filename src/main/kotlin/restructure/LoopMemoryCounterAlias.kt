@@ -9,9 +9,8 @@ import wasm.Index
 import wasm.WasmScope
 
 // replaces load with constload/symbol around loops
-/*
-@Deprecated("Doesn't work correctly")
-class LoopMemoryCounterAlias : Restructure() {
+//@Deprecated("Doesn't work correctly")
+/*class LoopMemoryCounterAlias : Restructure() {
 
     private val memRef = mutableMapOf<Load, Symbol>()
     private fun getMemRef(load: Load): Symbol {

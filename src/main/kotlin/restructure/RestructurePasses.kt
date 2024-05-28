@@ -6,11 +6,11 @@ object RestructurePasses {
 
     fun all(program: Program) {
         val passes = listOf(
-            ConditionalLoopRestructure(),
+            // ConditionalLoopRestructure(),
             //LoopMemoryCounterAlias(),
             IncrementRestructure(),
             // RangeLoopRestructure(),
-            ShiftToMultiply(),
+            // ShiftToMultiply(),
             // RangeLoopRangeRefinement(),
             // LoopVariableFlattening(),
         )
@@ -19,6 +19,7 @@ object RestructurePasses {
 
     fun basic(program: Program) {
         val passes = listOf(
+            ConditionalLoopRestructure(),
             ShiftToMultiply(),
         )
         passes.forEach { it.run(program) }

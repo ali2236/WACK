@@ -11,7 +11,7 @@ open class Assignment(
     var value: Expression,
     var inline: Boolean = false,
     var tee: Boolean = false
-) : Statement, Assignee {
+) : BasicStatement(), Assignee {
 
 
     override fun write(out: Appendable) {

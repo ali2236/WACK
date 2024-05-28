@@ -6,6 +6,7 @@ import ir.statement.*
 import wasm.WasmValueType
 
 class Increment(val operation: Assignee, val operator: Operator = Operator.add) : Assignee {
+    override var id: Long? = Statement.newId()
     override fun assignedWith(): Expression {
        return operation.assignedWith()
     }
