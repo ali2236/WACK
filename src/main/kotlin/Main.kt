@@ -8,14 +8,15 @@ import restructure.RestructurePasses
 import java.io.File
 
 fun main(args: Array<String>) {
-    val samples = File("./samples").listFiles()
+    val samples = listOf(File("./samples/simple_loop.wat"))// File("./samples").listFiles()
     for (sample in samples!!){
         val parseTree = Wat.parse(sample.path)
         val module = Wat.module(parseTree)
         val ir = IRConstructor(module)
         val program = ir.program()
 
-        // intermediate
+
+        // intermediate outputs
         program.statements.filterIsInstance<Function>().forEach { function ->
             val fileName = "${sample.nameWithoutExtension}_f" + function.functionData.index
 
@@ -27,7 +28,6 @@ fun main(args: Array<String>) {
             val dfa = Dfa.from(function, cfg)
             dfa.writeToFile(fileName)
         }
-
 
         // restructure pass
         RestructurePasses.all(program)

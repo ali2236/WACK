@@ -64,7 +64,7 @@ class RangeLoopRestructure : Restructure() {
             parent = current.parent
             blockIndex = current.indexInParent
         }
-        throw Error()
+        throw Error("symbol $symbol init not found!")
     }
 
     private fun findRangeLoopStep(loop: ConditionLoop, symbol: Assignable): Increment {

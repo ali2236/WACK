@@ -2,9 +2,11 @@ package analysis.dfa
 
 import analysis.cfg.CFG
 import analysis.cfg.CfgEdge
+import ir.expression.*
+import ir.statement.Assignable
 import ir.statement.Assignee
 import ir.statement.Function
-import java.util.Collections
+import wasm.WasmValueType
 
 // flow sensitive DFA
 class DfaBuilder(val function: Function, val cfg: CFG) {
@@ -13,9 +15,9 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
 
     fun build(): Dfa {
         initializeDfaFromCFG()
-        /*do {
+        do {
             val changed = runPass()
-        } while (changed)*/
+        } while (changed)
 
         return Dfa(nodes)
     }
@@ -30,7 +32,6 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
         var changed = false
         val q = mutableListOf<DfaNode>(nodes.first())
         val visited = BooleanArray(nodes.size)
-        // TODO: don't visit twice / prevent loops
         while (q.isNotEmpty()) {
             val node = q.removeFirst()
 
@@ -40,17 +41,21 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
             }
             visited[node.id] = true
 
-            // propagate IN -> OUT
-            node.IN.forEach {
-                node.OUT.put(it)
+            // propagate IN -> OUT except those in GEN
+            node.IN.facts.filter { inIt -> !node.GEN.any { genIt -> genIt.symbol == inIt.symbol } }.forEach {
+                changed = node.OUT.put(it)
             }
 
-            // propagate GEN -> OUT
-            node.GEN.forEach {
-                node.OUT.put(it)
+            // propagate GEN -> OUT override Symbol From IN
+            node.GEN.forEach { gen ->
+                try {
+                    val fact = explainFact(gen, node.IN.facts)
+                    changed = node.OUT.put(fact)
+                } catch (e: Exception) {
+                    // dont add
+                    println("didn't add $gen")
+                }
             }
-
-            changed = true
 
 
             for (suc in node.successors) {
@@ -58,7 +63,7 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
 
                 // set successor IN to predecessor OUT
                 node.OUT.facts.forEach {
-                    successor.IN.add(it)
+                    changed = successor.IN.put(it)
                 }
 
                 // add successors
@@ -104,10 +109,7 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
                 lastStmtNode.successors.addAll(block.successors)
             } else {
                 val node = DfaNode(
-                    block.id,
-                    block.label,
-                    block.statements.firstOrNull(),
-                    successors = block.successors
+                    block.id, block.label, block.statements.firstOrNull(), successors = block.successors
                 )
                 nodes.add(node)
             }
@@ -123,12 +125,168 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
                 val stmt = block.statement
                 if (stmt is Assignee) {
                     val fact = DfaFact(
-                        symbol = stmt.assignedTo(),
-                        value = DfaValue.Expr(stmt.assignedWith())
+                        symbol = stmt.assignedTo(), value = DfaValue.Expr(stmt.assignedWith())
                     )
                     block.GEN.add(fact)
                 }
             }
         }
     }
+
+    private fun explainFact(gen: DfaFact, dfaFacts: Set<DfaFact>): DfaFact {
+        if (gen.symbol is Load) {
+            val expl = explainExpression(gen.symbol.address, dfaFacts)
+            if (expl is DfaValue.Expr) {
+                gen.symbol.address = expl.value
+            } else {
+                throw java.lang.Exception()
+            }
+        }
+        if (gen.value is DfaValue.Expr) {
+            // Evaluate GEN
+            return DfaFact(gen.symbol, explainExpression(gen.value.value, dfaFacts))
+        } else {
+            return gen
+        }
+    }
+
+    private fun explainExpression(expr: Expression, dfaFacts: Set<DfaFact>): DfaValue {
+        when (expr) {
+            is Value -> {
+                // const
+                return DfaValue.Expr(expr)
+            }
+
+            is Assignable -> {
+                val query = dfaFacts.firstOrNull { it.symbol == expr }
+                 if (query != null) {
+                    // variable reference
+                    return query.value
+                } else if (expr is Load) {
+                    val value = explainExpression(expr.address, dfaFacts)
+                    if (value is DfaValue.Expr) {
+                        expr.address = value.value
+                        return DfaValue.Expr(value.value)
+                    } else {
+                        return DfaValue.Undeclared()
+                    }
+                } else {
+                    return DfaValue.Undeclared()
+                }
+            }
+
+            is BinaryOP -> {
+                try {
+                    val result = evalBinaryOp(expr, dfaFacts)
+                    return DfaValue.Expr(result)
+                } catch (e: ExpressionViolation) {
+                    return e.left.join(e.right)
+                }
+            }
+
+            is TeeValue -> {
+                return explainExpression(expr.expr, dfaFacts)
+            }
+
+            else -> {
+                throw Error("Unknown Type $expr")
+            }
+        }
+    }
+
+    private fun evalBinaryOp(op: BinaryOP, facts: Set<DfaFact>): Expression {
+        if (op.left is BinaryOP) {
+            op.left = evalBinaryOp(op.left as BinaryOP, facts)
+        }
+
+        if (op.right is BinaryOP) {
+            op.right = evalBinaryOp(op.right as BinaryOP, facts)
+        }
+
+        var leftL: DfaValue = DfaValue.Expr(op.left)
+        if (op.left is Assignable) {
+            // lookup value
+            val fact = facts.firstOrNull { it.symbol == op.left }
+            if (fact != null) {
+                val expl = explainFact(fact, facts)
+                leftL = expl.value
+                if (expl.value is DfaValue.Expr) {
+                    op.left = expl.value.value
+                }
+            } else {
+                leftL = DfaValue.Unkown()
+            }
+        }
+
+        var rightL: DfaValue = DfaValue.Expr(op.right)
+        if (op.right is Assignable) {
+            // lookup value
+            val fact = facts.firstOrNull { it.symbol == op.right }
+            if (fact != null) {
+                val expl = explainFact(fact, facts)
+                rightL = expl.value
+                if (expl.value is DfaValue.Expr) {
+                    op.right = expl.value.value
+                }
+            } else {
+                rightL = DfaValue.Unkown()
+            }
+        }
+
+        if (op.left is Value && op.right is Value) {
+            // type
+            when (op.type) {
+                WasmValueType.i32, WasmValueType.i64 -> {
+                    // calculate
+                    val l = (op.left as Value).value.toLong()
+                    val r = (op.right as Value).value.toLong()
+                    val value = when (op.operator.sign) {
+                        "+" -> l + r
+                        "-" -> l - r
+                        "*" -> l * r
+                        "/" -> l / r
+                        "&" -> l and r
+                        "|" -> l or r
+                        "==" -> l == r
+                        "!=" -> l != r
+                        "<" -> l < r
+                        "<=" -> l <= r
+                        ">" -> l > r
+                        ">=" -> l >= r
+                        "<<" -> l shl r.toInt()
+                        ">>" -> l ushr r.toInt()
+                        "^" -> l xor r
+                        else -> throw Error(op.operator.toString() + " not supported!")
+                    }
+                    return Value(op.type, value.toString())
+                }
+
+                WasmValueType.f32, WasmValueType.f64 -> {
+                    // calculate
+                    val l = (op.left as Value).value.toDouble()
+                    val r = (op.right as Value).value.toDouble()
+                    val value = when (op.operator.sign) {
+                        "+" -> l + r
+                        "-" -> l - r
+                        "*" -> l * r
+                        "/" -> l / r
+                        "==" -> l == r
+                        "!=" -> l != r
+                        "<" -> l < r
+                        "<=" -> l <= r
+                        ">" -> l > r
+                        ">=" -> l >= r
+                        else -> throw Error(op.operator.toString() + " not supported!")
+                    }
+                    return Value(op.type, value.toString())
+                }
+
+                else -> throw Error()
+            }
+        } else {
+            throw ExpressionViolation(leftL, rightL)
+        }
+    }
+
+    class ExpressionViolation(val left: DfaValue, val right: DfaValue) : Exception()
 }

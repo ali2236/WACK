@@ -2,23 +2,28 @@ package analysis.dfa
 
 import ir.statement.Assignable
 
-class DfaOUT {
+class DfaIN {
 
     private val _facts = mutableMapOf<Assignable, DfaFact>()
     val facts: Set<DfaFact>
         get() = _facts.values.toSet()
 
-    fun get(symbol: Assignable): DfaFact {
-        return _facts.getOrPut(symbol) { DfaFact(symbol, DfaValue.Undeclared()) }
+    fun get(symbol: Assignable): DfaFact? {
+        return _facts[symbol]
     }
 
     // return changed or not
     fun put(fact: DfaFact) : Boolean{
         val oldValue = _facts[fact.symbol]?.value
         val newValue = fact.value
-        val changed = oldValue != newValue
-        _facts[fact.symbol] = fact
-        return changed
+        if(oldValue != newValue && oldValue != null){
+            val joinedFact = DfaFact(fact.symbol, oldValue.join(newValue))
+            _facts[joinedFact.symbol] = joinedFact
+            return oldValue != joinedFact.value
+        } else {
+            _facts[fact.symbol] = fact
+            return false
+        }
     }
 
     override fun toString(): String {

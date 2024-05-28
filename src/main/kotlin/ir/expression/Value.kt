@@ -8,21 +8,24 @@ open class Value(val type: WasmValueType, val value: String) : Expression() {
         out.append(value)
     }
 
+    override fun wat(wat: WatWriter) {
+        wat.writeLine("${type}.const $value")
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Value) return false
 
+        if (type != other.type) return false
         if (value != other.value) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return value.hashCode()
-    }
-
-    override fun wat(wat: WatWriter) {
-        wat.writeLine("${type}.const $value")
+        var result = type.hashCode()
+        result = 31 * result + value.hashCode()
+        return result
     }
 
 

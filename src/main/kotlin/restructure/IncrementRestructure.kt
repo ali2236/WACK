@@ -20,13 +20,13 @@ class IncrementRestructure : Restructure() {
         if (stmt.assignedWith() is BinaryOP) {
             val opr = stmt.assignedWith() as BinaryOP
             if (
-                (opr.right is Value && opr.left == stmt.assignedTo())
+                (opr.right is Value && (opr.right as Value).value == "1" && opr.left == stmt.assignedTo())
             ) {
                 val v = opr.right as Value
                 if (opr.operator == Operator.add) {
-                    replaceCurrentInstruction(Increment(stmt, Operator.add, v))
+                    replaceCurrentInstruction(Increment(stmt, Operator.add))
                 } else if (opr.operator == Operator.sub) {
-                    replaceCurrentInstruction(Increment(stmt, Operator.sub, v))
+                    replaceCurrentInstruction(Increment(stmt, Operator.sub))
                 }
             }
         }

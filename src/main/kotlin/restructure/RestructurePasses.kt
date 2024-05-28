@@ -9,8 +9,8 @@ object RestructurePasses {
             ConditionalLoopRestructure(),
             //LoopMemoryCounterAlias(),
             IncrementRestructure(),
-            RangeLoopRestructure(),
-            // ShiftToMultiply(),
+            // RangeLoopRestructure(),
+            ShiftToMultiply(),
             // RangeLoopRangeRefinement(),
             // LoopVariableFlattening(),
         )

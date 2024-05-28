@@ -40,8 +40,14 @@ class Dfa(val nodes : List<DfaNode>) : DotGraph() {
             }
             dfaNode.statement?.let {
                 it.write(dot)
-                // out.append("<BR ALIGN=\"LEFT\"/>")
+                out.append("<BR ALIGN=\"LEFT\"/>")
             }
+            dot.append("IN = {" + dfaNode.IN + "}")
+            out.append("<BR ALIGN=\"LEFT\"/>")
+            dot.append("GEN = {" + dfaNode.GEN.map { it.toString() }.joinToString(", ") +"}")
+            out.append("<BR ALIGN=\"LEFT\"/>")
+            dot.append("OUT = {" + dfaNode.OUT + "}")
+            out.append("<BR ALIGN=\"LEFT\"/>")
 
             // close tag
             out.append("</TD></TR></TABLE>>")

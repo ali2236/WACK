@@ -3,6 +3,7 @@
 - [x] Lock Thread Mutex Before Kernel Lock
 - [x] Parallel Block Generation
 - [ ] DFA
+  - [ ] Restructure Constant 
 - [ ] Constant Propagation
 - [ ] GCD Test
 - [ ] Dependence Analysis P54
