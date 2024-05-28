@@ -19,7 +19,8 @@ class DfaIN {
         if(oldValue != newValue && oldValue != null){
             val joinedFact = DfaFact(fact.symbol, oldValue.join(newValue))
             _facts[joinedFact.symbol] = joinedFact
-            return oldValue != joinedFact.value
+            val changed = oldValue != joinedFact.value
+            return changed
         } else {
             _facts[fact.symbol] = fact
             return false

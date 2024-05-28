@@ -6,6 +6,8 @@ import ir.expression.*
 import ir.statement.Assignable
 import ir.statement.Assignee
 import ir.statement.Function
+import wasm.Index
+import wasm.WasmScope
 import wasm.WasmValueType
 
 // flow sensitive DFA
@@ -15,22 +17,25 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
 
     fun build(): Dfa {
         initializeDfaFromCFG()
-        do {
+        var propagated = false
+        while (!propagated) {
             val changed = runPass()
-        } while (changed)
+            propagated = !changed
+        }
 
         return Dfa(nodes)
     }
 
     private fun initializeDfaFromCFG() {
         mapNodesFromCFG()
+        addFunctionLocals()
         initializeGEN()
     }
 
     private fun runPass(): Boolean {
         // forward analysis
         var changed = false
-        val q = mutableListOf<DfaNode>(nodes.first())
+        val q = mutableListOf(nodes.first())
         val visited = BooleanArray(nodes.size)
         while (q.isNotEmpty()) {
             val node = q.removeFirst()
@@ -41,33 +46,42 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
             }
             visited[node.id] = true
 
-            // propagate IN -> OUT except those in GEN
-            node.IN.facts.filter { inIt -> !node.GEN.any { genIt -> genIt.symbol == inIt.symbol } }.forEach {
-                changed = node.OUT.put(it)
-            }
-
-            // propagate GEN -> OUT override Symbol From IN
-            node.GEN.forEach { gen ->
-                try {
-                    val fact = explainFact(gen, node.IN.facts)
-                    changed = node.OUT.put(fact)
-                } catch (e: Exception) {
-                    // dont add
-                    println("didn't add $gen")
-                }
-            }
+            changed = propegate(node) || changed
 
 
             for (suc in node.successors) {
                 val successor = nodes[suc.target]
 
                 // set successor IN to predecessor OUT
-                node.OUT.facts.forEach {
-                    changed = successor.IN.put(it)
+                node.OUT.facts.forEach { fact ->
+                    val t = successor.IN.put(fact)
+                    changed = t || changed
                 }
 
                 // add successors
                 q.add(successor)
+            }
+        }
+
+        return changed
+    }
+
+    // returns changed
+    private fun propegate(node: DfaNode): Boolean{
+        var changed = false
+        // propagate IN -> OUT except those in GEN
+        node.IN.facts.filter { inIt -> !node.GEN.any { genIt -> genIt.symbol == inIt.symbol } }.forEach {
+            changed = node.OUT.put(it) || changed
+        }
+
+        // propagate GEN -> OUT override Symbol From IN
+        node.GEN.forEach { gen ->
+            try {
+                val fact = explainFact(gen, node.IN.facts)
+                changed = node.OUT.put(fact) || changed
+            } catch (e: Exception) {
+                // dont add
+                println("didn't add $gen")
             }
         }
 
@@ -119,6 +133,18 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
 
     }
 
+    private fun addFunctionLocals() {
+        val start = nodes.first()
+        function.functionData.locals.forEachIndexed { index, localType ->
+            start.IN.put(
+                DfaFact(
+                    Symbol(WasmScope.local, localType, Index(index)),
+                    DfaValue.Expr(Value(localType, localType.defaultValue()))
+                )
+            )
+        }
+    }
+
     private fun initializeGEN() {
         for (block in nodes) {
             if (block.statement != null) {
@@ -159,7 +185,7 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
 
             is Assignable -> {
                 val query = dfaFacts.firstOrNull { it.symbol == expr }
-                 if (query != null) {
+                if (query != null) {
                     // variable reference
                     return query.value
                 } else if (expr is Load) {
@@ -167,7 +193,7 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
                     if (value is DfaValue.Expr) {
                         expr.address = value.value
                         val query = dfaFacts.firstOrNull { it.symbol == expr }
-                        if(query != null){
+                        if (query != null) {
                             return query.value
                         }
                         return DfaValue.Expr(expr)
@@ -210,8 +236,7 @@ class DfaBuilder(val function: Function, val cfg: CFG) {
         val leftL: DfaValue = explainExpression(op.left, facts)
         val rightL: DfaValue = explainExpression(op.right, facts)
 
-        if (leftL is DfaValue.Expr && rightL is DfaValue.Expr
-            && leftL.value is Value && rightL.value is Value) {
+        if (leftL is DfaValue.Expr && rightL is DfaValue.Expr && leftL.value is Value && rightL.value is Value) {
             // type
             when (op.type) {
                 WasmValueType.i32, WasmValueType.i64 -> {

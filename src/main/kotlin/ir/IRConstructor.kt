@@ -21,7 +21,7 @@ class IRConstructor(val module: WasmModule) {
         val functionBlock: List<Statement> = if (function.code != null) {
             val visitor = WatVisitor(module)
             val instructions = visitor.visitFunction(function)
-            getFunctionInitSection(function) + instructions
+            /*getFunctionInitSection(function) +*/ instructions
         } else {
             listOf()
         }

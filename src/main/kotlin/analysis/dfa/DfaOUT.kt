@@ -1,6 +1,10 @@
 package analysis.dfa
 
+import ir.expression.Symbol
 import ir.statement.Assignable
+import wasm.Index
+import wasm.WasmScope
+import wasm.WasmValueType
 
 class DfaOUT {
 
