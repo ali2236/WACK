@@ -11,7 +11,7 @@ open class Assignment(
     var value: Expression,
     var inline: Boolean = false,
     var tee: Boolean = false
-) : BasicStatement(), Assignee {
+) : BasicStatement(), AssignmentStore {
 
 
     override fun write(out: Appendable) {
@@ -43,7 +43,7 @@ open class Assignment(
         return value
     }
 
-    override fun assignedTo(): Assignable {
+    override fun assignedTo(): SymbolLoad {
         return symbol
     }
 

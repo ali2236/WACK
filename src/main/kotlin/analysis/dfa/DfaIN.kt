@@ -1,14 +1,14 @@
 package analysis.dfa
 
-import ir.statement.Assignable
+import ir.statement.SymbolLoad
 
 class DfaIN {
 
-    private val _facts = mutableMapOf<Assignable, DfaFact>()
+    private val _facts = mutableMapOf<SymbolLoad, DfaFact>()
     val facts: Set<DfaFact>
         get() = _facts.values.toSet()
 
-    fun get(symbol: Assignable): DfaFact? {
+    fun get(symbol: SymbolLoad): DfaFact? {
         return _facts[symbol]
     }
 

@@ -3,7 +3,7 @@ package ir.expression
 import generation.WatWriter
 import ir.Names
 import ir.finder.Visitor
-import ir.statement.Assignable
+import ir.statement.SymbolLoad
 import wasm.Index
 import wasm.WasmValueType
 
@@ -13,7 +13,7 @@ class Load(
     val memoryIndex: Index,
     val offset: Int = 0,
     val align: Int = 0,
-) : Expression(), Assignable {
+) : Expression(), SymbolLoad {
 
     override fun write(out: Appendable) {
         out.append(Names.memory + memoryIndex)

@@ -47,5 +47,11 @@ open class If(
             v.visit(elseBody!!, elseBody!!::set)
         }
     }
+
+    override fun toString(): String {
+        val b = StringBuffer()
+        writeHeader(b)
+        return b.toString()
+    }
 }
 

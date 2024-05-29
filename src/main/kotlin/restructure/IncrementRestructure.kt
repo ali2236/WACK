@@ -1,22 +1,20 @@
 package restructure
 
 import ir.expression.*
-import ir.statement.Assignee
-import ir.statement.Assignment
+import ir.statement.AssignmentStore
 import ir.statement.Statement
-import wasm.WasmValueType
 
 // check for "<symbol> = <symbol> + 1" pattern
 // replace with <symbol>++
 class IncrementRestructure : Restructure() {
 
     override fun restructureInstruction(stmt: Statement) {
-        if (stmt is Assignee) {
+        if (stmt is AssignmentStore) {
             checkAssignmentStyleIncrement(stmt)
         }
     }
 
-    private fun checkAssignmentStyleIncrement(stmt: Assignee) {
+    private fun checkAssignmentStyleIncrement(stmt: AssignmentStore) {
         if (stmt.assignedWith() is BinaryOP) {
             val opr = stmt.assignedWith() as BinaryOP
             if (

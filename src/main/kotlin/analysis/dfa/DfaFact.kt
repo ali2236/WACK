@@ -1,8 +1,8 @@
 package analysis.dfa
 
-import ir.statement.Assignable
+import ir.statement.SymbolLoad
 
-class DfaFact(val symbol: Assignable, val value: DfaValue) {
+class DfaFact(val symbol: SymbolLoad, val value: DfaValue) {
 
     override fun toString(): String {
         return "($symbol, $value)"
@@ -20,7 +20,7 @@ class DfaFact(val symbol: Assignable, val value: DfaValue) {
 
     fun clone(): DfaFact {
         return DfaFact(
-            symbol.clone() as Assignable,
+            symbol.clone() as SymbolLoad,
             when (value) {
                 is DfaValue.Expr -> DfaValue.Expr(value.value.clone())
                 else -> value

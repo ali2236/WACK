@@ -19,7 +19,7 @@ fun main(args: Array<String>) {
 
         RestructurePasses.basic(program)
 
-        ConstantPropagation().apply(program)
+         ConstantPropagation().apply(program)
 
         // AliasMemory().apply(program)
 

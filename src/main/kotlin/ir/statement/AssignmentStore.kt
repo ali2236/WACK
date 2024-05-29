@@ -3,9 +3,9 @@ package ir.statement
 import ir.expression.Expression
 
 // Assignment, store
-interface Assignee : Statement{
+interface AssignmentStore : Statement{
     fun assignedWith() : Expression
-    fun assignedTo() : Assignable
+    fun assignedTo() : SymbolLoad
 
     fun replaceAssign(newValue: Expression)
 }

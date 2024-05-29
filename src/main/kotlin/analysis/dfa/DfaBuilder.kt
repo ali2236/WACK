@@ -3,8 +3,8 @@ package analysis.dfa
 import analysis.cfg.CFG
 import analysis.cfg.CfgEdge
 import ir.expression.*
-import ir.statement.Assignable
-import ir.statement.Assignee
+import ir.statement.SymbolLoad
+import ir.statement.AssignmentStore
 import ir.statement.Function
 import wasm.Index
 import wasm.WasmScope
@@ -127,10 +127,10 @@ object DfaBuilder {
         for (block in dfa.nodes) {
             if (block.statement != null) {
                 val stmt = block.statement
-                if (stmt is Assignee) {
+                if (stmt is AssignmentStore) {
 
                     val fact = DfaFact(
-                        symbol = stmt.assignedTo().clone() as Assignable,
+                        symbol = stmt.assignedTo().clone() as SymbolLoad,
                         value = DfaValue.Expr(stmt.assignedWith().clone())
                     )
                     block.GEN.add(fact)
@@ -164,7 +164,7 @@ object DfaBuilder {
                 return DfaValue.Expr(expr)
             }
 
-            is Assignable -> {
+            is SymbolLoad -> {
                 val query = dfaFacts.firstOrNull { it.symbol == expr }
                 if (query != null) {
                     // variable reference

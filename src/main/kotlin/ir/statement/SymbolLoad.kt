@@ -4,6 +4,6 @@ import ir.expression.Expression
 
 
 // symbol, load
-interface Assignable : Statement {
+interface SymbolLoad : Statement {
     fun clone() : Expression
 }

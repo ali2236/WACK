@@ -3,15 +3,14 @@ package ir.expression
 import generation.WatWriter
 import ir.finder.Visitor
 import ir.statement.*
-import wasm.WasmValueType
 
-class Increment(val operation: Assignee, val operator: Operator = Operator.add) : Assignee {
+class Increment(val operation: AssignmentStore, val operator: Operator = Operator.add) : AssignmentStore {
     override var id: Long? = Statement.newId()
     override fun assignedWith(): Expression {
        return operation.assignedWith()
     }
 
-    override fun assignedTo(): Assignable {
+    override fun assignedTo(): SymbolLoad {
         return operation.assignedTo()
     }
 

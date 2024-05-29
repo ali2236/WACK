@@ -2,10 +2,7 @@ package restructure
 
 import ir.expression.*
 import ir.finder.BreadthFirstExpressionFinder
-import ir.finder.ExpressionFinder
-import ir.finder.Finders
 import ir.statement.*
-import wasm.WasmValueType
 import java.lang.Exception
 
 class RangeLoopRestructure : Restructure() {
@@ -23,8 +20,8 @@ class RangeLoopRestructure : Restructure() {
 
     private fun transformIntoRangeLoop(loop: ConditionLoop) {
         val condition = loop.condition
-        if (condition is BinaryOP && condition.left is Assignable) {
-            val left = condition.left as Assignable
+        if (condition is BinaryOP && condition.left is SymbolLoad) {
+            val left = condition.left as SymbolLoad
             val init = findRangeLoopInitInParent(left)
             val step = findRangeLoopStep(loop, left)
             val rangeLoop = RangeLoop(init, condition, step, loop.instructions)
@@ -32,7 +29,7 @@ class RangeLoopRestructure : Restructure() {
             }
         }
 
-    private fun findRangeLoopInitInParent(symbol: Assignable): Assignee {
+    private fun findRangeLoopInitInParent(symbol: SymbolLoad): AssignmentStore {
         var current = currentBlock
         var parent = current.parent
         var blockIndex = current.indexInParent
@@ -67,7 +64,7 @@ class RangeLoopRestructure : Restructure() {
         throw Error("symbol $symbol init not found!")
     }
 
-    private fun findRangeLoopStep(loop: ConditionLoop, symbol: Assignable): Increment {
+    private fun findRangeLoopStep(loop: ConditionLoop, symbol: SymbolLoad): Increment {
         val steps = BreadthFirstExpressionFinder(Increment::class.java).also { it.visit(loop.instructions) { i, stmt -> } }.result()
         return steps.first()
     }

@@ -1,15 +1,13 @@
 package ir.statement
 
 import generation.WatWriter
-import ir.Names
 import ir.expression.*
 import ir.finder.Visitor
-import wasm.WasmValueType
 
 class Store(
     val symbol: Load,
     var data: Expression,
-) : BasicStatement(), Assignee {
+) : BasicStatement(), AssignmentStore {
 
     override fun write(out: Appendable) {
         symbol.write(out)
@@ -35,7 +33,7 @@ class Store(
         return data
     }
 
-    override fun assignedTo(): Assignable {
+    override fun assignedTo(): SymbolLoad {
         return symbol
     }
 
