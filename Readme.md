@@ -3,7 +3,7 @@
 - [x] Lock Thread Mutex Before Kernel Lock
 - [x] Parallel Block Generation
 - [x] DFA
-  - [ ] Constant Propagation
+  - [x] Constant Propagation
   - [x] Memory Aliasing
 - [ ] Dependence Analysis P54
 - [ ] GCD Test

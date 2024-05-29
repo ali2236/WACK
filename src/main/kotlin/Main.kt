@@ -11,7 +11,7 @@ import java.io.File
 
 fun main(args: Array<String>) {
     val samples = listOf(File("./samples/simple_loop.wat"))// File("./samples").listFiles()
-    for (sample in samples!!){
+    for (sample in samples!!) {
         val parseTree = Wat.parse(sample.path)
         val module = Wat.module(parseTree)
         val ir = IRConstructor(module)
@@ -19,9 +19,9 @@ fun main(args: Array<String>) {
 
         RestructurePasses.basic(program)
 
-         ConstantPropagation().apply(program)
+        ConstantPropagation().apply(program)
 
-        // AliasMemory().apply(program)
+        AliasMemory().apply(program)
 
         // intermediate outputs
         program.statements.filterIsInstance<Function>().forEach { function ->
@@ -54,7 +54,6 @@ fun main(args: Array<String>) {
         //program.wat(watWriter)
         //outWriter.flush()
         //outWriter.close()
-
 
 
         // cfg
