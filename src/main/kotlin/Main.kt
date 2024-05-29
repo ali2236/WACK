@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
 
         ConstantPropagation().apply(program)
 
-        //AliasMemory().apply(program)
+        // AliasMemory().apply(program)
 
         // intermediate outputs
         program.statements.filterIsInstance<Function>().forEach { function ->

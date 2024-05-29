@@ -48,13 +48,16 @@ class Dfa(val nodes : MutableList<DfaNode>) : DotGraph() {
             out.append("label=<<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\"><TR><TD BORDER=\"0\" ALIGN=\"LEFT\" COLSPAN=\"2\">")
 
             // label & statement
-            dfaNode.label?.let {
-                dot.append(it)
-                out.append("<BR ALIGN=\"LEFT\"/>")
-            }
-            dfaNode.statement?.let {
-                it.write(dot)
-                out.append("<BR ALIGN=\"LEFT\"/>")
+            if (dfaNode.label != null){
+                dfaNode.label?.let {
+                    dot.append(it)
+                    out.append("<BR ALIGN=\"LEFT\"/>")
+                }
+            } else {
+                dfaNode.statement?.let {
+                    it.write(dot)
+                    out.append("<BR ALIGN=\"LEFT\"/>")
+                }
             }
             dot.append("IN = {" + dfaNode.IN + "}")
             out.append("<BR ALIGN=\"LEFT\"/>")

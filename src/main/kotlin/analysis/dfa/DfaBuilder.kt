@@ -157,7 +157,7 @@ object DfaBuilder {
         }
     }
 
-    private fun explainExpression(expr: Expression, dfaFacts: Set<DfaFact>): DfaValue {
+    fun explainExpression(expr: Expression, dfaFacts: Set<DfaFact>): DfaValue {
         when (expr) {
             is Value -> {
                 // const
@@ -205,7 +205,7 @@ object DfaBuilder {
         }
     }
 
-    private fun evalBinaryOp(op: BinaryOP, facts: Set<DfaFact>): Expression {
+    fun evalBinaryOp(op: BinaryOP, facts: Set<DfaFact>): Expression {
         if (op.left is BinaryOP) {
             op.left = evalBinaryOp(op.left as BinaryOP, facts)
         }

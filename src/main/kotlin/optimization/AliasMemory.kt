@@ -30,7 +30,7 @@ class AliasMemory : Optimizer {
                 val dfa = Dfa.from(function)
                 val exitNode = dfa.nodes[1]
                 exitNode.OUT.facts
-                    .filter { fact -> fact.symbol is Load && fact.value is DfaValue.Expr }
+                    .filter { fact -> fact.symbol is Load }
                     .forEach { fact -> makeAlias(fact.symbol as Load) }
 
                 // Find All loads
@@ -45,6 +45,10 @@ class AliasMemory : Optimizer {
                     .forEach { (load, replace) ->
                         replace(aliases[load]!!)
                     }
+
+                aliases.entries.forEach {(key, value) ->
+                    println("$key -> $value")
+                }
 
                 // Replace stores with assignment
                 rStores

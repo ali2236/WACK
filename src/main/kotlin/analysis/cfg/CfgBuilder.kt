@@ -27,6 +27,7 @@ internal class CfgBuilder(val function: Function) {
         pushScope(function, endBlock, endBlock)
         runOnBlock(function, body)
         popScope()
+        function.statements.clear()
         removeEmptyBlocks()
         return CFG(blocks)
     }
@@ -90,6 +91,7 @@ internal class CfgBuilder(val function: Function) {
                     val block = makeBlock(stmt.printHeader())
                     block.addSuccessor(scope[scope.size - stmt.depth - 1].br, "True")
                     current.addSuccessor(block)
+                    block.statements.add(stmt)
 
                     // false
                     block.addSuccessor(next, "False")
@@ -101,6 +103,7 @@ internal class CfgBuilder(val function: Function) {
 
                     val block = makeBlock(stmt.printHeader())
                     pushScope(block, next, next)
+                    block.statements.add(stmt)
 
                     // true
                     val trueBody = makeBlock()
@@ -136,6 +139,7 @@ internal class CfgBuilder(val function: Function) {
                     val headBlock = makeBlock(stmt.printHeader())
                     pushScope(headBlock, headBlock, next)
                     current.addSuccessor(headBlock)
+                    headBlock.statements.add(stmt)
 
                     // body
                     val bodyBlock = makeBlock()
@@ -155,6 +159,7 @@ internal class CfgBuilder(val function: Function) {
                     pushScope(block, next, next)
                     runOnBlock(block, stmt.instructions)
                     current.addSuccessor(block)
+                    block.statements.add(stmt)
 
                     // end
                     popScope()
