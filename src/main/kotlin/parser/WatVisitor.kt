@@ -168,7 +168,8 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
                 "sub" -> Operator.sub
                 "and" -> Operator.and
                 "shl" -> Operator.shl
-                else -> throw Error()
+                "mul" -> Operator.mul
+                else -> throw Error("unkown operator $operatorName")
             }
             val second = stack.pop()
             val first = stack.pop()
@@ -190,6 +191,10 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val memoryIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
             val store = Store(Load(type, addr, memoryIndex, offset, align), data)
             stack.push(store)
+        } else if(ctx.NOP() != null){
+            stack.push(Nop())
+        } else if(ctx.DROP() != null){
+            stack.push(Drop(stack.pop()))
         } else {
             throw Exception("No Case found for: " + ctx.text)
         }

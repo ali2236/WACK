@@ -1,4 +1,4 @@
-// Generated from C:/Users/Aligator/Projects/WACK/src/main/java/dev/aligator/parser/WatParser.g4 by ANTLR 4.13.1
+// Generated from C:/Users/Aligator/Projects/WACK/src/main/java/parser/WatParser.g4 by ANTLR 4.13.1
 package parser;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -100,6 +100,12 @@ public interface WatParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitPlain_instr(WatParser.Plain_instrContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link WatParser#select_type}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSelect_type(WatParser.Select_typeContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link WatParser#call_instr}.
 	 * @param ctx the parse tree

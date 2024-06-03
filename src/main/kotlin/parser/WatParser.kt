@@ -14,6 +14,8 @@ object Wat {
     fun parse(path: String): ParseTree {
         // 1. Read
         val reader = File(path).reader(Charsets.UTF_8)
+        // if Charsets.UTF_16LE -> Convert to UTF_8
+        // 0x0a should be the last character
 
         // 2. Tokenize
         val lexer = WatLexer(CharStreams.fromReader(reader))

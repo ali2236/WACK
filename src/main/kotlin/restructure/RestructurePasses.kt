@@ -4,22 +4,23 @@ import ir.statement.Program
 
 object RestructurePasses {
 
-    fun all(program: Program) {
+/*    fun all(program: Program) {
         val passes = listOf(
             // ConditionalLoopRestructure(),
             //LoopMemoryCounterAlias(),
-            IncrementRestructure(),
+            // IncrementRestructure(),
             // RangeLoopRestructure(),
             // ShiftToMultiply(),
             // RangeLoopRangeRefinement(),
             // LoopVariableFlattening(),
         )
         passes.forEach { it.run(program) }
-    }
+    }*/
 
-    fun basic(program: Program) {
+    fun apply(program: Program) {
         val passes = listOf(
             ConditionalLoopRestructure(),
+            IncrementRestructure(),
             ShiftToMultiply(),
         )
         passes.forEach { it.run(program) }

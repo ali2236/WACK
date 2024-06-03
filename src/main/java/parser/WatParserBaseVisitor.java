@@ -1,4 +1,4 @@
-// Generated from C:/Users/Aligator/Projects/WACK/src/main/java/dev/aligator/parser/WatParser.g4 by ANTLR 4.13.1
+// Generated from C:/Users/Aligator/Projects/WACK/src/main/java/parser/WatParser.g4 by ANTLR 4.13.1
 package parser;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
@@ -117,6 +117,13 @@ public class WatParserBaseVisitor<T> extends AbstractParseTreeVisitor<T> impleme
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitPlain_instr(WatParser.Plain_instrContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitSelect_type(WatParser.Select_typeContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

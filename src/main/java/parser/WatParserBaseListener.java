@@ -1,4 +1,4 @@
-// Generated from C:/Users/Aligator/Projects/WACK/src/main/java/dev/aligator/parser/WatParser.g4 by ANTLR 4.13.1
+// Generated from C:/Users/Aligator/Projects/WACK/src/main/java/parser/WatParser.g4 by ANTLR 4.13.1
 package parser;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -192,6 +192,18 @@ public class WatParserBaseListener implements WatParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitPlain_instr(WatParser.Plain_instrContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSelect_type(WatParser.Select_typeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSelect_type(WatParser.Select_typeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

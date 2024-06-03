@@ -157,6 +157,8 @@ CONVERT:
 
 MEMORY_SIZE : 'memory.size';
 MEMORY_GROW : 'memory.grow';
+MEMORY_COPY : 'memory.copy';
+MEMORY_FILL : 'memory.fill';
 
 TYPE   : 'type';
 FUNC   : 'func';

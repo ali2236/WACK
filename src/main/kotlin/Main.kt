@@ -1,65 +1,74 @@
 import analysis.cfg.CFG
 import analysis.dfa.Dfa
+import external.Wasm2Wat
+import generation.WasiThreadsGenerator
+import generation.WatWriter
 import ir.IRConstructor
 import ir.statement.Function
-import optimization.AliasMemory
-import optimization.ConstantPropagation
+import ir.statement.Program
 import optimization.OptimizationPasses
 import parser.Wat
 import restructure.RestructurePasses
 import java.io.File
 
 fun main(args: Array<String>) {
-    val samples = listOf(File("./samples/simple_loop.wat"))// File("./samples").listFiles()
+
+    // create folders
+    val _out = File("./out")
+    if(!_out.exists()){
+        _out.mkdir()
+    }
+    val _intermediate = File("./out/intermediate")
+    if(!_intermediate.exists()){
+        _intermediate.mkdir()
+    }
+
+    // run
+    val wasm2wat = Wasm2Wat()
+    val samples = listOf(File("./samples/matrix_multiply.wat"))// File("./samples").listFiles()
     for (sample in samples!!) {
-        val parseTree = Wat.parse(sample.path)
+        val watInput = wasm2wat.process(sample)
+        val parseTree = Wat.parse(watInput.path)
+        val tokensFile = File("./out/tokens.txt").also { it.createNewFile() }
+        val tokensWriter = tokensFile.bufferedWriter()
+        for (i in 0 until parseTree.childCount){
+            tokensWriter.write(parseTree.getChild(i).text)
+            tokensWriter.newLine()
+        }
         val module = Wat.module(parseTree)
         val ir = IRConstructor(module)
         val program = ir.program()
 
-        RestructurePasses.basic(program)
+        RestructurePasses.apply(program)
 
-        ConstantPropagation().apply(program)
-
-        AliasMemory().apply(program)
-
-        // intermediate outputs
-        program.statements.filterIsInstance<Function>().forEach { function ->
-            val fileName = "${sample.nameWithoutExtension}_f" + function.functionData.index
-
-            /// cfg
-            val cfg = CFG.from(function)
-            cfg.writeToFile(fileName)
-
-            /// dfa
-            val dfa = Dfa.from(function, cfg)
-            dfa.writeToFile(fileName)
-        }
-
-        // restructure pass
-        // RestructurePasses.all(program)
-
-        // analysis passes
-
-        // optimization passes
         OptimizationPasses.apply(program)
 
-        // code generation
-        //WasiThreadsGenerator().apply(program)
+        analysis2Dot(program, watInput)
+
+        // runtime injection / parallel loop transformer
+        WasiThreadsGenerator().apply(program)
 
         // write out
-        //val watOut = File("./out/wat_$test.wat")
-        //val outWriter = watOut.writer()
-        //val watWriter = WatWriter(outWriter)
-        //program.wat(watWriter)
-        //outWriter.flush()
-        //outWriter.close()
+        val watOut = File("./out/wat_${watInput.nameWithoutExtension}.wat")
+        val outWriter = watOut.writer()
+        val watWriter = WatWriter(outWriter)
+        program.wat(watWriter)
+        outWriter.flush()
+        outWriter.close()
+    }
+}
 
+fun analysis2Dot(program: Program, sample: File) {
+    // intermediate outputs
+    program.statements.filterIsInstance<Function>().forEach { function ->
+        val fileName = "${sample.nameWithoutExtension}_f" + function.functionData.index
 
-        // cfg
-        /*val dotOut = File("./out/cfg_${test}_$functionIndex.dot")
-        val dotWriter = dotOut.writer()
-        cfg.dot(dotWriter)
-        dotWriter.close()*/
+        /// cfg
+        val cfg = CFG.from(function)
+        cfg.writeToFile(fileName)
+
+        /// dfa
+        val dfa = Dfa.from(function, cfg)
+        dfa.writeToFile(fileName)
     }
 }

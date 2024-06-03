@@ -113,7 +113,7 @@ plain_instr
     : UNREACHABLE
     | NOP
     | DROP
-    | SELECT LPAR RETURN value_type RPAR
+    | SELECT select_type?
     | BR var_
     | BR_IF var_
     | BR_TABLE var_+
@@ -128,12 +128,18 @@ plain_instr
     | STORE var_? OFFSET_EQ_NAT? ALIGN_EQ_NAT?
     | MEMORY_SIZE var_?
     | MEMORY_GROW var_?
+    | MEMORY_COPY var_?
+    | MEMORY_FILL var_?
     | CONST literal
     | TEST
     | COMPARE
     | UNARY
     | BINARY
     | CONVERT
+    ;
+
+select_type:
+    LPAR RETURN value_type RPAR
     ;
 
 call_instr

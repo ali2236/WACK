@@ -1,4 +1,4 @@
-// Generated from C:/Users/Aligator/Projects/WACK/src/main/java/dev/aligator/parser/WatParser.g4 by ANTLR 4.13.1
+// Generated from C:/Users/Aligator/Projects/WACK/src/main/java/parser/WatParser.g4 by ANTLR 4.13.1
 package parser;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -157,6 +157,16 @@ public interface WatParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitPlain_instr(WatParser.Plain_instrContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link WatParser#select_type}.
+	 * @param ctx the parse tree
+	 */
+	void enterSelect_type(WatParser.Select_typeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link WatParser#select_type}.
+	 * @param ctx the parse tree
+	 */
+	void exitSelect_type(WatParser.Select_typeContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link WatParser#call_instr}.
 	 * @param ctx the parse tree
