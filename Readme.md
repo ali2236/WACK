@@ -5,10 +5,11 @@
 - [x] DFA
   - [x] Constant Propagation
   - [x] Memory Aliasing
+- [x] Block WasmBlockType
+- [ ] Else for If block
 - [ ] Dependence Analysis P54
 - [ ] GCD Test
 - [ ] Data Dependency Test
-- [ ] Block WasmBlockType
 - [ ] Eval or Runtime Evaluation
 - [ ] Runtime limit evaluation(omp if)
 - [ ] Profitability Analysis

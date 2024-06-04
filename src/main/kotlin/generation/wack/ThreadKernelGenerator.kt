@@ -59,7 +59,7 @@ object ThreadKernelGenerator {
                         // size = to - from
                         val size = BinaryOP(
                             WasmValueType.i32,
-                            Operator.sub,
+                            BinaryOP.Operator.sub,
                             rangeTo,
                             rangeFrom,
                         )
@@ -70,10 +70,10 @@ object ThreadKernelGenerator {
                             Assignment(
                                 start, BinaryOP(
                                     WasmValueType.i32,
-                                    Operator.mul,
+                                    BinaryOP.Operator.mul,
                                     BinaryOP(
                                         WasmValueType.i32,
-                                        Operator.div.copy(signed = BitSign.s),
+                                        BinaryOP.Operator.div.copy(signed = BinaryOP.BitSign.s),
                                         size,
                                         threadCount.symbol,
                                     ),
@@ -89,25 +89,25 @@ object ThreadKernelGenerator {
                                 end, Select(
                                     BinaryOP(
                                         WasmValueType.i32,
-                                        Operator.mul,
+                                        BinaryOP.Operator.mul,
                                         BinaryOP(
                                             WasmValueType.i32,
-                                            Operator.div.copy(signed = BitSign.s),
+                                            BinaryOP.Operator.div.copy(signed = BinaryOP.BitSign.s),
                                             size,
                                             threadCount.symbol,
                                         ),
                                         BinaryOP(
                                             WasmValueType.i32,
-                                            Operator.add,
+                                            BinaryOP.Operator.add,
                                             threadId,
                                             Value(WasmValueType.i32, "1"),
                                         ),
                                     ),
                                     size,
                                     BinaryOP(
-                                        WasmValueType.i32, Operator.eq, threadId, BinaryOP(
+                                        WasmValueType.i32, BinaryOP.Operator.eq, threadId, BinaryOP(
                                             WasmValueType.i32,
-                                            Operator.sub,
+                                            BinaryOP.Operator.sub,
                                             threadCount.symbol,
                                             Value(WasmValueType.i32, "1")
                                         )
@@ -159,7 +159,7 @@ object ThreadKernelGenerator {
                             If(
                                 BinaryOP(
                                     WasmValueType.i32,
-                                    Operator.lt.copy(signed = BitSign.s),
+                                    BinaryOP. Operator.lt.copy(signed = BinaryOP.BitSign.s),
                                     threadSpawn.call(arg.encode.call(threadId, Value(WasmValueType.i32, "$kernelId"))),
                                     Value(WasmValueType.i32, "0")
                                 ), mutableListOf(Unreachable())

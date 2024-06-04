@@ -128,7 +128,7 @@ plain_instr
     | STORE var_? OFFSET_EQ_NAT? ALIGN_EQ_NAT?
     | MEMORY_SIZE var_?
     | MEMORY_GROW var_?
-    | MEMORY_COPY var_?
+    | MEMORY_COPY var_? var_?
     | MEMORY_FILL var_?
     | CONST literal
     | TEST

@@ -26,11 +26,11 @@ object ParallelBlockGenerator {
                             listOf(
                                 // body: run block body
                                 *oldBody,
-                                Assignment(threadId, BinaryOP(WasmValueType.i32, Operator.add, threadId, one)),
+                                Assignment(threadId, BinaryOP(WasmValueType.i32, BinaryOP.Operator.add, threadId, one)),
                                 BrIf(
                                     BinaryOP(
                                         WasmValueType.i32,
-                                        Operator.lt.copy(signed = BitSign.s),
+                                        BinaryOP.Operator.lt.copy(signed = BinaryOP.BitSign.s),
                                         threadId,
                                         threadCount.symbol
                                     ),
@@ -51,11 +51,11 @@ object ParallelBlockGenerator {
                             listOf(
                                 // barrier: loop threadId from 0 until num_threads -> join(threadId)
                                 mutex.join.call(threadId),
-                                Assignment(threadId, BinaryOP(WasmValueType.i32, Operator.add, threadId, one)),
+                                Assignment(threadId, BinaryOP(WasmValueType.i32, BinaryOP.Operator.add, threadId, one)),
                                 BrIf(
                                     BinaryOP(
                                         WasmValueType.i32,
-                                        Operator.lt.copy(signed = BitSign.s),
+                                        BinaryOP.Operator.lt.copy(signed = BinaryOP.BitSign.s),
                                         threadId,
                                         threadCount.symbol
                                     ),

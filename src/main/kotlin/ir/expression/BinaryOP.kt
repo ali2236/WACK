@@ -39,37 +39,38 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
     override fun clone(): Expression {
         return BinaryOP(type, operator.copy(), left.clone(), right.clone())
     }
-}
 
-data class Operator(val sign: String, val watName: String, var signed: BitSign? = null) {
+    data class Operator(val sign: String, val watName: String, var signed: BitSign? = null) {
 
-    companion object {
-        val eq = Operator("==", "eq")
-        val neq = Operator("!=", "ne")
-        val lt = Operator("<", "lt")
-        val le = Operator("<=", "le")
-        val gt = Operator(">", "gt")
-        val ge = Operator(">=", "ge")
-        val add = Operator("+", "add")
-        val sub = Operator("-", "sub")
-        val div = Operator("/", "div")
-        val mul = Operator("*", "mul")
-        val shl = Operator("<<", "shl")
-        val shr = Operator(">>", "shr")
-        val and = Operator("&", "and")
-        val or = Operator("|", "or")
-        val xor = Operator("^", "xor")
-    }
+        companion object {
+            val eq = Operator("==", "eq")
+            val neq = Operator("!=", "ne")
+            val lt = Operator("<", "lt")
+            val le = Operator("<=", "le")
+            val gt = Operator(">", "gt")
+            val ge = Operator(">=", "ge")
+            val add = Operator("+", "add")
+            val sub = Operator("-", "sub")
+            val div = Operator("/", "div")
+            val mul = Operator("*", "mul")
+            val shl = Operator("<<", "shl")
+            val shr = Operator(">>", "shr")
+            val and = Operator("&", "and")
+            val or = Operator("|", "or")
+            val xor = Operator("^", "xor")
+            val rem = Operator("%", "rem")
+        }
 
-    fun wat(): String {
-        if (signed != null) {
-            return "${watName}_$signed"
-        } else {
-            return watName
+        fun wat(): String {
+            if (signed != null) {
+                return "${watName}_$signed"
+            } else {
+                return watName
+            }
         }
     }
-}
 
-enum class BitSign {
-    s, u
+    enum class BitSign {
+        s, u
+    }
 }

@@ -4,7 +4,7 @@ import generation.WatWriter
 import wasm.WasmValueType
 
 // return selector == 0 ? val2 : val1
-class Select(val val1: Expression, val val2: Expression, val selector: Expression, val resultType: WasmValueType) :
+class Select(val val1: Expression, val val2: Expression, val selector: Expression, val resultType: WasmValueType?) :
     Expression() {
     override fun clone(): Expression {
         return Select(val1.clone(), val2.clone(), selector.clone(), resultType)

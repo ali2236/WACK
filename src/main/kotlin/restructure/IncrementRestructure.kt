@@ -21,10 +21,10 @@ class IncrementRestructure : Restructure() {
                 (opr.right is Value && (opr.right as Value).value == "1" && opr.left == stmt.assignedTo())
             ) {
                 val v = opr.right as Value
-                if (opr.operator == Operator.add) {
-                    replaceCurrentInstruction(Increment(stmt, Operator.add))
-                } else if (opr.operator == Operator.sub) {
-                    replaceCurrentInstruction(Increment(stmt, Operator.sub))
+                if (opr.operator == BinaryOP.Operator.add) {
+                    replaceCurrentInstruction(Increment(stmt, BinaryOP.Operator.add))
+                } else if (opr.operator == BinaryOP.Operator.sub) {
+                    replaceCurrentInstruction(Increment(stmt, BinaryOP.Operator.sub))
                 }
             }
         }

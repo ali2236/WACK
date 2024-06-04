@@ -16,7 +16,11 @@ object DfaBuilder {
     fun build(function: Function, cfg: CFG): Dfa {
         val dfa = initializeDfaFromCFG(cfg, function)
         var propagated = false
+        var i = 0
         while (!propagated) {
+            if(i > 20){
+                println("function=${function.functionData.index}, i=$i")
+            }
             var changed = false
             dfa.pass { node ->
                 changed = propegate(node) || changed
@@ -30,6 +34,7 @@ object DfaBuilder {
                     }
                 }
                 propagated = !changed
+                i++
             }
         }
 

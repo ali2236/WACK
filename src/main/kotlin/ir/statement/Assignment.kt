@@ -24,6 +24,8 @@ open class Assignment(
         // TODO: Tee
     }
 
+    override fun isExpression(): Boolean = false
+
     override fun wat(wat: WatWriter) {
         value.wat(wat)
         if (tee) {

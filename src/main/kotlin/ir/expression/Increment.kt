@@ -4,7 +4,7 @@ import generation.WatWriter
 import ir.finder.Visitor
 import ir.statement.*
 
-class Increment(val operation: AssignmentStore, val operator: Operator = Operator.add) : AssignmentStore {
+class Increment(val operation: AssignmentStore, val operator: BinaryOP.Operator = BinaryOP.Operator.add) : AssignmentStore {
     override var id: Long? = Statement.newId()
     override fun assignedWith(): Expression {
        return operation.assignedWith()
@@ -20,14 +20,16 @@ class Increment(val operation: AssignmentStore, val operator: Operator = Operato
 
     override fun write(out: Appendable) {
         val op = when (operator) {
-            Operator.add -> "${operation.assignedTo()}++"
-            Operator.sub -> "${operation.assignedTo()}--"
+            BinaryOP.Operator.add -> "${operation.assignedTo()}++"
+            BinaryOP.Operator.sub -> "${operation.assignedTo()}--"
             else -> throw Error()
         }
 
         out.append(op)
         out.append(";\n")
     }
+
+    override fun isExpression(): Boolean = false
 
     override fun visit(v: Visitor) {
         operation.visit(v)

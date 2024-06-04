@@ -31,8 +31,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
         this.function = function
         blocks.add(
             Block(
-                hasReturn = function.type.result.isNotEmpty(),
-                brackets = false
+                hasReturn = function.type.result.isNotEmpty(), brackets = false
             )
         )
         visit(function.code)
@@ -52,19 +51,29 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
 
 
     override fun visitBlock_instr(ctx: WatParser.Block_instrContext) {
+        var type: WasmValueType? = null
+        if (ctx.block().block_type() != null) {
+            type = WasmValueType.parse(ctx.block().block_type().value_type().text)
+        }
         if (ctx.LOOP() != null) {
             newScope(Loop())
             super.visitBlock_instr(ctx)
             val loop = exitScope() as Loop
             currentBlock.push(loop)
+            if (type != null) {
+                currentBlock.push(BlockResult(type, loop))
+            }
         } else if (ctx.BLOCK() != null) {
-            newScope(Block())
+            newScope(Block(type = type))
             super.visitBlock_instr(ctx)
             val block = exitScope()
             currentBlock.push(block)
+            if (type != null) {
+                currentBlock.push(BlockResult(type, block))
+            }
         } else if (ctx.IF() != null) {
             val condition = stack.pop()
-            newScope(If(condition))
+            newScope(If(condition, type = type))
             super.visitBlock(ctx.block())
             val ifMain = exitScope() as If
             if (ctx.ELSE() != null) {
@@ -74,6 +83,9 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
                 ifMain.elseBody = falseBody.instructions
             }
             stack.push(ifMain)
+            if (type != null) {
+                currentBlock.push(BlockResult(type, ifMain))
+            }
         }
     }
 
@@ -139,7 +151,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val (typeString, operatorName) = ctx.TEST()!!.text.split(".")
             val type = WasmValueType.parse(typeString)
             val expr = when (operatorName) {
-                "eqz" -> BinaryOP(type, Operator.eq, stack.pop(), Value(WasmValueType.i32, "0"))
+                "eqz" -> BinaryOP(type, BinaryOP.Operator.eq, stack.pop(), Value(WasmValueType.i32, "0"))
                 else -> throw Error()
             }
             stack.push(expr)
@@ -147,16 +159,16 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val (typeString, operatorName) = ctx.COMPARE()!!.text.split(".")
             val type = WasmValueType.parse(typeString)
             val operatorSign = when (operatorName) {
-                "eq" -> Operator.eq
-                "ne" -> Operator.neq
-                "lt", "lt_s", "lt_u" -> Operator.lt
-                "le", "le_s", "le_u" -> Operator.le
-                "gt", "gt_s", "gt_u" -> Operator.gt
-                "ge", "ge_s", "ge_u" -> Operator.ge
+                "eq" -> BinaryOP.Operator.eq
+                "ne" -> BinaryOP.Operator.neq
+                "lt", "lt_s", "lt_u" -> BinaryOP.Operator.lt
+                "le", "le_s", "le_u" -> BinaryOP.Operator.le
+                "gt", "gt_s", "gt_u" -> BinaryOP.Operator.gt
+                "ge", "ge_s", "ge_u" -> BinaryOP.Operator.ge
                 else -> throw Error()
             }
-            val signed = if (operatorName.length > 2) BitSign.valueOf(operatorName.last().toString()) else null
-            val operator = Operator(operatorSign.sign, operatorSign.watName, signed)
+            val signed = if (operatorName.length > 2) BinaryOP.BitSign.valueOf(operatorName.last().toString()) else null
+            val operator = BinaryOP.Operator(operatorSign.sign, operatorSign.watName, signed)
             val second = stack.pop()
             val first = stack.pop()
             stack.push(BinaryOP(type, operator, first, second))
@@ -164,16 +176,33 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val (typeString, operatorName) = ctx.BINARY()!!.text.split(".")
             val type = WasmValueType.parse(typeString)
             val operatorSign = when (operatorName) {
-                "add" -> Operator.add
-                "sub" -> Operator.sub
-                "and" -> Operator.and
-                "shl" -> Operator.shl
-                "mul" -> Operator.mul
-                else -> throw Error("unkown operator $operatorName")
+                "add" -> BinaryOP.Operator.add
+                "sub" -> BinaryOP.Operator.sub
+                "and" -> BinaryOP.Operator.and
+                "shl" -> BinaryOP.Operator.shl
+                "mul" -> BinaryOP.Operator.mul
+                "or" -> BinaryOP.Operator.or
+                "shr_u" -> BinaryOP.Operator.shr.copy(signed = BinaryOP.BitSign.u)
+                "shr_s" -> BinaryOP.Operator.shr.copy(signed = BinaryOP.BitSign.s)
+                "xor" -> BinaryOP.Operator.xor
+                "div_u" -> BinaryOP.Operator.div.copy(signed = BinaryOP.BitSign.u)
+                "div_s" -> BinaryOP.Operator.div.copy(signed = BinaryOP.BitSign.s)
+                "rem_u" -> BinaryOP.Operator.rem.copy(signed = BinaryOP.BitSign.u)
+                "rem_s" -> BinaryOP.Operator.rem.copy(signed = BinaryOP.BitSign.s)
+                else -> throw Error("unkown binary operator $operatorName")
             }
             val second = stack.pop()
             val first = stack.pop()
             stack.push(BinaryOP(type, operatorSign, first, second))
+        } else if (ctx.UNARY() != null) {
+            val (typeString, operatorName) = ctx.UNARY()!!.text.split(".")
+            val type = WasmValueType.parse(typeString)
+            val operatorSign = when (operatorName) {
+                "neg" -> UnaryOP.Operator.neg
+                "abs" -> UnaryOP.Operator.abs
+                else -> throw Error("unkown unary operator $operatorName")
+            }
+            stack.push(UnaryOP(type, operatorSign, stack.pop()))
         } else if (ctx.LOAD() != null) {
             val type = WasmValueType.parse(ctx.LOAD()!!.text.substring(0, 3))
             val offset = ctx.OFFSET_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
@@ -191,10 +220,51 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val memoryIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
             val store = Store(Load(type, addr, memoryIndex, offset, align), data)
             stack.push(store)
-        } else if(ctx.NOP() != null){
+        } else if (ctx.NOP() != null) {
             stack.push(Nop())
-        } else if(ctx.DROP() != null){
+        } else if (ctx.DROP() != null) {
             stack.push(Drop(stack.pop()))
+        } else if (ctx.CONVERT() != null) {
+            val (typeRaw, instruction) = ctx.CONVERT()!!.text.split(".")
+            val type = WasmValueType.parse(typeRaw)
+            stack.push(Convert(type, instruction, stack.pop()))
+        } else if (ctx.SELECT() != null) {
+            val val2 = stack.pop()
+            val val1 = stack.pop()
+            val type = if (ctx.select_type() != null) {
+                WasmValueType.parse(ctx.select_type().value_type().text)
+            } else {
+                null
+            }
+            stack.push(Select(val1, val2, stack.pop(), type))
+        } else if (ctx.BR_TABLE() != null) {
+            val jumps = ctx.var_().map { it.text.toInt() }
+            stack.push(BrTable(stack.pop(), jumps))
+        } else if (ctx.MEMORY_SIZE() != null) {
+            val memoryIndex = Index(ctx.var_()?.firstOrNull()?.text?.toInt() ?: 0)
+            stack.push(MemorySize(memoryIndex))
+        } else if (ctx.MEMORY_GROW() != null) {
+            val memoryIndex = Index(ctx.var_()?.firstOrNull()?.text?.toInt() ?: 0)
+            stack.push(MemoryGrow(memoryIndex, stack.pop()))
+        } else if (ctx.MEMORY_COPY() != null) {
+            val z = Index(0)
+            var (from, to) = Pair(z, z)
+            if(ctx.var_()?.size == 2){
+                ctx.var_()!!.map { Index(it.text.toInt()) }.also {
+                    from = it.first()
+                    to = it.last()
+                }
+            }
+            val n = stack.pop()
+            val i2 = stack.pop()
+            val i1 = stack.pop()
+            stack.push(MemoryCopy(from, to, n, i1, i2))
+        } else if(ctx.MEMORY_FILL() != null){
+            val memoryIndex = Index(ctx.var_()?.firstOrNull()?.text?.toInt() ?: 0)
+            val n = stack.pop()
+            val value = stack.pop()
+            val i = stack.pop()
+            stack.push(MemoryFill(memoryIndex, i, value, n))
         } else {
             throw Exception("No Case found for: " + ctx.text)
         }

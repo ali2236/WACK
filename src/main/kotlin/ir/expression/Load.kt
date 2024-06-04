@@ -19,7 +19,7 @@ class Load(
         out.append(Names.memory + memoryIndex)
         out.append("[")
         if (offset != 0) {
-            BinaryOP(type, Operator.add, address, Value(WasmValueType.i32, offset.toString())).write(out)
+            BinaryOP(type, BinaryOP.Operator.add, address, Value(WasmValueType.i32, offset.toString())).write(out)
         } else {
             address.write(out)
         }

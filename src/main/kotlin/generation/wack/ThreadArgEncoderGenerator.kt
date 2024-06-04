@@ -34,9 +34,9 @@ object ThreadArgEncoderGenerator {
         val argEncode = Function(
             wasmArgEncode, instructions = mutableListOf(
                 BinaryOP(
-                    WasmValueType.i32, Operator.xor, Symbol(WasmScope.local, WasmValueType.i32, Index(0)), BinaryOP(
+                    WasmValueType.i32, BinaryOP.Operator.xor, Symbol(WasmScope.local, WasmValueType.i32, Index(0)), BinaryOP(
                         WasmValueType.i32,
-                        Operator.shl,
+                        BinaryOP.Operator.shl,
                         Symbol(WasmScope.local, WasmValueType.i32, Index(1)),
                         Value(WasmValueType.i32, "16"),
                     )
@@ -50,14 +50,14 @@ object ThreadArgEncoderGenerator {
             // thread_id
             it.instructions.add(
                 BinaryOP(
-                    WasmValueType.i32, Operator.and, arg, Value(WasmValueType.i32, "0x0000FFFF")
+                    WasmValueType.i32, BinaryOP.Operator.and, arg, Value(WasmValueType.i32, "0x0000FFFF")
                 )
             )
             // kernel_id
             it.instructions.add(
                 BinaryOP(
-                    WasmValueType.i32, Operator.shr.copy(signed = BitSign.u), BinaryOP(
-                        WasmValueType.i32, Operator.and, arg, Value(WasmValueType.i32, "0xFFFF0000")
+                    WasmValueType.i32, BinaryOP.Operator.shr.copy(signed = BinaryOP.BitSign.u), BinaryOP(
+                        WasmValueType.i32, BinaryOP.Operator.and, arg, Value(WasmValueType.i32, "0xFFFF0000")
                     ), Value(WasmValueType.i32, "16")
                 ),
             )

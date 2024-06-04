@@ -5,6 +5,7 @@ import generation.WatWriter
 import generation.WebAssemblyBlock
 import ir.expression.Expression
 import ir.finder.Visitor
+import wasm.WasmValueType
 
 open class Block(
     open val instructions: MutableList<Statement> = mutableListOf(),
@@ -12,6 +13,7 @@ open class Block(
     val brackets : Boolean = true,
     var parent : Block? = null,
     var indexInParent : Int? = null,
+    val type : WasmValueType? = null,
     open val annotations: MutableList<WackAnnotation> = mutableListOf()
 ) : BasicStatement(), WebAssemblyBlock {
 
@@ -59,6 +61,10 @@ open class Block(
             expr.write(out)
         }
         if (brackets) out.append("}\n")
+    }
+
+    override fun isExpression(): Boolean {
+        return type != null
     }
 
 

@@ -41,7 +41,7 @@ fun main(args: Array<String>) {
 
         RestructurePasses.apply(program)
 
-        OptimizationPasses.apply(program)
+        //OptimizationPasses.apply(program)
 
         analysis2Dot(program, watInput)
 
@@ -68,7 +68,7 @@ fun analysis2Dot(program: Program, sample: File) {
         cfg.writeToFile(fileName)
 
         /// dfa
-        val dfa = Dfa.from(function, cfg)
-        dfa.writeToFile(fileName)
+        //val dfa = Dfa.from(function, cfg)
+        //dfa.writeToFile(fileName)
     }
 }

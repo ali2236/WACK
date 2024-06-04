@@ -70,7 +70,9 @@ internal class CfgBuilder(val function: Function) {
         }
         for ((i, stmt) in instructions.withIndex()) {
             when (stmt) {
-                // TODO: is switch
+                is BrTable -> {
+                    TODO("Function(${function.functionData.index}): br_table cfg not implemented.")
+                }
                 is Return, is Unreachable -> {
                     current.statements.add(stmt)
                     current.addSuccessor(endBlock)

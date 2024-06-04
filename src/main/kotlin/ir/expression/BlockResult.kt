@@ -1,0 +1,19 @@
+package ir.expression
+
+import generation.WatWriter
+import ir.statement.Block
+import wasm.WasmValueType
+
+class BlockResult(val type: WasmValueType, val block: Block) : Expression() {
+    override fun clone(): Expression {
+        return this
+    }
+
+    override fun write(out: Appendable) {
+        block.write(out)
+    }
+
+    override fun wat(wat: WatWriter) {
+        // nothing
+    }
+}

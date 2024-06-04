@@ -6,7 +6,10 @@ import ir.finder.Visitable
 interface Statement : Visitable, WebAssemblyInstruction {
 
     var id: Long?
-    abstract fun write(out: Appendable)
+    fun write(out: Appendable)
+
+    @Deprecated("")
+    fun isExpression() : Boolean
 
     companion object {
 

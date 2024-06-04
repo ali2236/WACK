@@ -3,13 +3,15 @@ package ir.statement
 import generation.WatWriter
 import ir.expression.Expression
 import ir.finder.Visitor
+import wasm.WasmValueType
 
 open class If(
     var condition: Expression,
     trueBody: MutableList<Statement> = mutableListOf(),
     var elseBody: MutableList<Statement>? = null,
-    brackets: Boolean = true
-) : Block(trueBody, brackets = brackets) {
+    brackets: Boolean = true,
+    type: WasmValueType? = null,
+) : Block(trueBody, brackets = brackets, type = type) {
     open val trueBody: List<Statement>
         get() = instructions
 

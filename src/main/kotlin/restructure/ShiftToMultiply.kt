@@ -19,9 +19,9 @@ class ShiftToMultiply : Restructure() {
     private fun refineChildExpression(expr: Replaceable<Expression>) {
         if (expr.statement is BinaryOP) {
             val binOp = expr.statement
-            if (binOp.operator == Operator.shl && binOp.right is Value) {
+            if (binOp.operator == BinaryOP.Operator.shl && binOp.right is Value) {
                 val v = binOp.right as Value
-                binOp.operator = Operator.mul
+                binOp.operator = BinaryOP.Operator.mul
                 binOp.right = Value(WasmValueType.i32, 2.0.pow(v.value.toDouble()).toInt().toString())
             }
         }

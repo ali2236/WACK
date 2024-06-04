@@ -2,7 +2,6 @@ package restructure
 
 import ir.expression.BinaryOP
 import ir.expression.Increment
-import ir.expression.Operator
 import ir.expression.Value
 import ir.statement.Assignment
 import ir.statement.Block
@@ -29,9 +28,9 @@ class RangeLoopRangeRefinement : Restructure() {
         if (loop.condition is BinaryOP) {
             val binOp = loop.condition as BinaryOP
             when (binOp.operator) {
-                Operator.le, Operator.lt, Operator.gt, Operator.ge -> throw NotRangeLoopException("Already a range Loop")
+                BinaryOP.Operator.le, BinaryOP.Operator.lt, BinaryOP.Operator.gt, BinaryOP.Operator.ge -> throw NotRangeLoopException("Already a range Loop")
             }
-            if (!listOf(Operator.neq).contains(binOp.operator)) {
+            if (!listOf(BinaryOP.Operator.neq).contains(binOp.operator)) {
                 throw NotRangeLoopException("operator not supported")
             }
         } else {
@@ -42,8 +41,8 @@ class RangeLoopRangeRefinement : Restructure() {
         val direction: LoopStepDirection
         if (loop.step is Increment) {
             direction = when ((loop.step as Increment).operator) {
-                Operator.add -> LoopStepDirection.Up
-                Operator.sub -> LoopStepDirection.Down
+                BinaryOP.Operator.add -> LoopStepDirection.Up
+                BinaryOP.Operator.sub -> LoopStepDirection.Down
                 else -> throw NotRangeLoopException("No Direction!")
             }
         } else {
@@ -65,7 +64,7 @@ class RangeLoopRangeRefinement : Restructure() {
             val binOp = loop.condition as BinaryOP
             if (binOp.right is Value){
                 val v = binOp.right as Value
-                if (binOp.operator == Operator.neq) {
+                if (binOp.operator == BinaryOP.Operator.neq) {
                     end = v.value.toInt()
                 } else {
                     throw NotRangeLoopException("operator not supported(2)")
@@ -77,10 +76,10 @@ class RangeLoopRangeRefinement : Restructure() {
 
         // change condition
         val op = (loop.condition as BinaryOP).operator
-        (loop.condition as BinaryOP).operator = if (op == Operator.neq) {
+        (loop.condition as BinaryOP).operator = if (op == BinaryOP.Operator.neq) {
             when (direction) {
-                LoopStepDirection.Up -> Operator.lt
-                LoopStepDirection.Down -> Operator.gt
+                LoopStepDirection.Up -> BinaryOP.Operator.lt
+                LoopStepDirection.Down -> BinaryOP.Operator.gt
             }
         } else {
             (loop.condition as BinaryOP).operator
