@@ -65,14 +65,31 @@ internal class CfgBuilder(val function: Function) {
         current: CfgBlock,
         instructions: List<Statement>,
     ) {
-        if(instructions.isEmpty()){
+        if (instructions.isEmpty()) {
             current.addSuccessor(currentScope.next)
         }
         for ((i, stmt) in instructions.withIndex()) {
             when (stmt) {
                 is BrTable -> {
-                    TODO("Function(${function.functionData.index}): br_table cfg not implemented.")
+                    val brBlock = makeBlock("br_table")
+                    current.addSuccessor(brBlock)
+
+                    stmt.depths.forEachIndexed { i, depth ->
+                        if (i != stmt.depths.size - 1){
+                        val case = makeBlock()
+                        case.addSuccessor(scope[scope.size - depth - 1].br, "$i")
+                        brBlock.addSuccessor(case)
+                        } else {
+                            val default = makeBlock()
+                            val brTarget = scope[scope.size - depth - 1].br
+                            default.addSuccessor(brTarget, "else")
+                            brBlock.addSuccessor(default)
+                        }
+                    }
+
+                    // no next
                 }
+
                 is Return, is Unreachable -> {
                     current.statements.add(stmt)
                     current.addSuccessor(endBlock)
@@ -114,16 +131,16 @@ internal class CfgBuilder(val function: Function) {
 
                     // false
                     if (stmt.elseBody != null) {
-                        // TODO
-                        //val falseBody = makeScope()
-                        // remaining += runOnBlock(falseBody, stmt.elseBody!!)
-                        //block.addSuccessor(falseBody, "False")
-                        //popScope()
+                        val falseBody = makeBlock()
+                        runOnBlock(falseBody, stmt.elseBody!!)
+                        block.addSuccessor(falseBody, "False")
+                        popScope()
                     } else {
+                        popScope()
                         // go to next
                         block.addSuccessor(next, "False")
                     }
-                    popScope()
+
                     current.addSuccessor(block)
                 }
 
@@ -157,7 +174,7 @@ internal class CfgBuilder(val function: Function) {
                     val next = makeNext(i, instructions)
 
                     // current
-                    val block = makeBlock()
+                    val block = makeBlock("Block")
                     pushScope(block, next, next)
                     runOnBlock(block, stmt.instructions)
                     current.addSuccessor(block)
@@ -173,6 +190,10 @@ internal class CfgBuilder(val function: Function) {
                 }
             }
             return
+        }
+        // instructions ended with no next
+        if(current.next == null){
+            current.addSuccessor(currentScope.next)
         }
     }
 

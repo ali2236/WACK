@@ -47,7 +47,7 @@ class AliasMemory : Optimizer {
                     }
 
                 aliases.entries.forEach {(key, value) ->
-                    println("$key -> $value")
+                    println("function ${function.functionData.index}: $key -> $value")
                 }
 
                 // Replace stores with assignment

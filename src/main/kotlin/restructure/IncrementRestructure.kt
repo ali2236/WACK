@@ -1,7 +1,9 @@
 package restructure
 
 import ir.expression.*
+import ir.statement.Assignment
 import ir.statement.AssignmentStore
+import ir.statement.Increment
 import ir.statement.Statement
 
 // check for "<symbol> = <symbol> + 1" pattern
@@ -9,23 +11,16 @@ import ir.statement.Statement
 class IncrementRestructure : Restructure() {
 
     override fun restructureInstruction(stmt: Statement) {
-        if (stmt is AssignmentStore) {
+        if (stmt is Assignment) {
             checkAssignmentStyleIncrement(stmt)
         }
     }
 
-    private fun checkAssignmentStyleIncrement(stmt: AssignmentStore) {
+    private fun checkAssignmentStyleIncrement(stmt: Assignment) {
         if (stmt.assignedWith() is BinaryOP) {
             val opr = stmt.assignedWith() as BinaryOP
-            if (
-                (opr.right is Value && (opr.right as Value).value == "1" && opr.left == stmt.assignedTo())
-            ) {
-                val v = opr.right as Value
-                if (opr.operator == BinaryOP.Operator.add) {
-                    replaceCurrentInstruction(Increment(stmt, BinaryOP.Operator.add))
-                } else if (opr.operator == BinaryOP.Operator.sub) {
-                    replaceCurrentInstruction(Increment(stmt, BinaryOP.Operator.sub))
-                }
+            if ((opr.right is Value && opr.operator == BinaryOP.Operator.add && (opr.right as Value).value == "1" && opr.left == stmt.assignedTo())) {
+                replaceCurrentInstruction(Increment(stmt.symbol))
             }
         }
     }

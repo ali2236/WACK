@@ -1,7 +1,7 @@
 package restructure
 
 import ir.expression.BinaryOP
-import ir.expression.Increment
+import ir.statement.Increment
 import ir.expression.Value
 import ir.statement.Assignment
 import ir.statement.Block
@@ -14,8 +14,8 @@ class RangeLoopRangeRefinement : Restructure() {
         super.restructureBlock(block)
         if (block is RangeLoop) {
             try {
-            refineForLoop(block)
-            } catch (e: NotRangeLoopException){
+                refineForLoop(block)
+            } catch (e: NotRangeLoopException) {
 
             }
         }
@@ -28,7 +28,9 @@ class RangeLoopRangeRefinement : Restructure() {
         if (loop.condition is BinaryOP) {
             val binOp = loop.condition as BinaryOP
             when (binOp.operator) {
-                BinaryOP.Operator.le, BinaryOP.Operator.lt, BinaryOP.Operator.gt, BinaryOP.Operator.ge -> throw NotRangeLoopException("Already a range Loop")
+                BinaryOP.Operator.le, BinaryOP.Operator.lt, BinaryOP.Operator.gt, BinaryOP.Operator.ge -> throw NotRangeLoopException(
+                    "Already a range Loop"
+                )
             }
             if (!listOf(BinaryOP.Operator.neq).contains(binOp.operator)) {
                 throw NotRangeLoopException("operator not supported")
@@ -38,16 +40,7 @@ class RangeLoopRangeRefinement : Restructure() {
         }
 
         // loop direction
-        val direction: LoopStepDirection
-        if (loop.step is Increment) {
-            direction = when ((loop.step as Increment).operator) {
-                BinaryOP.Operator.add -> LoopStepDirection.Up
-                BinaryOP.Operator.sub -> LoopStepDirection.Down
-                else -> throw NotRangeLoopException("No Direction!")
-            }
-        } else {
-            throw NotRangeLoopException("No Direction!(2)")
-        }
+        val direction = LoopStepDirection.Up
 
         // where does the loop start
         var from: Int = 0
@@ -62,7 +55,7 @@ class RangeLoopRangeRefinement : Restructure() {
         var end: Int = 0
         if (loop.condition is BinaryOP) {
             val binOp = loop.condition as BinaryOP
-            if (binOp.right is Value){
+            if (binOp.right is Value) {
                 val v = binOp.right as Value
                 if (binOp.operator == BinaryOP.Operator.neq) {
                     end = v.value.toInt()

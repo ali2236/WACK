@@ -30,17 +30,6 @@ class Load(
         v.visit(address) { address = it as Expression }
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is Load) return false
-
-        if (type != other.type) return false
-        if (address != other.address) return false
-        if (offset != other.offset) return false
-
-        return true
-    }
-
     override fun hashCode(): Int {
         var result = type.hashCode()
         result = 31 * result + address.hashCode()
@@ -57,6 +46,19 @@ class Load(
 
     override fun clone(): Load {
         return Load(type, address.clone(), memoryIndex, offset, align)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Load) return false
+
+        if (type != other.type) return false
+        if (address != other.address) return false
+        if (memoryIndex != other.memoryIndex) return false
+        if (offset != other.offset) return false
+        if (align != other.align) return false
+
+        return true
     }
 
 }

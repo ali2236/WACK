@@ -7,8 +7,6 @@ abstract class Expression : Statement {
 
     override var id: Long? = Statement.newId()
 
-    override fun isExpression(): Boolean = true
-
     override fun toString(): String {
         val b = StringBuffer()
         write(b)

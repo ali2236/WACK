@@ -9,6 +9,7 @@ import ir.statement.Function
 import wasm.Index
 import wasm.WasmScope
 import wasm.WasmValueType
+import kotlin.math.abs
 
 // flow sensitive DFA
 object DfaBuilder {
@@ -18,12 +19,17 @@ object DfaBuilder {
         var propagated = false
         var i = 0
         while (!propagated) {
-            if(i > 20){
-                println("function=${function.functionData.index}, i=$i")
-            }
             var changed = false
             dfa.pass { node ->
-                changed = propegate(node) || changed
+                if (i > 100 && node.id == 32) {
+                    println()
+                }
+                val p = propegate(node)
+                changed = p || changed
+                if (i > 100 && p) {
+                    println("stuck on node ${node.id} propagation from function ${function.functionData.index}")
+                }
+
                 for (suc in node.successors) {
                     val successor = dfa.nodes[suc.target]
 
@@ -31,11 +37,14 @@ object DfaBuilder {
                     node.OUT.facts.forEach { fact ->
                         val t = successor.IN.put(fact)
                         changed = t || changed
+                        if (i > 100 && t) {
+                            println("stuck on node ${node.id} propagation from function ${function.functionData.index}")
+                        }
                     }
                 }
-                propagated = !changed
-                i++
             }
+            propagated = !changed
+            i++
         }
 
         return dfa
@@ -53,8 +62,25 @@ object DfaBuilder {
     private fun propegate(node: DfaNode): Boolean {
         var changed = false
         // propagate IN -> OUT except those in GEN
-        node.IN.facts.filter { inIt -> !node.GEN.any { genIt -> genIt.symbol == inIt.symbol } }.forEach {
-            changed = node.OUT.put(it) || changed
+        node.IN.facts.filter { inIt ->
+            !node.GEN.any { genIt ->
+                if (genIt.symbol is Load) {
+                    try {
+                        val address = explainExpression(genIt.symbol.address.clone(), node.IN.facts)
+                        if (address is DfaValue.Expr) {
+                            val gen = genIt.symbol.clone().also { it.address = address.value }
+                            val eq = gen == inIt.symbol
+                            return@any eq
+                        }
+                    } catch (e: Exception) {
+                    }
+                }
+                val eq = genIt.symbol == inIt.symbol
+                eq
+            }
+        }.forEach {
+            val o = node.OUT.put(it)
+            changed = o || changed
         }
 
         // propagate GEN -> OUT override Symbol From IN
@@ -64,7 +90,7 @@ object DfaBuilder {
                 changed = node.OUT.put(fact) || changed
             } catch (e: Exception) {
                 // dont add
-                println("didn't add $gen")
+                // println("didn't add $gen")
             }
         }
 
@@ -200,8 +226,41 @@ object DfaBuilder {
                 }
             }
 
+            is UnaryOP -> {
+                try {
+                    val result = evalUnaryOp(expr, dfaFacts)
+                    return DfaValue.Expr(result)
+                } catch (e: java.lang.Exception) {
+                    return DfaValue.Unkown()
+                }
+            }
+
             is TeeValue -> {
                 return explainExpression(expr.expr, dfaFacts)
+            }
+
+            is FunctionCall, is BlockResult -> {
+                return DfaValue.Unkown()
+            }
+
+            is Select -> {
+                val selector = explainExpression(expr.selector, dfaFacts)
+                if (selector is DfaValue.Expr && selector.value is Value) {
+                    val value = selector.value.value.toInt()
+                    val res = if (value == 0) expr.val1 else expr.val2
+                    return explainExpression(res, dfaFacts)
+                } else {
+                    return DfaValue.Unkown()
+                }
+            }
+
+            is Convert -> {
+                val v = explainExpression(expr.value, dfaFacts)
+                if(v is DfaValue.Expr){
+                    return DfaValue.Expr(Value(expr.toType, v.value.toString()))
+                } else {
+                    return DfaValue.Unkown()
+                }
             }
 
             else -> {
@@ -274,6 +333,44 @@ object DfaBuilder {
             }
         } else {
             throw ExpressionViolation(leftL, rightL)
+        }
+    }
+
+    fun evalUnaryOp(op: UnaryOP, facts: Set<DfaFact>): Expression {
+        var value = op.value
+        if (op.value !is Value) {
+            val fact = explainExpression(op.value, facts)
+            if (fact is DfaValue.Expr) {
+                value = fact.value
+            }
+        }
+
+        if (value is Value) {
+            when (op.type) {
+                WasmValueType.i32, WasmValueType.i64 -> {
+                    val v = value.value.toLong()
+                    val res = when (op.operator.sign) {
+                        "-" -> -v
+                        "abs:" -> abs(v)
+                        else -> throw Error("${op.operator.sign} not supported!")
+                    }
+                    return Value(op.type, res.toString())
+                }
+
+                WasmValueType.f32, WasmValueType.f64 -> {
+                    val v = value.value.toDouble()
+                    val res = when (op.operator.sign) {
+                        "-" -> -v
+                        "abs:" -> abs(v)
+                        else -> throw Error("${op.operator.sign} not supported!")
+                    }
+                    return Value(op.type, res.toString())
+                }
+
+                else -> throw Error()
+            }
+        } else {
+            throw java.lang.Exception()
         }
     }
 

@@ -40,6 +40,27 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
         return BinaryOP(type, operator.copy(), left.clone(), right.clone())
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is BinaryOP) return false
+
+        if (type != other.type) return false
+        if (operator != other.operator) return false
+        if (left != other.left) return false
+        if (right != other.right) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = type.hashCode()
+        result = 31 * result + operator.hashCode()
+        result = 31 * result + left.hashCode()
+        result = 31 * result + right.hashCode()
+        return result
+    }
+
+
     data class Operator(val sign: String, val watName: String, var signed: BitSign? = null) {
 
         companion object {

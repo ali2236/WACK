@@ -1,15 +1,17 @@
 package ir.statement
 
 import generation.WatWriter
+import ir.Mode.debug
 import ir.expression.*
 import ir.finder.Visitor
 
 class Store(
-    val symbol: Load,
+    var symbol: Load,
     var data: Expression,
 ) : BasicStatement(), AssignmentStore {
 
     override fun write(out: Appendable) {
+        if(debug) out.append("$id: ")
         symbol.write(out)
         out.append(" = ")
         data.write(out)

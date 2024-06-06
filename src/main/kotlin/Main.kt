@@ -25,7 +25,7 @@ fun main(args: Array<String>) {
 
     // run
     val wasm2wat = Wasm2Wat()
-    val samples = listOf(File("./samples/matrix_multiply.wat"))// File("./samples").listFiles()
+    val samples = listOf(File("./samples/matrix_multiply.wasm"))// File("./samples").listFiles()
     for (sample in samples!!) {
         val watInput = wasm2wat.process(sample)
         val parseTree = Wat.parse(watInput.path)
@@ -41,12 +41,12 @@ fun main(args: Array<String>) {
 
         RestructurePasses.apply(program)
 
-        //OptimizationPasses.apply(program)
+        OptimizationPasses.apply(program)
 
         analysis2Dot(program, watInput)
 
         // runtime injection / parallel loop transformer
-        WasiThreadsGenerator().apply(program)
+        // WasiThreadsGenerator().apply(program)
 
         // write out
         val watOut = File("./out/wat_${watInput.nameWithoutExtension}.wat")
@@ -68,7 +68,7 @@ fun analysis2Dot(program: Program, sample: File) {
         cfg.writeToFile(fileName)
 
         /// dfa
-        //val dfa = Dfa.from(function, cfg)
-        //dfa.writeToFile(fileName)
+        val dfa = Dfa.from(function, cfg)
+        dfa.writeToFile(fileName)
     }
 }

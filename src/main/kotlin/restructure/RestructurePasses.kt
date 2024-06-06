@@ -20,7 +20,6 @@ object RestructurePasses {
     fun apply(program: Program) {
         val passes = listOf(
             ConditionalLoopRestructure(),
-            IncrementRestructure(),
             ShiftToMultiply(),
         )
         passes.forEach { it.run(program) }

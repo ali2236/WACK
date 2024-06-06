@@ -45,6 +45,10 @@ interface DfaValue {
             return other
         }
 
+        override fun equals(other: Any?): Boolean {
+            return other is Undeclared
+        }
+
         override fun toString(): String {
             return "T"
         }
@@ -55,8 +59,18 @@ interface DfaValue {
             return this
         }
 
+
+
         override fun toString(): String {
             return "?"
+        }
+
+        override fun equals(other: Any?): Boolean {
+            return other is Unkown
+        }
+
+        override fun hashCode(): Int {
+            return javaClass.hashCode()
         }
     }
 }

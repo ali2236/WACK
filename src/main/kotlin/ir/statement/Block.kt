@@ -63,11 +63,6 @@ open class Block(
         if (brackets) out.append("}\n")
     }
 
-    override fun isExpression(): Boolean {
-        return type != null
-    }
-
-
     override fun visit(v: Visitor) {
         v.visit(instructions){i , stmt ->
             instructions[i] = stmt
