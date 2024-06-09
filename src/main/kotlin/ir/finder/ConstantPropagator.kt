@@ -53,9 +53,6 @@ class ConstantPropagator : Visitor() {
                 ///
                 /// Look for symbols and loads on the right side
                 ///
-                if(v.id == 128L){
-                    println()
-                }
 
                 visit(v.assignedWith()) { v.replaceAssign(it as Expression) }
 

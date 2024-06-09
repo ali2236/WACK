@@ -6,13 +6,13 @@ object RestructurePasses {
 
 /*    fun all(program: Program) {
         val passes = listOf(
-            // ConditionalLoopRestructure(),
-            //LoopMemoryCounterAlias(),
+            // // ConditionalLoopRestructure(),
+            // Unneeded: // LoopMemoryCounterAlias(),
             // IncrementRestructure(),
             // RangeLoopRestructure(),
-            // ShiftToMultiply(),
+            // // ShiftToMultiply(),
             // RangeLoopRangeRefinement(),
-            // LoopVariableFlattening(),
+            // Unneeded: // LoopVariableFlattening(),
         )
         passes.forEach { it.run(program) }
     }*/
