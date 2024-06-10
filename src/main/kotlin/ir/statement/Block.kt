@@ -10,15 +10,15 @@ import wasm.WasmValueType
 open class Block(
     open val instructions: MutableList<Statement> = mutableListOf(),
     val hasReturn: Boolean = false,
-    val brackets : Boolean = true,
-    var parent : Block? = null,
-    var indexInParent : Int? = null,
-    val type : WasmValueType? = null,
+    val brackets: Boolean = true,
+    var parent: Block? = null,
+    var indexInParent: Int? = null,
+    val type: WasmValueType? = null,
     open val annotations: MutableList<WackAnnotation> = mutableListOf()
 ) : BasicStatement(), WebAssemblyBlock {
 
     open fun push(stmt: Statement) {
-        if(stmt is Block){
+        if (stmt is Block) {
             stmt.parent = this
             stmt.indexInParent = instructions.size
         }
@@ -26,8 +26,8 @@ open class Block(
     }
 
     open fun pop(): Expression {
-        for(i in (instructions.size-1) downTo 0){
-            if(instructions[i] !is Expression){
+        for (i in (instructions.size - 1) downTo 0) {
+            if (instructions[i] !is Expression) {
                 continue
             }
             return instructions.removeAt(i) as Expression
@@ -35,12 +35,12 @@ open class Block(
         throw Error()
     }
 
-    open fun writeHeader(out: Appendable){}
+    open fun writeHeader(out: Appendable) {}
 
-    fun printHeader() : String?{
+    fun printHeader(): String? {
         val header = StringBuffer()
         writeHeader(header)
-        if(header.isEmpty()){
+        if (header.isEmpty()) {
             return null
         }
         return header.toString()
@@ -52,7 +52,7 @@ open class Block(
         if (brackets) out.append("{\n")
         for (i in 0 until len) {
             val expr = instructions[i]
-            if(i == len - 1 && hasReturn){
+            if (i == len - 1 && hasReturn) {
                 out.append("return ")
                 expr.write(out)
                 out.append(";\n")
@@ -64,7 +64,7 @@ open class Block(
     }
 
     override fun visit(v: Visitor) {
-        v.visit(instructions){i , stmt ->
+        v.visit(instructions) { i, stmt ->
             instructions[i] = stmt
         }
     }
@@ -74,11 +74,15 @@ open class Block(
 
     }
 
+    override fun watEnd(wat: WatWriter) {
+        wat.writeLine("end")
+    }
+
     override fun wat(wat: WatWriter) {
         watHeader(wat)
         wat.indent++
         wat.writeAll(instructions)
         wat.indent--
-        wat.writeLine("end")
+        watEnd(wat)
     }
 }

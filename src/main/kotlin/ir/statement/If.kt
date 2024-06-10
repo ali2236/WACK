@@ -37,15 +37,28 @@ open class If(
         wat.writeLine("if")
     }
 
+    override fun watEnd(wat: WatWriter) {
+        // do nothing
+    }
+
     override fun wat(wat: WatWriter) {
         super.wat(wat)
-        // TODO: Else
+        if (elseBody != null && elseBody!!.isNotEmpty()) {
+            wat.writeLine("else")
+            wat.indent++
+            // TODO: Else
+            elseBody?.forEach { instr ->
+                instr.wat(wat)
+            }
+            wat.indent--
+        }
+        wat.writeLine("end")
     }
 
     override fun visit(v: Visitor) {
-        v.visit(condition){ condition = it as Expression}
+        v.visit(condition) { condition = it as Expression }
         super.visit(v)
-        if(elseBody != null){
+        if (elseBody != null) {
             v.visit(elseBody!!, elseBody!!::set)
         }
     }
