@@ -6,8 +6,9 @@
   - [x] Constant Propagation
   - [x] Memory Aliasing
 - [x] Block WasmBlockType
-- [ ] Move Increment & RangeLoop Restructure to Optimization Passes
-- [ ] Else for If block
+- [x] Else for If block
+- [x] Move RangeLoop Restructure to Optimization Passes
+- [ ] Move Increment Restructure to Optimization Passes
 - [ ] Dependence Analysis P54
 - [ ] GCD Test
 - [ ] Data Dependency Test
