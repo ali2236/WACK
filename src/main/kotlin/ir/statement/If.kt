@@ -46,7 +46,6 @@ open class If(
         if (elseBody != null && elseBody!!.isNotEmpty()) {
             wat.writeLine("else")
             wat.indent++
-            // TODO: Else
             elseBody?.forEach { instr ->
                 instr.wat(wat)
             }
