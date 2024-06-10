@@ -1,4 +1,4 @@
-package restructure
+package restructure.archive
 
 import ir.Names
 import ir.expression.*

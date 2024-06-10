@@ -1,14 +1,12 @@
 import analysis.cfg.CFG
 import analysis.dfa.Dfa
 import external.Wasm2Wat
-import generation.WasiThreadsGenerator
 import generation.WatWriter
 import ir.IRConstructor
 import ir.statement.Function
 import ir.statement.Program
 import optimization.OptimizationPasses
 import parser.Wat
-import restructure.RestructurePasses
 import java.io.File
 
 fun main(args: Array<String>) {
@@ -38,8 +36,6 @@ fun main(args: Array<String>) {
         val module = Wat.module(parseTree)
         val ir = IRConstructor(module)
         val program = ir.program()
-
-        RestructurePasses.apply(program)
 
         OptimizationPasses.apply(program)
 

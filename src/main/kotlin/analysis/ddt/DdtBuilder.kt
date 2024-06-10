@@ -1,13 +1,13 @@
 package analysis.ddt
 
 import ir.finder.BreadthFirstExpressionFinder
-import ir.statement.ConditionLoop
+import ir.statement.Loop
 import ir.statement.RangeLoop
 
 object DdtBuilder {
     fun build() {
         // for each top level Loop
-        val rangeLoops = BreadthFirstExpressionFinder(RangeLoop::class.java).result()
+        val rangeLoops = BreadthFirstExpressionFinder(Loop::class.java).result()
         for (loop in rangeLoops) {
             // find all access
             val accesses = AccessFinder().also { it.visit(loop){} }.result()
@@ -19,7 +19,7 @@ object DdtBuilder {
                     val a2 = accesses[j]
                     // determine dependency type between them
 
-                    val pair = AccessPair(a1,  a2)
+                    //val pair = AccessPair(a1,  a2)
                 }
             }
         }

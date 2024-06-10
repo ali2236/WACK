@@ -1,11 +1,24 @@
 package restructure
 
-import ir.expression.*
-import ir.finder.BreadthFirstExpressionFinder
+import analysis.dfa.Dfa
+import ir.expression.BinaryOP
+import ir.expression.Value
+import ir.finder.*
 import ir.statement.*
-import java.lang.Exception
+import ir.statement.Function
+import kotlin.Exception
 
 class RangeLoopRestructure : Restructure() {
+
+    private lateinit var functionDfa: Dfa
+    private lateinit var functionFacts: StatementFactsFinder
+
+    override fun restructureFunction(function: Function) {
+        // dfa
+        functionDfa = Dfa.from(function)
+        functionFacts = StatementFactsFinder(functionDfa)
+        super.restructureFunction(function)
+    }
 
     override fun restructureBlock(block: Block) {
         super.restructureBlock(block)
@@ -20,53 +33,40 @@ class RangeLoopRestructure : Restructure() {
 
     private fun transformIntoRangeLoop(loop: ConditionLoop) {
         val condition = loop.condition
-        if (condition is BinaryOP && condition.left is SymbolLoad) {
-            val left = condition.left as SymbolLoad
-            val init = findRangeLoopInitInParent(left)
-            val step = findRangeLoopStep(loop, left)
-            val rangeLoop = RangeLoop(init, condition, step, loop.instructions)
+        val conditionSymbols = Finders.symbols(loop.condition)
+        if (condition is BinaryOP && conditionSymbols.size == 1) {
+            val symbol = conditionSymbols.first()
+
+            // symbol initial value
+            val initial = functionFacts.at(loop).whatIs(symbol)?.asValue() ?: return
+
+            // symbol end value
+            val endExclusive = condition.endExclusive
+
+            // validate has Increment
+            // TODO: Normalize Increments
+            val hasIncrement = loop.instructions.any { it is Increment }
+            if (!hasIncrement) {
+                return
+            }
+
+            val rangeLoop = RangeLoop(symbol, initial, endExclusive, condition, loop.instructions)
             replaceCurrentBlock(rangeLoop)
-            }
         }
-
-    private fun findRangeLoopInitInParent(symbol: SymbolLoad): AssignmentStore {
-        var current = currentBlock
-        var parent = current.parent
-        var blockIndex = current.indexInParent
-        while (parent != null) {
-            for (i in (blockIndex!! - 1) downTo 0) {
-                val stmt = parent.instructions[i]
-                when(symbol) {
-                    is Symbol -> {
-                        if (stmt is Assignment && stmt.symbol == symbol) {
-                            // TODO: Check Forward Dependencies (if you use ssa you dont need this)
-                            // parent.instructions.removeAt(i)
-                            // current.indexInParent = blockIndex - 1
-                            // stmt.inline = true
-                            return stmt
-                        }
-                    }
-                    is Load -> {
-                        if (stmt is Store && stmt.symbol == symbol) {
-                            // TODO: Check Forward Dependencies (if you use ssa you dont need this)
-                            // parent.instructions.removeAt(i)
-                            // current.indexInParent = blockIndex - 1
-                            // stmt.inline = true
-                            return stmt
-                        }
-                    }
-                }
-            }
-            current = parent
-            parent = current.parent
-            blockIndex = current.indexInParent
-        }
-        throw Error("symbol $symbol init not found!")
     }
 
-    private fun findRangeLoopStep(loop: ConditionLoop, symbol: SymbolLoad): Increment {
-        val steps = BreadthFirstExpressionFinder(Increment::class.java).also { it.visit(loop.instructions) { i, stmt -> } }.result()
-        return steps.first()
-    }
+    private val BinaryOP.endExclusive: Value
+        get() {
+            if (right !is Value) {
+                throw Exception()
+            }
+            return when (operator.sign) {
+                "<" -> right as Value
+                "<=" -> (right as Value).add(1)
+                ">" -> (right as Value).add(1)
+                ">=" -> (right as Value)
+                else -> throw Exception()
+            }
+        }
 
 }

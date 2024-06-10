@@ -21,9 +21,6 @@ object DfaBuilder {
         while (!propagated) {
             var changed = false
             dfa.pass { node ->
-                if (i > 100 && node.id == 32) {
-                    println()
-                }
                 val p = propegate(node)
                 changed = p || changed
                 if (i > 100 && p) {

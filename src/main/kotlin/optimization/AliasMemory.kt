@@ -46,9 +46,9 @@ class AliasMemory : Optimizer {
                         replace(aliases[load]!!)
                     }
 
-                aliases.entries.forEach {(key, value) ->
+                /*aliases.entries.forEach {(key, value) ->
                     println("function ${function.functionData.index}: $key -> $value")
-                }
+                }*/
 
                 // Replace stores with assignment
                 rStores
@@ -57,6 +57,8 @@ class AliasMemory : Optimizer {
                         val symbol = aliases[store.symbol]!!
                         replace(Assignment(symbol, store.data))
                     }
+
+                // TODO: commit to stack/heap on end
             }
     }
 }

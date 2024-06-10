@@ -1,4 +1,4 @@
-package restructure
+package restructure.archive
 
 import ir.expression.BinaryOP
 import ir.statement.Increment
@@ -8,7 +8,7 @@ import ir.statement.Block
 import ir.statement.RangeLoop
 import java.lang.Exception
 
-class RangeLoopRangeRefinement : Restructure() {
+/*class RangeLoopRangeRefinement : Restructure() {
 
     override fun restructureBlock(block: Block) {
         super.restructureBlock(block)
@@ -85,4 +85,4 @@ class RangeLoopRangeRefinement : Restructure() {
     }
 
     private class NotRangeLoopException(message: String?) : Exception(message)
-}
+}*/

@@ -5,7 +5,6 @@ import ir.annotations.*
 import ir.expression.*
 import ir.finder.AnnotationFinder
 import ir.finder.Finders
-import ir.finder.ReplaceableFinder
 import ir.statement.*
 import ir.statement.Function
 import wasm.*
@@ -34,8 +33,8 @@ object ThreadKernelGenerator {
                     // loop boundaries
                     // TODO: determine value for local using dfa+eval+ssa
                     val rangeLoop = (forLoop as RangeLoop)
-                    val rangeFrom = rangeLoop.from()
-                    val rangeTo = rangeLoop.to()
+                    val rangeFrom = rangeLoop.from
+                    val rangeTo = rangeLoop.toExclusive
                     if (Finders.symbols(rangeFrom).isNotEmpty()) {
                         throw Exception("Can't Deduce Loop From Range: $rangeFrom")
                     }
@@ -119,7 +118,7 @@ object ThreadKernelGenerator {
 
                         // replace locals with new boundaries
                         // replace init with start
-                        rangeLoop.init.replaceAssign(start) // what to replace with start
+                        // TODO: Comme: rangeLoop.init.replaceAssign(start) // what to replace with start
                         // replace condition.right with end
                         (rangeLoop.condition as BinaryOP).right = end// what to replace with end
                         instructions.add(forLoop)

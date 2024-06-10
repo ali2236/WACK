@@ -1,5 +1,6 @@
 package analysis.dfa
 
+import ir.expression.Value
 import ir.statement.SymbolLoad
 
 class DfaFact(val symbol: SymbolLoad, val value: DfaValue) {

@@ -1,4 +1,4 @@
-package restructure
+package restructure.archive
 
 import ir.finder.Replaceable
 import ir.expression.Expression
@@ -7,6 +7,7 @@ import ir.finder.Finders
 import ir.statement.*
 import java.util.Stack
 
+/*
 class LoopVariableFlattening : Restructure(){
     private val inserts = Stack<IndexedValue<Statement>>()
     private val symbolAssignment = mutableMapOf<Symbol, Expression>()
@@ -80,4 +81,4 @@ class LoopVariableFlattening : Restructure(){
             }
         }
     }
-}
+}*/

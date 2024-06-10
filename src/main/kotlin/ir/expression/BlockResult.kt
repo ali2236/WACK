@@ -10,7 +10,7 @@ class BlockResult(val type: WasmValueType, val block: Block) : Expression() {
     }
 
     override fun write(out: Appendable) {
-        block.write(out)
+        out.append("BlockResult(${block.printHeader()})")
     }
 
     override fun wat(wat: WatWriter) {

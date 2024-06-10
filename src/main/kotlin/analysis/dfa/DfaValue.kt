@@ -1,9 +1,11 @@
 package analysis.dfa
 
 import ir.expression.Expression
+import ir.expression.Value
 
 interface DfaValue {
     fun join(other: DfaValue): DfaValue
+    fun asValue(): Value
 
     class Expr(val value: Expression) : DfaValue {
         override fun join(other: DfaValue): DfaValue {
@@ -20,6 +22,13 @@ interface DfaValue {
             }
         }
 
+        override fun asValue(): Value {
+            if (value is Value) {
+                return value
+            } else {
+                throw Exception()
+            }
+        }
 
 
         override fun toString(): String {
@@ -52,13 +61,20 @@ interface DfaValue {
         override fun toString(): String {
             return "T"
         }
+
+        override fun asValue(): Value {
+            throw Exception()
+        }
+
+        override fun hashCode(): Int {
+            return javaClass.hashCode()
+        }
     }
 
     class Unkown() : DfaValue {
         override fun join(other: DfaValue): DfaValue {
             return this
         }
-
 
 
         override fun toString(): String {
@@ -72,6 +88,12 @@ interface DfaValue {
         override fun hashCode(): Int {
             return javaClass.hashCode()
         }
+
+        override fun asValue(): Value {
+            throw Exception()
+        }
     }
+
+    class Range()
 }
 

@@ -82,6 +82,26 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
             val rem = Operator("%", "rem")
         }
 
+        fun invert(): Operator {
+            return when (sign) {
+                "==" -> neq
+                "!=" -> eq
+                "<" -> gt
+                "<=" -> gt
+                ">" -> le
+                ">=" -> lt
+                "+" -> sub
+                "-" -> add
+                "/" -> mul.copy(signed = signed)
+                "*" -> div
+                "<<" -> shr.copy(signed = signed)
+                ">>" -> shl.copy(signed = signed)
+                "&" -> or
+                "|" -> and
+                else -> throw Exception("Unknown Invert for Binary Operator $sign")
+            }
+        }
+
         fun wat(): String {
             if (signed != null) {
                 return "${watName}_$signed"

@@ -1,4 +1,4 @@
-package restructure
+package restructure.archive
 
 import ir.finder.Replaceable
 import ir.Names

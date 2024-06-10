@@ -4,9 +4,10 @@ import ir.statement.Block
 import ir.statement.Function
 import ir.statement.Program
 import ir.statement.Statement
+import optimization.Optimizer
 import java.util.*
 
-abstract class Restructure {
+abstract class Restructure : Optimizer {
     lateinit var currentProgram: Program
     lateinit var currentFunction: Function
     protected var blocks = Stack<Block>()
@@ -14,7 +15,7 @@ abstract class Restructure {
         get() = blocks.peek()
 
     var currentInstrIndex: Int? = null
-    open fun run(program: Program) {
+    override fun apply(program: Program) {
         currentProgram = program
         val functions = program.statements.filterIsInstance<Function>()
         for (function in functions) {

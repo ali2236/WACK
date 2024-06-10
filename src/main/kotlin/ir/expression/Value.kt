@@ -28,5 +28,15 @@ open class Value(val type: WasmValueType, val value: String) : ImmutableExpressi
         return result
     }
 
+    fun add(i : Int): Value {
+        return when(type){
+            WasmValueType.i32 -> Value(type, (value.toInt() + i).toString())
+            WasmValueType.i64 -> Value(type, (value.toLong() + i).toString())
+            WasmValueType.f32 -> Value(type, (value.toFloat() + i).toString())
+            WasmValueType.f64 -> Value(type, (value.toDouble() + i).toString())
+            WasmValueType.Unknown -> throw Error("Type $type unknown to add")
+        }
+    }
+
 
 }
