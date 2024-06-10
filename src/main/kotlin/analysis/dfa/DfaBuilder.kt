@@ -3,8 +3,7 @@ package analysis.dfa
 import analysis.cfg.CFG
 import analysis.cfg.CfgEdge
 import ir.expression.*
-import ir.statement.SymbolLoad
-import ir.statement.AssignmentStore
+import ir.statement.*
 import ir.statement.Function
 import wasm.Index
 import wasm.WasmScope
@@ -129,7 +128,11 @@ object DfaBuilder {
                 lastStmtNode.successors.addAll(block.successors)
             } else {
                 val node = DfaNode(
-                    block.id, block.label, block.statements.firstOrNull(), successors = block.successors
+                    block.id,
+                    block.label,
+                    block.statements.firstOrNull(),
+                    successors = block.successors,
+                    next = block.next?.id
                 )
                 dfa.nodes.add(node)
             }
@@ -155,13 +158,22 @@ object DfaBuilder {
         for (block in dfa.nodes) {
             if (block.statement != null) {
                 val stmt = block.statement
-                if (stmt is AssignmentStore) {
+                when (stmt) {
+                    is AssignmentStore -> {
+                        val fact = DfaFact(
+                            symbol = stmt.assignedTo().clone() as SymbolLoad,
+                            value = DfaValue.Expr(stmt.assignedWith().clone())
+                        )
+                        block.GEN.add(fact)
+                    }
 
-                    val fact = DfaFact(
-                        symbol = stmt.assignedTo().clone() as SymbolLoad,
-                        value = DfaValue.Expr(stmt.assignedWith().clone())
-                    )
-                    block.GEN.add(fact)
+                    is RangeLoop -> {
+                        val fact = DfaFact(stmt.symbol, stmt.range)
+                        block.GEN.add(fact)
+                        if(block.next != null){ // kina works
+                            dfa.nodes[block.next].GEN.add(DfaFact(stmt.symbol, DfaValue.Expr(stmt.range.to)))
+                        }
+                    }
                 }
             }
         }
@@ -228,7 +240,7 @@ object DfaBuilder {
                     val result = evalUnaryOp(expr, dfaFacts)
                     return DfaValue.Expr(result)
                 } catch (e: java.lang.Exception) {
-                    return DfaValue.Unkown()
+                    return DfaValue.Unknown()
                 }
             }
 
@@ -237,7 +249,7 @@ object DfaBuilder {
             }
 
             is FunctionCall, is BlockResult -> {
-                return DfaValue.Unkown()
+                return DfaValue.Unknown()
             }
 
             is Select -> {
@@ -247,16 +259,16 @@ object DfaBuilder {
                     val res = if (value == 0) expr.val1 else expr.val2
                     return explainExpression(res, dfaFacts)
                 } else {
-                    return DfaValue.Unkown()
+                    return DfaValue.Unknown()
                 }
             }
 
             is Convert -> {
                 val v = explainExpression(expr.value, dfaFacts)
-                if(v is DfaValue.Expr){
+                if (v is DfaValue.Expr) {
                     return DfaValue.Expr(Value(expr.toType, v.value.toString()))
                 } else {
-                    return DfaValue.Unkown()
+                    return DfaValue.Unknown()
                 }
             }
 

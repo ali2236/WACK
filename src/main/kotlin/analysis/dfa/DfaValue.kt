@@ -14,7 +14,7 @@ interface DfaValue {
                     if (other.value == value) {
                         return this
                     } else {
-                        return Unkown()
+                        return Unknown()
                     }
                 }
 
@@ -71,9 +71,9 @@ interface DfaValue {
         }
     }
 
-    class Unkown() : DfaValue {
+    open class Unknown() : DfaValue {
         override fun join(other: DfaValue): DfaValue {
-            return this
+            return Unknown()
         }
 
 
@@ -82,7 +82,7 @@ interface DfaValue {
         }
 
         override fun equals(other: Any?): Boolean {
-            return other is Unkown
+            return other is Unknown
         }
 
         override fun hashCode(): Int {
@@ -94,6 +94,23 @@ interface DfaValue {
         }
     }
 
-    class Range()
+    // to: exclusive in loop - inclusive outside
+    class Range(val from: Value,val to: Value) : Unknown(){
+        override fun toString(): String {
+            return "[$from, $to]"
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if(other is Range){
+                if (from != other.from) return false
+                if (to != other.to) return false
+                return true
+            } else {
+                return super.equals(other)
+            }
+        }
+
+
+    }
 }
 

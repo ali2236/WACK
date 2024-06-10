@@ -33,8 +33,8 @@ object ThreadKernelGenerator {
                     // loop boundaries
                     // TODO: determine value for local using dfa+eval+ssa
                     val rangeLoop = (forLoop as RangeLoop)
-                    val rangeFrom = rangeLoop.from
-                    val rangeTo = rangeLoop.toExclusive
+                    val rangeFrom = rangeLoop.range.from
+                    val rangeTo = rangeLoop.range.to
                     if (Finders.symbols(rangeFrom).isNotEmpty()) {
                         throw Exception("Can't Deduce Loop From Range: $rangeFrom")
                     }

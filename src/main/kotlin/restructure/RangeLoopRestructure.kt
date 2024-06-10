@@ -1,6 +1,7 @@
 package restructure
 
 import analysis.dfa.Dfa
+import analysis.dfa.DfaValue
 import ir.expression.BinaryOP
 import ir.expression.Value
 import ir.finder.*
@@ -43,14 +44,14 @@ class RangeLoopRestructure : Restructure() {
             // symbol end value
             val endExclusive = condition.endExclusive
 
-            // validate has Increment
+            // TODO: validate has Increment
             // TODO: Normalize Increments
-            val hasIncrement = loop.instructions.any { it is Increment }
+            /*val hasIncrement = loop.instructions.any { it is Increment }
             if (!hasIncrement) {
                 return
-            }
+            }*/
 
-            val rangeLoop = RangeLoop(symbol, initial, endExclusive, condition, loop.instructions)
+            val rangeLoop = RangeLoop(symbol, DfaValue.Range(initial, endExclusive), condition, loop.instructions)
             replaceCurrentBlock(rangeLoop)
         }
     }
