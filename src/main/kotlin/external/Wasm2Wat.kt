@@ -1,12 +1,11 @@
 package external
 
 import java.io.File
-import java.lang.Exception
 
 class Wasm2Wat : FileProcessor {
     override fun process(input: File): File {
         // validate input
-        if (input.extension != "wasm") {
+        if (input.extension != "ir/wasm") {
             return input
         }
 

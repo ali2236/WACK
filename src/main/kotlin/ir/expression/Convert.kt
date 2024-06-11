@@ -1,7 +1,7 @@
 package ir.expression
 
 import generation.WatWriter
-import wasm.WasmValueType
+import ir.wasm.WasmValueType
 
 class Convert(val toType: WasmValueType, val instruction: String, val value: Expression) : Expression() {
     override fun clone(): Expression {

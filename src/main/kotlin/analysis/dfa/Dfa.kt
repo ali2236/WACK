@@ -29,6 +29,10 @@ class Dfa(val nodes : MutableList<DfaNode>) : DotGraph() {
         }
     }
 
+    fun finder() : StatementFactsFinder{
+        return StatementFactsFinder(this)
+    }
+
     override fun dot(out: Appendable){
         val dot = DotSanitizer(out)
         out.append("strict digraph {\n")

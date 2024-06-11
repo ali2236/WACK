@@ -3,10 +3,10 @@ package generation.wack
 import ir.expression.*
 import ir.statement.Function
 import ir.statement.Program
-import wasm.Index
-import wasm.WasmFunction
-import wasm.WasmScope
-import wasm.WasmValueType
+import ir.wasm.Index
+import ir.wasm.WasmFunction
+import ir.wasm.WasmScope
+import ir.wasm.WasmValueType
 
 object ThreadArgEncoderGenerator {
 

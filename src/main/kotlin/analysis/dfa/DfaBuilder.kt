@@ -5,9 +5,9 @@ import analysis.cfg.CfgEdge
 import ir.expression.*
 import ir.statement.*
 import ir.statement.Function
-import wasm.Index
-import wasm.WasmScope
-import wasm.WasmValueType
+import ir.wasm.Index
+import ir.wasm.WasmScope
+import ir.wasm.WasmValueType
 import kotlin.math.abs
 
 // flow sensitive DFA

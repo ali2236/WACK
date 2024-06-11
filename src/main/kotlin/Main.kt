@@ -1,4 +1,5 @@
 import analysis.cfg.CFG
+import analysis.ddt.DdtBuilder
 import analysis.dfa.Dfa
 import external.Wasm2Wat
 import generation.WatWriter
@@ -6,7 +7,7 @@ import ir.IRConstructor
 import ir.statement.Function
 import ir.statement.Program
 import optimization.OptimizationPasses
-import parser.Wat
+import ir.parser.Wat
 import java.io.File
 
 fun main(args: Array<String>) {

@@ -1,7 +1,7 @@
 package ir.expression
 
 import generation.WatWriter
-import wasm.Index
+import ir.wasm.Index
 
 class IndirectFunctionCall(
     val tableIndex : Index,

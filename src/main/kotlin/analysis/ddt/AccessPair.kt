@@ -1,7 +1,7 @@
 package analysis.ddt
 
 data class AccessPair(
-    val access1 : Access,
-    val access2 : Access,
+    val source : Access,
+    val sink : Access,
     val dependencyType : DependencyType,
 )

@@ -3,6 +3,7 @@ package generation.wasm.threads
 import ir.expression.*
 import ir.statement.*
 import ir.statement.Function
+import ir.wasm.*
 import wasm.*
 
 object MutexLibraryGenerator {
@@ -38,7 +39,7 @@ object MutexLibraryGenerator {
         val tryLockMutex = Function(
             wasmTryLockMutex, mutableListOf(
                 Symbol(WasmScope.local, WasmValueType.i32, Index(0)),
-                Value(WasmValueType.i32, "0"),
+                Value.zero,
                 Value(WasmValueType.i32, "1"),
                 RawWat("i32.atomic.rmw.cmpxchg ${mutexMemory.index}"),
                 RawWat("i32.eqz"),
@@ -70,7 +71,7 @@ object MutexLibraryGenerator {
         val unlockMutex = Function(
             wasmUnlockMutex, mutableListOf(
                 Symbol(WasmScope.local, WasmValueType.i32, Index(0)),
-                Value(WasmValueType.i32, "0"),
+                Value.zero,
                 RawWat("i32.atomic.store"),
 
                 Symbol(WasmScope.local, WasmValueType.i32, Index(0)),

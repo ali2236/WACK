@@ -8,6 +8,7 @@ import ir.statement.Assignment
 import ir.statement.Function
 import ir.statement.Program
 import ir.statement.RawWat
+import ir.wasm.*
 import wasm.*
 
 object WasiThreadStartGenerator {

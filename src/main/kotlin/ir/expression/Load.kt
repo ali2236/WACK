@@ -4,8 +4,8 @@ import generation.WatWriter
 import ir.Names
 import ir.finder.Visitor
 import ir.statement.SymbolLoad
-import wasm.Index
-import wasm.WasmValueType
+import ir.wasm.Index
+import ir.wasm.WasmValueType
 
 class Load(
     val type: WasmValueType,

@@ -1,7 +1,8 @@
 package optimization
 
 import ir.statement.Program
-import ir.statement.RangeLoop
+import optimization.constant_propegation.ConstantPropagation
+import optimization.restructure.*
 import restructure.*
 
 object OptimizationPasses {
@@ -14,7 +15,7 @@ object OptimizationPasses {
             ConditionalLoopRestructure(),
             IncrementRestructure(),
             RangeLoopRestructure(),
-            // ParallelForAnnotator(),
+            ParallelForAnnotator(),
         )
         for (pass in passes){
             pass.apply(program)

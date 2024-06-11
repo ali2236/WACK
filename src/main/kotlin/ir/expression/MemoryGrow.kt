@@ -2,7 +2,7 @@ package ir.expression
 
 import generation.WatWriter
 import ir.finder.Visitor
-import wasm.Index
+import ir.wasm.Index
 
 class MemoryGrow(val memoryId : Index, var amount: Expression) : Expression() {
     override fun clone(): Expression {

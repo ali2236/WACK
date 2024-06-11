@@ -3,7 +3,7 @@ package ir.statement
 import generation.WatWriter
 import ir.expression.Expression
 import ir.finder.Visitor
-import wasm.WasmValueType
+import ir.wasm.WasmValueType
 
 open class If(
     var condition: Expression,

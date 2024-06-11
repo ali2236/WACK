@@ -4,6 +4,7 @@ import ir.statement.Statement
 
 class BreadthFirstExpressionFinder<T : Visitable>(
     private val clazz: Class<T>,
+    val stopOnTopHit : Boolean = false,
 ) :
     Visitor() {
 
@@ -24,6 +25,9 @@ class BreadthFirstExpressionFinder<T : Visitable>(
         if (clazz.isInstance(v)) {
             @Suppress("UNCHECKED_CAST")
             expr.add(v as T)
+            if(stopOnTopHit){
+                return
+            }
         }
         super.visit(v, replace)
     }

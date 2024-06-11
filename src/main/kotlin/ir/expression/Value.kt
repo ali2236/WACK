@@ -1,7 +1,8 @@
 package ir.expression
 
 import generation.WatWriter
-import wasm.WasmValueType
+import ir.wasm.WasmValueType
+import java.lang.Exception
 
 open class Value(val type: WasmValueType, val value: String) : ImmutableExpression() {
     override fun write(out: Appendable) {
@@ -28,7 +29,7 @@ open class Value(val type: WasmValueType, val value: String) : ImmutableExpressi
         return result
     }
 
-    fun add(i : Int): Value {
+    fun add(i : Long): Value {
         return when(type){
             WasmValueType.i32 -> Value(type, (value.toInt() + i).toString())
             WasmValueType.i64 -> Value(type, (value.toLong() + i).toString())
@@ -36,6 +37,37 @@ open class Value(val type: WasmValueType, val value: String) : ImmutableExpressi
             WasmValueType.f64 -> Value(type, (value.toDouble() + i).toString())
             WasmValueType.Unknown -> throw Error("Type $type unknown to add")
         }
+    }
+
+    fun add(i: Value): Value{
+        return when(i.type){
+            WasmValueType.i32 -> add(i.value.toLong())
+            WasmValueType.i64 -> add(i.value.toLong())
+            else -> throw Exception("should use an integer add")
+        }
+    }
+
+    fun multiply(i: Long): Value {
+        return when(type){
+            WasmValueType.i32 -> Value(type, (value.toInt() * i).toString())
+            WasmValueType.i64 -> Value(type, (value.toLong() * i).toString())
+            WasmValueType.f32 -> Value(type, (value.toFloat() * i).toString())
+            WasmValueType.f64 -> Value(type, (value.toDouble() * i).toString())
+            WasmValueType.Unknown -> throw Error("Type $type unknown to multiply")
+        }
+    }
+
+    fun multiply(i: Value): Value{
+        return when(i.type){
+            WasmValueType.i32 -> multiply(i.value.toLong())
+            WasmValueType.i64 -> multiply(i.value.toLong())
+            else -> throw Exception("should use an integer add")
+        }
+    }
+
+    companion object {
+        val zero: Value = Value(WasmValueType.i32, "0")
+        val one: Value = Value(WasmValueType.i32, "1")
     }
 
 

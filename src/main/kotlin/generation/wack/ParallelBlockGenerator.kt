@@ -4,15 +4,15 @@ import generation.wasm.threads.MutexLibrary
 import ir.annotations.Parallel
 import ir.expression.*
 import ir.statement.*
-import wasm.WasmGlobal
-import wasm.WasmValueType
+import ir.wasm.WasmGlobal
+import ir.wasm.WasmValueType
 
 object ParallelBlockGenerator {
     fun generate(blocks: List<Block>, threadCount: WasmGlobal, mutex: MutexLibrary) {
         blocks.forEach { block ->
             val threadId = block.annotations.filterIsInstance<Parallel>().first().threadId!!
             val oldBody = block.instructions.toTypedArray()
-            val zero = Value(WasmValueType.i32, "0")
+            val zero = Value.zero
             val one = Value(WasmValueType.i32, "1")
             block.instructions.clear()
             block.instructions.apply {

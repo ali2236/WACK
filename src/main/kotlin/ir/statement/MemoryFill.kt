@@ -3,7 +3,7 @@ package ir.statement
 import generation.WatWriter
 import ir.expression.Expression
 import ir.finder.Visitor
-import wasm.Index
+import ir.wasm.Index
 
 class MemoryFill(
     val memoryId: Index,

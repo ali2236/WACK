@@ -2,9 +2,9 @@ package ir.expression
 
 import generation.WatWriter
 import ir.statement.SymbolLoad
-import wasm.Index
-import wasm.WasmScope
-import wasm.WasmValueType
+import ir.wasm.Index
+import ir.wasm.WasmScope
+import ir.wasm.WasmValueType
 
 open class Symbol(val scope: WasmScope, val type: WasmValueType, val index : Index) : ImmutableExpression(), SymbolLoad {
 

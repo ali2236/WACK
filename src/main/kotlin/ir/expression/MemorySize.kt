@@ -1,7 +1,7 @@
 package ir.expression
 
 import generation.WatWriter
-import wasm.Index
+import ir.wasm.Index
 
 class MemorySize(val memoryId: Index) : Expression() {
     override fun clone(): Expression {

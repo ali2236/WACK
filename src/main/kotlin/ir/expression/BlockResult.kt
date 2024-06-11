@@ -2,7 +2,7 @@ package ir.expression
 
 import generation.WatWriter
 import ir.statement.Block
-import wasm.WasmValueType
+import ir.wasm.WasmValueType
 
 class BlockResult(val type: WasmValueType, val block: Block) : Expression() {
     override fun clone(): Expression {

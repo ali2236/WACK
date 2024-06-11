@@ -3,7 +3,7 @@ package ir.statement
 import generation.WatWriter
 import ir.expression.Symbol
 import ir.finder.Visitor
-import wasm.WasmValueType
+import ir.wasm.WasmValueType
 
 class Declaration(val type : WasmValueType, var symbol: Symbol) : BasicStatement() {
     override fun write(out: Appendable) {

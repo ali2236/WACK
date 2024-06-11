@@ -2,7 +2,7 @@ package ir.expression
 
 import generation.WatWriter
 import ir.finder.Visitor
-import wasm.WasmValueType
+import ir.wasm.WasmValueType
 
 class UnaryOP(val type: WasmValueType, val operator: Operator, var value: Expression) : Expression() {
     override fun clone(): Expression {

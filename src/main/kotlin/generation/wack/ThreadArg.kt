@@ -1,6 +1,6 @@
 package generation.wack
 
-import wasm.WasmFunction
+import ir.wasm.WasmFunction
 
 class ThreadArg(
     val encode : WasmFunction,

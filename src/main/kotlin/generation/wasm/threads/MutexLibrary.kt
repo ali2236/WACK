@@ -1,7 +1,7 @@
 package generation.wasm.threads
 
-import wasm.WasmFunction
-import wasm.WasmMemory
+import ir.wasm.WasmFunction
+import ir.wasm.WasmMemory
 
 class MutexLibrary(
     val lock: WasmFunction,

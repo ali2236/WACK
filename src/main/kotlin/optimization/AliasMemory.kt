@@ -1,7 +1,6 @@
 package optimization
 
 import analysis.dfa.Dfa
-import analysis.dfa.DfaValue
 import ir.expression.Load
 import ir.expression.Symbol
 import ir.finder.ReplaceableFinder
@@ -9,8 +8,8 @@ import ir.statement.Assignment
 import ir.statement.Function
 import ir.statement.Program
 import ir.statement.Store
-import wasm.Index
-import wasm.WasmScope
+import ir.wasm.Index
+import ir.wasm.WasmScope
 
 class AliasMemory : Optimizer {
     override fun apply(program: Program) {

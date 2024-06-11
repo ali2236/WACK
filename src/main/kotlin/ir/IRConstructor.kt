@@ -4,11 +4,11 @@ import ir.expression.Symbol
 import ir.expression.Value
 import ir.statement.*
 import ir.statement.Function
-import parser.WatVisitor
-import wasm.Index
-import wasm.WasmFunction
-import wasm.WasmModule
-import wasm.WasmScope
+import ir.parser.WatVisitor
+import ir.wasm.Index
+import ir.wasm.WasmFunction
+import ir.wasm.WasmModule
+import ir.wasm.WasmScope
 
 class IRConstructor(val module: WasmModule) {
 

@@ -2,10 +2,10 @@ package generation.wasi.threads
 
 import ir.statement.Function
 import ir.statement.Program
-import wasm.Index
-import wasm.WasmFunction
-import wasm.WasmImport
-import wasm.WasmValueType
+import ir.wasm.Index
+import ir.wasm.WasmFunction
+import ir.wasm.WasmImport
+import ir.wasm.WasmValueType
 
 object WasiThreadSpawnGenerator {
     fun generate(program: Program) : WasmFunction {

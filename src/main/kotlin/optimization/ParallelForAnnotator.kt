@@ -1,5 +1,6 @@
 package optimization
 
+import analysis.ddt.DdtBuilder
 import ir.annotations.For
 import ir.annotations.Parallel
 import ir.finder.LoopFinder
@@ -16,14 +17,15 @@ class ParallelForAnnotator : Optimizer {
 
     private fun applyToFunction(program: Program, function: Function) {
         val module = program.module
+        DdtBuilder.build(function)
 
-        val loops = LoopFinder(RangeLoop::class.java, true).apply { visit(function){ } }.result()
+        /*val loops = LoopFinder(RangeLoop::class.java, true).apply { visit(function){ } }.result()
         for ((loop, replace) in loops) {
-            val loopIsParallelizable = true // TODO: check dependencies
+            val loopIsParallelizable = false // TODO: check dependencies
             if (loopIsParallelizable) {
                 loop.annotations.add(Parallel())
                 loop.annotations.add(For())
             }
-        }
+        }*/
     }
 }

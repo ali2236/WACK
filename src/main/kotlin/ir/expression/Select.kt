@@ -1,7 +1,7 @@
 package ir.expression
 
 import generation.WatWriter
-import wasm.WasmValueType
+import ir.wasm.WasmValueType
 
 // return selector == 0 ? val2 : val1
 class Select(val val1: Expression, val val2: Expression, val selector: Expression, val resultType: WasmValueType?) :

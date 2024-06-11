@@ -7,6 +7,7 @@ import ir.finder.AnnotationFinder
 import ir.finder.Finders
 import ir.statement.*
 import ir.statement.Function
+import ir.wasm.*
 import wasm.*
 
 object ThreadKernelGenerator {
@@ -160,7 +161,7 @@ object ThreadKernelGenerator {
                                     WasmValueType.i32,
                                     BinaryOP. Operator.lt.copy(signed = BinaryOP.BitSign.s),
                                     threadSpawn.call(arg.encode.call(threadId, Value(WasmValueType.i32, "$kernelId"))),
-                                    Value(WasmValueType.i32, "0")
+                                    Value.zero
                                 ), mutableListOf(Unreachable())
                             ),
                         )

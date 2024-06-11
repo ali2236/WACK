@@ -5,7 +5,7 @@ import generation.WatWriter
 import generation.WebAssemblyBlock
 import ir.expression.Expression
 import ir.finder.Visitor
-import wasm.WasmValueType
+import ir.wasm.WasmValueType
 
 open class Block(
     open val instructions: MutableList<Statement> = mutableListOf(),
