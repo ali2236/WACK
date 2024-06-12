@@ -5,7 +5,7 @@ import java.io.File
 class Wasm2Wat : FileProcessor {
     override fun process(input: File): File {
         // validate input
-        if (input.extension != "ir/wasm") {
+        if (input.extension != "wasm") {
             return input
         }
 

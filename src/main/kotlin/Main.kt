@@ -1,7 +1,7 @@
 import analysis.cfg.CFG
-import analysis.ddt.DdtBuilder
 import analysis.dfa.Dfa
 import external.Wasm2Wat
+import generation.WasiThreadsGenerator
 import generation.WatWriter
 import ir.IRConstructor
 import ir.statement.Function
@@ -43,7 +43,7 @@ fun main(args: Array<String>) {
         analysis2Dot(program, watInput)
 
         // runtime injection / parallel loop transformer
-        // WasiThreadsGenerator().apply(program)
+        WasiThreadsGenerator().apply(program)
 
         // write out
         val watOut = File("./out/wat_${watInput.nameWithoutExtension}.wat")

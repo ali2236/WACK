@@ -3,7 +3,6 @@ package optimization
 import ir.statement.Program
 import optimization.constant_propegation.ConstantPropagation
 import optimization.restructure.*
-import restructure.*
 
 object OptimizationPasses {
     fun apply(program: Program){

@@ -1,14 +1,15 @@
 package analysis.ddt
 
 import analysis.dfa.Dfa
-import ir.expression.Symbol
 import ir.finder.BreadthFirstExpressionFinder
 import ir.statement.Function
 import ir.statement.RangeLoop
+import java.lang.Exception
 
-object DdtBuilder {
-    fun build(function: Function) {
+object DependenceTester {
+    fun testLoops(function: Function) : List<RangeLoop> {
         val dfa = Dfa.from(function)
+        val loops = mutableListOf<RangeLoop>()
         // for each top level Loop
         val rangeLoops = BreadthFirstExpressionFinder(RangeLoop::class.java, true)
             .also { it.visit(function){} }
@@ -19,6 +20,7 @@ object DdtBuilder {
             val accesses = finder.accesses()
             val subLoops = finder.subLoops()
             val accessSize = accesses.size
+            val pairs = mutableListOf<AccessPair>()
             // make all access pairs
             for (i in 0 until accessSize){
                 for (j in 0 until accessSize){
@@ -29,11 +31,24 @@ object DdtBuilder {
                     if(subLoops.any { it.symbol == a1.symbol || it.symbol == a2.symbol }) continue
 
                     // determine dependency type between them
-                    val distance = a1.distance(a2)
+                    try {
+                        val distance = a1.distance(a2)
 
-                    //val pair = AccessPair(a1,  a2)
+                        if (distance != null) {
+                            val pair = AccessPair(a1, a2, distance)
+                            pairs.add(pair)
+                        }
+                    } catch (e: Exception){
+                        // TODO: this is only here to make the test fail
+                        pairs.add(AccessPair(a1, a2, -1))
+                        println("Dependency probably exists")
+                    }
                 }
             }
+            if (pairs.isEmpty()){
+                loops.add(topLevelRangeLoop)
+            }
         }
+        return loops
     }
 }

@@ -21,9 +21,9 @@ class AddressPolynomialFinder(address: Expression) : Visitor() {
                 when(v.operator.sign){
                     BinaryOP.Operator.mul.sign -> {
                         if(v.left is Value && v.right is Symbol){
-                            p.addDim(v.right as Symbol, v.left as Value)
+                            p.addMultiplier(v.right as Symbol, v.left as Value)
                         } else if(v.right is Value && v.left is Symbol) {
-                            p.addDim(v.left as Symbol, v.right as Value)
+                            p.addMultiplier(v.left as Symbol, v.right as Value)
                         } else {
                             // no way
                             throw Exception("couldn't decode $v")

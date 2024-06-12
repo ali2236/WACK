@@ -7,6 +7,7 @@ import ir.expression.Symbol
 import ir.expression.Value
 import ir.finder.Finders
 import ir.statement.SymbolLoad
+import ir.wasm.WasmValueType
 
 data class Access(
     val symbol: SymbolLoad,
@@ -34,10 +35,14 @@ data class Access(
                 return null
             }
 
-            // check gcd
-            p1.gcd(p2)
+            // TODO: check gcd
 
             // distance
+            val source = p1
+            val sink = p2
+            val distance = sink - source
+
+            return distance.calculate(distance.symbols().associateWith { Value.zero }).value.toInt()
         }
         return null
     }
@@ -48,6 +53,8 @@ data class Access(
         }
         val address = symbol.address
         val poly = AddressPolynomialFinder(address).result()
+
+        poly.addOffset(Value(WasmValueType.i32, symbol.offset.toString()))
 
         return poly
     }
