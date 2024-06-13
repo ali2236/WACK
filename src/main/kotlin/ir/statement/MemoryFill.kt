@@ -25,7 +25,7 @@ class MemoryFill(
         i.wat(wat)
         value.wat(wat)
         n.wat(wat)
-        wat.writeLine("memory.fill $memoryId")
+        wat.writeLine("memory.fill $memoryId", this)
     }
 
     override fun visit(v: Visitor) {

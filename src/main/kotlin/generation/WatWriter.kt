@@ -8,9 +8,16 @@ class WatWriter(private val buffer: Appendable) {
 
     var indent = 0
 
-    fun writeLine(instruction: String) {
+    fun writeLine(instruction: String, debug: Statement? = null) {
         startLine()
         write(instruction)
+        debug?.let {
+            write(" ;; ")
+            it.id?.let {id ->
+                write("$id: ")
+            }
+            write(debug.toString().replace("\n",""))
+        }
         endLine()
     }
 

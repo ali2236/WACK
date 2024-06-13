@@ -5,12 +5,16 @@ import ir.wasm.WasmValueType
 import java.lang.Exception
 
 open class Value(val type: WasmValueType, val value: String) : ImmutableExpression() {
+    override fun getType(): List<WasmValueType> {
+        return listOf(type)
+    }
+
     override fun write(out: Appendable) {
         out.append(value)
     }
 
     override fun wat(wat: WatWriter) {
-        wat.writeLine("${type}.const $value")
+        wat.writeLine("${type}.const $value", this)
     }
 
     override fun equals(other: Any?): Boolean {

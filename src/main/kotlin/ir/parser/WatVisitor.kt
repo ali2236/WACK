@@ -7,7 +7,6 @@ import ir.wasm.*
 import org.antlr.v4.runtime.tree.ParseTree
 import parser.WatParser
 import parser.WatParserBaseVisitor
-import wasm.*
 import java.lang.Exception
 
 class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
@@ -115,8 +114,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val calledFunction = module.functions.first { it.index == functionIndex }
             val (paramsTypes, resultTypes) = calledFunction.type.getParamsAndResults(module)
             val params = paramsTypes.map { stack.pop() }
-            val hasReturn = resultTypes.isNotEmpty()
-            stack.push(FunctionCall(functionIndex, params, hasReturn))
+            stack.push(FunctionCall(functionIndex, params, resultTypes))
         } else if (ctx.LOCAL_GET() != null) {
             val index = ctx.var_().first().text.toInt()
             val type = function!!.allLocals[index]

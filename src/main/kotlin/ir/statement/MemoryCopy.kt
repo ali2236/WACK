@@ -26,7 +26,7 @@ class MemoryCopy(
         i1.wat(wat)
         i2.wat(wat)
         n.wat(wat)
-        wat.writeLine("memory.copy $fromMemoryIndex $toMemoryIndex")
+        wat.writeLine("memory.copy $fromMemoryIndex $toMemoryIndex", this)
     }
 
     override fun visit(v: Visitor) {

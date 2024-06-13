@@ -1,6 +1,7 @@
 import analysis.cfg.CFG
 import analysis.dfa.Dfa
 import external.Wasm2Wat
+import external.Wat2Wasm
 import generation.WasiThreadsGenerator
 import generation.WatWriter
 import ir.IRConstructor
@@ -43,15 +44,18 @@ fun main(args: Array<String>) {
         analysis2Dot(program, watInput)
 
         // runtime injection / parallel loop transformer
-        WasiThreadsGenerator().apply(program)
+        //WasiThreadsGenerator().apply(program)
 
         // write out
-        val watOut = File("./out/wat_${watInput.nameWithoutExtension}.wat")
+        val watOut = File("./out/intermediate/wack_${watInput.nameWithoutExtension}.wat")
         val outWriter = watOut.writer()
         val watWriter = WatWriter(outWriter)
         program.wat(watWriter)
         outWriter.flush()
         outWriter.close()
+
+        // convert to wasm
+        Wat2Wasm().process(watOut)
     }
 }
 

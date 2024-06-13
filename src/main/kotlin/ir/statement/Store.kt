@@ -28,7 +28,7 @@ class Store(
         data.wat(wat)
         val ofst = if (symbol.offset != 0) " offset=${symbol.offset}" else ""
         val algn = if (symbol.align != 0) " align=${symbol.align}" else ""
-        wat.writeLine("${symbol.type}.store ${symbol.memoryIndex}${ofst}${algn}")
+        wat.writeLine("${symbol.type}.store ${symbol.memoryIndex}${ofst}${algn}", this)
     }
 
     override fun assignedWith(): Expression {

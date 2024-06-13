@@ -4,7 +4,6 @@ import ir.expression.*
 import ir.statement.*
 import ir.statement.Function
 import ir.wasm.*
-import wasm.*
 
 object MutexLibraryGenerator {
     fun generate(program: Program): MutexLibrary {
@@ -54,7 +53,7 @@ object MutexLibraryGenerator {
                             FunctionCall(
                                 tryLockMutex.functionData.index,
                                 listOf(Symbol(WasmScope.local, WasmValueType.i32, Index(0))),
-                                true,
+                                tryLockMutex.functionData.type.result,
                             ), block, 1
                         ),
                         Symbol(WasmScope.local, WasmValueType.i32, Index(0)),

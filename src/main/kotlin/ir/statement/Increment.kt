@@ -21,9 +21,9 @@ class Increment(var symbol: Symbol) : BasicStatement() {
 
     override fun wat(wat: WatWriter) {
         symbol.wat(wat)
-        wat.writeLine("${symbol.type}.add")
         wat.writeLine("${symbol.type}.const 1")
-        wat.writeLine("${symbol.scope}.set ${symbol.index}")
+        wat.writeLine("${symbol.type}.add")
+        wat.writeLine("${symbol.scope}.set ${symbol.index} ;; $this")
     }
 }
 

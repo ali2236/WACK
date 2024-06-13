@@ -9,11 +9,15 @@ class BlockResult(val type: WasmValueType, val block: Block) : Expression() {
         return this
     }
 
+    override fun getType(): List<WasmValueType> {
+        return listOf(type)
+    }
+
     override fun write(out: Appendable) {
         out.append("BlockResult(${block.printHeader()})")
     }
 
     override fun wat(wat: WatWriter) {
-        // nothing
+        wat.writeLine("nop", this)
     }
 }

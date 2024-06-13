@@ -297,19 +297,19 @@ object DfaBuilder {
                     // calculate
                     val l = (leftL.value as Value).value.toLong()
                     val r = (rightL.value as Value).value.toLong()
-                    val value = when (op.operator.sign) {
+                    val value : Number = when (op.operator.sign) {
                         "+" -> l + r
                         "-" -> l - r
                         "*" -> l * r
                         "/" -> l / r
                         "&" -> l and r
                         "|" -> l or r
-                        "==" -> l == r
-                        "!=" -> l != r
-                        "<" -> l < r
-                        "<=" -> l <= r
-                        ">" -> l > r
-                        ">=" -> l >= r
+                        "==" -> (l == r).toInt()
+                        "!=" -> (l != r).toInt()
+                        "<" -> (l < r).toInt()
+                        "<=" -> (l <= r).toInt()
+                        ">" -> (l > r).toInt()
+                        ">=" -> (l >= r).toInt()
                         "<<" -> l shl r.toInt()
                         ">>" -> l ushr r.toInt()
                         "^" -> l xor r
@@ -322,17 +322,17 @@ object DfaBuilder {
                     // calculate
                     val l = (leftL.value as Value).value.toDouble()
                     val r = (rightL.value as Value).value.toDouble()
-                    val value = when (op.operator.sign) {
+                    val value : Number = when (op.operator.sign) {
                         "+" -> l + r
                         "-" -> l - r
                         "*" -> l * r
                         "/" -> l / r
-                        "==" -> l == r
-                        "!=" -> l != r
-                        "<" -> l < r
-                        "<=" -> l <= r
-                        ">" -> l > r
-                        ">=" -> l >= r
+                        "==" -> (l == r).toInt()
+                        "!=" -> (l != r).toInt()
+                        "<" -> (l < r).toInt()
+                        "<=" -> (l <= r).toInt()
+                        ">" -> (l > r).toInt()
+                        ">=" -> (l >= r).toInt()
                         else -> throw Error(op.operator.toString() + " not supported!")
                     }
                     return Value(op.type, value.toString())
@@ -384,4 +384,12 @@ object DfaBuilder {
     }
 
     class ExpressionViolation(val left: DfaValue, val right: DfaValue) : Exception()
+}
+
+private fun Boolean.toInt(): Int {
+    if (true){
+        return 1
+    } else {
+        return 0
+    }
 }

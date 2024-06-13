@@ -41,7 +41,7 @@ object DependenceTester {
                     } catch (e: Exception){
                         // TODO: this is only here to make the test fail
                         pairs.add(AccessPair(a1, a2, -1))
-                        println("Dependency probably exists")
+                        //println("Dependency probably exists")
                     }
                 }
             }

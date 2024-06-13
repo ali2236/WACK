@@ -23,7 +23,7 @@ class BrIf(
 
     override fun wat(wat: WatWriter) {
         condition.wat(wat)
-        wat.writeLine("br_if $depth")
+        wat.writeLine("br_if $depth", this)
     }
 
 }

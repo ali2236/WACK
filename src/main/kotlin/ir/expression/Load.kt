@@ -41,11 +41,15 @@ class Load(
         address.wat(wat)
         val ofst = if (offset != 0) " offset=$offset" else ""
         val algn = if (align != 0) " align=$align" else ""
-        wat.writeLine("${type}.load $memoryIndex${ofst}${algn}")
+        wat.writeLine("${type}.load $memoryIndex${ofst}${algn}", this)
     }
 
     override fun clone(): Load {
         return Load(type, address.clone(), memoryIndex, offset, align)
+    }
+
+    override fun getType(): List<WasmValueType> {
+        return listOf(type)
     }
 
     override fun equals(other: Any?): Boolean {

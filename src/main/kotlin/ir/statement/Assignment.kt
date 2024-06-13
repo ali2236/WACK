@@ -1,8 +1,10 @@
 package ir.statement
 
 import generation.WatWriter
+import ir.expression.BinaryOP
 import ir.expression.Expression
 import ir.expression.Symbol
+import ir.expression.Value
 import ir.finder.Visitor
 
 
@@ -12,6 +14,13 @@ open class Assignment(
     var inline: Boolean = false,
     var tee: Boolean = false
 ) : BasicStatement(), AssignmentStore {
+
+    init {
+        // validate
+        if (value.getType().first() != symbol.getType().first()) {
+            throw Exception("Can't assign type ${value.getType()} to ${symbol.getType()}")
+        }
+    }
 
 
     override fun write(out: Appendable) {
@@ -27,9 +36,9 @@ open class Assignment(
     override fun wat(wat: WatWriter) {
         value.wat(wat)
         if (tee) {
-            wat.writeLine("${symbol.scope}.tee ${symbol.index}")
+            wat.writeLine("${symbol.scope}.tee ${symbol.index}", this)
         } else {
-            wat.writeLine("${symbol.scope}.set ${symbol.index}")
+            wat.writeLine("${symbol.scope}.set ${symbol.index}", this)
 
         }
     }

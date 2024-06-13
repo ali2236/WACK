@@ -23,11 +23,11 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
     override fun wat(wat: WatWriter) {
         if (right is Value && (right as Value).value == "0" && operator == Operator.eq) {
             left.wat(wat)
-            wat.writeLine("${(right as Value).type}.eqz")
+            wat.writeLine("${(right as Value).type}.eqz", this)
         } else {
             left.wat(wat)
             right.wat(wat)
-            wat.writeLine("${type}.${operator.wat()}")
+            wat.writeLine("${type}.${operator.wat()}", this)
         }
     }
 
@@ -38,6 +38,10 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
 
     override fun clone(): Expression {
         return BinaryOP(type, operator.copy(), left.clone(), right.clone())
+    }
+
+    override fun getType(): List<WasmValueType> {
+        return listOf(type)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -86,20 +90,20 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
             return when (sign) {
                 "==" -> neq
                 "!=" -> eq
-                "<" -> gt
+                "<" -> ge
                 "<=" -> gt
                 ">" -> le
                 ">=" -> lt
                 "+" -> sub
                 "-" -> add
-                "/" -> mul.copy(signed = signed)
+                "/" -> mul
                 "*" -> div
-                "<<" -> shr.copy(signed = signed)
-                ">>" -> shl.copy(signed = signed)
+                "<<" -> shr
+                ">>" -> shl
                 "&" -> or
                 "|" -> and
                 else -> throw Exception("Unknown Invert for Binary Operator $sign")
-            }
+            }.copy(signed = signed)
         }
 
         fun wat(): String {

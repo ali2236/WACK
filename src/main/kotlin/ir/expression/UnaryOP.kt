@@ -9,6 +9,10 @@ class UnaryOP(val type: WasmValueType, val operator: Operator, var value: Expres
         return UnaryOP(type, operator, value.clone())
     }
 
+    override fun getType(): List<WasmValueType> {
+        return listOf(type)
+    }
+
     override fun write(out: Appendable) {
         out.append(operator.sign)
         value.write(out)
@@ -16,7 +20,7 @@ class UnaryOP(val type: WasmValueType, val operator: Operator, var value: Expres
 
     override fun wat(wat: WatWriter) {
         value.wat(wat)
-        wat.writeLine("${type}.${operator.wat()}")
+        wat.writeLine("${type}.${operator.wat()}", this)
     }
 
     override fun visit(v: Visitor) {

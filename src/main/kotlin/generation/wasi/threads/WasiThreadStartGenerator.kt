@@ -9,7 +9,6 @@ import ir.statement.Function
 import ir.statement.Program
 import ir.statement.RawWat
 import ir.wasm.*
-import wasm.*
 
 object WasiThreadStartGenerator {
     fun generate(program: Program, arg: ThreadArg, mutex: MutexLibrary) {
@@ -69,7 +68,7 @@ object WasiThreadStartGenerator {
                     kernelType.index,
                     kernelIndex,
                     listOf(threadId),
-                    false,
+                    kernelType.result,
                 )
             )
 

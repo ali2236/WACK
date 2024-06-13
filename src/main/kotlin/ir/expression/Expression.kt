@@ -2,6 +2,7 @@ package ir.expression
 
 import ir.statement.Statement
 import ir.finder.Visitor
+import ir.wasm.WasmValueType
 
 abstract class Expression : Statement {
 
@@ -18,6 +19,8 @@ abstract class Expression : Statement {
     }
 
     abstract fun clone(): Expression
+
+    abstract fun getType(): List<WasmValueType>
 }
 
 

@@ -14,6 +14,6 @@ class Br(val target: Block, var depth: Int) : BasicStatement() {
     }
 
     override fun wat(wat: WatWriter) {
-        wat.writeLine("br $depth")
+        wat.writeLine("br $depth", this)
     }
 }

@@ -13,7 +13,7 @@ class Wat2Wasm : FileProcessor {
         // TODO: validate wat2wasm is present
 
         // make output file
-        val output = File("./out/intermediate/wack_${input.nameWithoutExtension}.wasm")
+        val output = File("./out/${input.nameWithoutExtension}.wasm")
         if(output.exists()){
             output.delete()
         }
@@ -24,8 +24,15 @@ class Wat2Wasm : FileProcessor {
             "wat2wasm",
             input.absolutePath,
             "--enable-threads",
-            "--enable-multi-memory"
+            "--enable-multi-memory",
+            "-o",
+            output.absolutePath,
         ).start()
+
+        val errors = process.errorStream.reader()
+        errors.forEachLine {
+            println(it)
+        }
 
         process.waitFor()
         return output
