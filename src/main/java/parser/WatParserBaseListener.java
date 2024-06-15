@@ -209,18 +209,6 @@ public class WatParserBaseListener implements WatParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCall_instr(WatParser.Call_instrContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitCall_instr(WatParser.Call_instrContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterCall_instr_params(WatParser.Call_instr_paramsContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -228,42 +216,6 @@ public class WatParserBaseListener implements WatParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitCall_instr_params(WatParser.Call_instr_paramsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterCall_instr_instr(WatParser.Call_instr_instrContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitCall_instr_instr(WatParser.Call_instr_instrContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterCall_instr_params_instr(WatParser.Call_instr_params_instrContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitCall_instr_params_instr(WatParser.Call_instr_params_instrContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterCall_instr_results_instr(WatParser.Call_instr_results_instrContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitCall_instr_results_instr(WatParser.Call_instr_results_instrContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

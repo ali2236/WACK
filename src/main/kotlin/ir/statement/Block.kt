@@ -36,7 +36,10 @@ open class Block(
             }
             return instructions.removeAt(i) as Expression
         }
-        throw Error()
+        /*if(parent != null){
+            return parent!!.pop()
+        }*/
+        throw Exception()
     }
 
     open fun writeHeader(out: Appendable) {}

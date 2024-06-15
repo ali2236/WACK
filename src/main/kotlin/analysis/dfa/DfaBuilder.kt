@@ -276,6 +276,10 @@ object DfaBuilder {
                 }
             }
 
+            is IndirectFunctionCall -> {
+                return DfaValue.Unknown()
+            }
+
             else -> {
                 throw Error("Unknown Type $expr")
             }

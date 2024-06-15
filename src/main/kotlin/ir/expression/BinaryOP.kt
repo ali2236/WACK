@@ -23,7 +23,7 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
     override fun wat(wat: WatWriter) {
         if (right is Value && (right as Value).value == "0" && operator == Operator.eq) {
             left.wat(wat)
-            wat.writeLine("${(right as Value).type}.eqz", this)
+            wat.writeLine("${type}.eqz", this)
         } else {
             left.wat(wat)
             right.wat(wat)

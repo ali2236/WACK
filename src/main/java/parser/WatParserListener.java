@@ -168,16 +168,6 @@ public interface WatParserListener extends ParseTreeListener {
 	 */
 	void exitSelect_type(WatParser.Select_typeContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link WatParser#call_instr}.
-	 * @param ctx the parse tree
-	 */
-	void enterCall_instr(WatParser.Call_instrContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link WatParser#call_instr}.
-	 * @param ctx the parse tree
-	 */
-	void exitCall_instr(WatParser.Call_instrContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link WatParser#call_instr_params}.
 	 * @param ctx the parse tree
 	 */
@@ -187,36 +177,6 @@ public interface WatParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitCall_instr_params(WatParser.Call_instr_paramsContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link WatParser#call_instr_instr}.
-	 * @param ctx the parse tree
-	 */
-	void enterCall_instr_instr(WatParser.Call_instr_instrContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link WatParser#call_instr_instr}.
-	 * @param ctx the parse tree
-	 */
-	void exitCall_instr_instr(WatParser.Call_instr_instrContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link WatParser#call_instr_params_instr}.
-	 * @param ctx the parse tree
-	 */
-	void enterCall_instr_params_instr(WatParser.Call_instr_params_instrContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link WatParser#call_instr_params_instr}.
-	 * @param ctx the parse tree
-	 */
-	void exitCall_instr_params_instr(WatParser.Call_instr_params_instrContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link WatParser#call_instr_results_instr}.
-	 * @param ctx the parse tree
-	 */
-	void enterCall_instr_results_instr(WatParser.Call_instr_results_instrContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link WatParser#call_instr_results_instr}.
-	 * @param ctx the parse tree
-	 */
-	void exitCall_instr_results_instr(WatParser.Call_instr_results_instrContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link WatParser#block_instr}.
 	 * @param ctx the parse tree

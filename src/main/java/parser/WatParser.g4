@@ -104,7 +104,6 @@ bind_var
 
 instr
     : plain_instr
-    | call_instr_instr
     | block_instr
     | expr
     ;
@@ -119,6 +118,7 @@ plain_instr
     | BR_TABLE var_+
     | RETURN
     | CALL var_
+    | CALL_INDIRECT var_? type_use call_instr_params
     | LOCAL_GET var_
     | LOCAL_SET var_
     | LOCAL_TEE var_
@@ -142,24 +142,12 @@ select_type:
     LPAR RETURN value_type RPAR
     ;
 
-call_instr
-    : CALL_INDIRECT type_use? call_instr_params
-    ;
-
 call_instr_params
-    : (LPAR PARAM value_type* RPAR)* (LPAR RESULT value_type* RPAR)*
+    : (LPAR PARAM value_type* RPAR)* call_instr_params_result
     ;
 
-call_instr_instr
-    : CALL_INDIRECT type_use? call_instr_params_instr
-    ;
-
-call_instr_params_instr
-    : (LPAR PARAM value_type* RPAR)* call_instr_results_instr
-    ;
-
-call_instr_results_instr
-    : (LPAR RESULT value_type* RPAR)* instr
+call_instr_params_result
+    : (LPAR RESULT value_type* RPAR)*
     ;
 
 block_instr
@@ -181,7 +169,6 @@ expr
 
 expr1
     : plain_instr expr*
-    | CALL_INDIRECT call_expr_type
     | BLOCK bind_var? block
     | LOOP bind_var? block
     | IF bind_var? if_block
@@ -205,7 +192,7 @@ if_block
     ;
 
 instr_list
-    : instr* call_instr?
+    : instr*
     ;
 
 const_expr

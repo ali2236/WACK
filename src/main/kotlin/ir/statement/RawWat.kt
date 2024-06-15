@@ -14,6 +14,6 @@ class RawWat(val instruction: String) : BasicStatement() {
     }
 
     override fun wat(wat: WatWriter) {
-        wat.writeLine(instruction)
+        wat.writeLine(instruction, this)
     }
 }

@@ -107,35 +107,11 @@ public interface WatParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSelect_type(WatParser.Select_typeContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link WatParser#call_instr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCall_instr(WatParser.Call_instrContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link WatParser#call_instr_params}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitCall_instr_params(WatParser.Call_instr_paramsContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link WatParser#call_instr_instr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCall_instr_instr(WatParser.Call_instr_instrContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link WatParser#call_instr_params_instr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCall_instr_params_instr(WatParser.Call_instr_params_instrContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link WatParser#call_instr_results_instr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCall_instr_results_instr(WatParser.Call_instr_results_instrContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link WatParser#block_instr}.
 	 * @param ctx the parse tree
