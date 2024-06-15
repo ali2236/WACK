@@ -292,7 +292,8 @@ object DfaBuilder {
 
         if (leftL is DfaValue.Expr && rightL is DfaValue.Expr && leftL.value is Value && rightL.value is Value) {
             // type
-            when (op.type) {
+            val type = op.getType().first()
+            when (type) {
                 WasmValueType.i32, WasmValueType.i64 -> {
                     // calculate
                     val l = (leftL.value as Value).value.toLong()
@@ -315,7 +316,7 @@ object DfaBuilder {
                         "^" -> l xor r
                         else -> throw Error(op.operator.toString() + " not supported!")
                     }
-                    return Value(op.type, value.toString())
+                    return Value(type, value.toString())
                 }
 
                 WasmValueType.f32, WasmValueType.f64 -> {
@@ -335,7 +336,7 @@ object DfaBuilder {
                         ">=" -> (l >= r).toInt()
                         else -> throw Error(op.operator.toString() + " not supported!")
                     }
-                    return Value(op.type, value.toString())
+                    return Value(type, value.toString())
                 }
 
                 else -> throw Error()

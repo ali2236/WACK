@@ -41,6 +41,9 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
     }
 
     override fun getType(): List<WasmValueType> {
+        if (operator.boolean) {
+            return listOf(WasmValueType.i32)
+        }
         return listOf(type)
     }
 
@@ -66,6 +69,12 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
 
 
     data class Operator(val sign: String, val watName: String, var signed: BitSign? = null) {
+
+        val boolean: Boolean
+            get() = when (sign) {
+                "==", "!=", "<", "<=", ">", ">=" -> true
+                else -> false
+            }
 
         companion object {
             val eq = Operator("==", "eq")

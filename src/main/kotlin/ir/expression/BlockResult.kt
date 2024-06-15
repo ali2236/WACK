@@ -18,6 +18,6 @@ class BlockResult(val type: WasmValueType, val block: Block) : Expression() {
     }
 
     override fun wat(wat: WatWriter) {
-        wat.writeLine("nop", this)
+        //wat.writeLine("nop", this)
     }
 }

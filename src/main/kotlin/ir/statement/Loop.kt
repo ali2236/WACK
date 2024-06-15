@@ -15,6 +15,6 @@ open class Loop(instructions: MutableList<Statement> = mutableListOf()) : Block(
     }
 
     override fun watHeader(wat: WatWriter) {
-        wat.writeLine("loop")
+        wat.writeLine("loop${watBlockType()}")
     }
 }

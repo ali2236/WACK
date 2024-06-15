@@ -69,9 +69,16 @@ open class Block(
         }
     }
 
-    override fun watHeader(wat: WatWriter) {
-        wat.writeLine("block")
+    fun watBlockType() : String {
+        if(type == null){
+            return ""
+        } else {
+            return " (result ${type.name})"
+        }
+    }
 
+    override fun watHeader(wat: WatWriter) {
+        wat.writeLine("block${watBlockType()}")
     }
 
     override fun watEnd(wat: WatWriter) {

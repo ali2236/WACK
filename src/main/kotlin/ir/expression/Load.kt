@@ -7,6 +7,7 @@ import ir.statement.SymbolLoad
 import ir.wasm.Index
 import ir.wasm.WasmValueType
 
+// TODO: i32.load8_u not supported
 class Load(
     val type: WasmValueType,
     var address: Expression,

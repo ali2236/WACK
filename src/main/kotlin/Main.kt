@@ -39,7 +39,7 @@ fun main(args: Array<String>) {
         val ir = IRConstructor(module)
         val program = ir.program()
 
-        OptimizationPasses.apply(program)
+        //OptimizationPasses.apply(program)
 
         analysis2Dot(program, watInput)
 
