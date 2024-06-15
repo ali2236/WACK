@@ -8,6 +8,7 @@ data class WasmModule(
     val globals: MutableList<WasmGlobal> = mutableListOf(),
     val exports: MutableList<WasmExport> = mutableListOf(),
     val elementSegments: MutableList<WasmElementSegment> = mutableListOf(),
+    val dataSegments: MutableList<WasmDataSegment> = mutableListOf(),
 ) {
     fun findOraddType(params: List<WasmValueType>, result: List<WasmValueType>): WasmFunctionType {
         var type = functionTypes

@@ -113,6 +113,12 @@ public interface WatParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCall_instr_params(WatParser.Call_instr_paramsContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link WatParser#call_instr_params_result}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCall_instr_params_result(WatParser.Call_instr_params_resultContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link WatParser#block_instr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -232,6 +238,18 @@ public interface WatParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitElem(WatParser.ElemContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link WatParser#function_list}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunction_list(WatParser.Function_listContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link WatParser#table_bind}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTable_bind(WatParser.Table_bindContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link WatParser#table}.
 	 * @param ctx the parse tree

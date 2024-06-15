@@ -1,5 +1,7 @@
 package ir.parser
 
+import ir.statement.RawWat
+import ir.statement.Statement
 import ir.wasm.*
 import parser.WatParser.SimportContext
 import parser.WatParser.Type_defContext
@@ -10,7 +12,6 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker
 import parser.WatLexer
 import parser.WatParser
 import parser.WatParserBaseListener
-import wasm.*
 import java.io.File
 
 object Wat {
@@ -132,16 +133,46 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
         module.exports.add(export)
     }
 
-    override fun enterElem(ctx: WatParser.ElemContext?) {
-        // TODO: Fix Element Grammar
-    }
-
     override fun enterTable(ctx: WatParser.TableContext) {
         val range = ctx.table_fields().table_type().NAT()
         val min = range.first().text.toInt()
         val max = if (range.size > 1) range.last().text.toInt() else null
-        val table = WasmTable(Index.next(module.tables),min, max, WasmRefType.funcref)
+        val table = WasmTable(Index.next(module.tables), min, max, WasmRefType.funcref)
         module.tables.add(table)
+    }
+
+    override fun enterElem(ctx: WatParser.ElemContext) {
+        val tableIndex = Index(ctx.table_bind()?.var_()?.text?.toIntOrNull() ?: 0)
+        val expr = ctx.offset()
+        val instructions =
+            if (expr != null) WatVisitor(module).visitArbitrary(expr).toMutableList() else listOf<Statement>()
+        val functionList = ctx.function_list()?.var_() ?: listOf()
+        val functions = functionList.map { Index(it.text?.toIntOrNull() ?: 0) }
+        val element = WasmElementSegment(
+            Index.next(module.elementSegments),
+            tableIndex,
+            instructions,
+            functions
+            )
+        module.elementSegments.add(element)
+    }
+
+    override fun enterData(ctx: WatParser.DataContext) {
+        val memoryIndex = Index(ctx.var_()?.text?.toIntOrNull() ?: 0)
+        val expr = ctx.offset()
+        val instructions =
+            if (expr != null) WatVisitor(module).visitArbitrary(expr).toMutableList() else listOf<Statement>()
+        if (ctx.STRING_().size > 1) {
+            throw Exception("data segment with size ${ctx.STRING_().size}")
+        }
+        val string = ctx.STRING_().first().text!!
+        val data = WasmDataSegment(
+            Index.next(module.dataSegments),
+            memoryIndex,
+            instructions,
+            string
+        )
+        module.dataSegments.add(data)
     }
 
 }

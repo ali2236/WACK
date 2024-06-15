@@ -34,7 +34,8 @@ class Program(val module: WasmModule, val statements: MutableList<Statement>) : 
         module.exports.forEach { it.wat(wat) }
         // elements
         module.elementSegments.forEach { it.wat(wat) }
-        // TODO: data segment
+        // data segment
+        module.dataSegments.forEach { it.wat(wat) }
         // close module
         wat.indent--
         wat.writeLine(")")

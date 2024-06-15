@@ -36,7 +36,12 @@ object WasiThreadStartGenerator {
         module.tables.add(kernelTable)
 
         // elements
-        val kernelsElementSegment = WasmElementSegment(kernelTable.index, 0, kernels.map { it.functionData.index })
+        val kernelsElementSegment = WasmElementSegment(
+            Index.next(module.elementSegments),
+            kernelTable.index,
+            listOf(Value.zero),
+            kernels.map { it.functionData.index }
+        )
         module.elementSegments.add(kernelsElementSegment)
 
         // function headers

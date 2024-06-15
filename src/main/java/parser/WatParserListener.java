@@ -178,6 +178,16 @@ public interface WatParserListener extends ParseTreeListener {
 	 */
 	void exitCall_instr_params(WatParser.Call_instr_paramsContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link WatParser#call_instr_params_result}.
+	 * @param ctx the parse tree
+	 */
+	void enterCall_instr_params_result(WatParser.Call_instr_params_resultContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link WatParser#call_instr_params_result}.
+	 * @param ctx the parse tree
+	 */
+	void exitCall_instr_params_result(WatParser.Call_instr_params_resultContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link WatParser#block_instr}.
 	 * @param ctx the parse tree
 	 */
@@ -377,6 +387,26 @@ public interface WatParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitElem(WatParser.ElemContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link WatParser#function_list}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunction_list(WatParser.Function_listContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link WatParser#function_list}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunction_list(WatParser.Function_listContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link WatParser#table_bind}.
+	 * @param ctx the parse tree
+	 */
+	void enterTable_bind(WatParser.Table_bindContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link WatParser#table_bind}.
+	 * @param ctx the parse tree
+	 */
+	void exitTable_bind(WatParser.Table_bindContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link WatParser#table}.
 	 * @param ctx the parse tree

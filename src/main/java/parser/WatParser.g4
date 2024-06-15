@@ -239,7 +239,15 @@ offset
     ;
 
 elem
-    : LPAR ELEM var_? offset FUNC? var_* RPAR
+    : LPAR ELEM var_? table_bind? offset function_list? RPAR
+    ;
+
+function_list
+    : FUNC var_+
+    ;
+
+table_bind
+    : LPAR TABLE var_ RPAR
     ;
 
 table
