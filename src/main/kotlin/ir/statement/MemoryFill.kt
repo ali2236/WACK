@@ -1,6 +1,7 @@
 package ir.statement
 
 import generation.WatWriter
+import ir.Mode
 import ir.expression.Expression
 import ir.finder.Visitor
 import ir.wasm.Index
@@ -25,7 +26,8 @@ class MemoryFill(
         i.wat(wat)
         value.wat(wat)
         n.wat(wat)
-        wat.writeLine("memory.fill $memoryId", this)
+        val index = if(Mode.multipleMemories) " $memoryId" else ""
+        wat.writeLine("memory.fill$index", this)
     }
 
     override fun visit(v: Visitor) {

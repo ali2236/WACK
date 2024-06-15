@@ -1,8 +1,7 @@
 package optimization.restructure
 
 import ir.expression.*
-import ir.statement.Assignment
-import ir.statement.AssignmentStore
+import ir.expression.Assignment
 import ir.statement.Increment
 import ir.statement.Statement
 

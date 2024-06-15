@@ -27,7 +27,11 @@ open class Block(
 
     open fun pop(): Expression {
         for (i in (instructions.size - 1) downTo 0) {
-            if (instructions[i] !is Expression) {
+            val instr = instructions[i]
+            if (instr !is Expression) {
+                continue
+            }
+            if(instr.getType().isEmpty()){
                 continue
             }
             return instructions.removeAt(i) as Expression

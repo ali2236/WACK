@@ -1,13 +1,5 @@
 package optimization.restructure.archive
 
-import ir.expression.BinaryOP
-import ir.statement.Increment
-import ir.expression.Value
-import ir.statement.Assignment
-import ir.statement.Block
-import ir.statement.RangeLoop
-import java.lang.Exception
-
 /*class RangeLoopRangeRefinement : Restructure() {
 
     override fun restructureBlock(block: Block) {

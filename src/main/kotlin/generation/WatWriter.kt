@@ -1,5 +1,6 @@
 package generation
 
+import ir.Mode
 import ir.Names
 import ir.statement.Statement
 
@@ -7,31 +8,37 @@ import ir.statement.Statement
 class WatWriter(private val buffer: Appendable) {
 
     var indent = 0
+    val debugIndent = 36
 
     fun writeLine(instruction: String, debug: Statement? = null) {
         startLine()
         write(instruction)
-        debug?.let {
-            write(" ;; ")
-            it.id?.let {id ->
-                write("$id: ")
+        if(Mode.debug) {
+            debug?.let {
+                for (i in 1..(debugIndent - (indent * Names.indent.length) - instruction.length)) {
+                    buffer.append(' ')
+                }
+                write(" ;; ")
+                it.id?.let { id ->
+                    write("${debug.javaClass.simpleName}($id): ")
+                }
+                write(debug.toString().replace("\n", ""))
             }
-            write(debug.toString().replace("\n",""))
         }
         endLine()
     }
 
-    fun startLine(){
-        for (i in 1..indent){
+    fun startLine() {
+        for (i in 1..indent) {
             buffer.append(Names.indent) // two spaces
         }
     }
 
-    fun endLine(){
+    fun endLine() {
         buffer.append('\n')
     }
 
-    fun write(instruction: String){
+    fun write(instruction: String) {
         buffer.append(instruction)
     }
 

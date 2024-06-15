@@ -1,6 +1,7 @@
 package ir.statement
 
 import generation.WatWriter
+import ir.Mode
 import ir.Mode.debug
 import ir.expression.*
 import ir.finder.Visitor
@@ -11,7 +12,6 @@ class Store(
 ) : BasicStatement(), AssignmentStore {
 
     override fun write(out: Appendable) {
-        if(debug) out.append("$id: ")
         symbol.write(out)
         out.append(" = ")
         data.write(out)
@@ -28,7 +28,8 @@ class Store(
         data.wat(wat)
         val ofst = if (symbol.offset != 0) " offset=${symbol.offset}" else ""
         val algn = if (symbol.align != 0) " align=${symbol.align}" else ""
-        wat.writeLine("${symbol.type}.store ${symbol.memoryIndex}${ofst}${algn}", this)
+        val memIndex = if(Mode.multipleMemories) " ${symbol.memoryIndex}" else ""
+        wat.writeLine("${symbol.type}.store${memIndex}${ofst}${algn}", this)
     }
 
     override fun assignedWith(): Expression {

@@ -4,7 +4,7 @@ import generation.wack.ThreadArg
 import generation.wasm.threads.MutexLibrary
 import ir.annotations.Kernel
 import ir.expression.*
-import ir.statement.Assignment
+import ir.expression.Assignment
 import ir.statement.Function
 import ir.statement.Program
 import ir.statement.RawWat

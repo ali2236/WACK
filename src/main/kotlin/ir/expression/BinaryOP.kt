@@ -1,8 +1,8 @@
 package ir.expression
 
 import generation.WatWriter
-import generation.WebAssemblyInstruction
 import ir.finder.Visitor
+import ir.wasm.WasmBitSign
 import ir.wasm.WasmValueType
 
 class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expression, var right: Expression) :
@@ -68,7 +68,7 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
     }
 
 
-    data class Operator(val sign: String, val watName: String, var signed: BitSign? = null) {
+    data class Operator(val sign: String, val watName: String, var signed: WasmBitSign? = null) {
 
         val boolean: Boolean
             get() = when (sign) {
@@ -122,9 +122,5 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
                 return watName
             }
         }
-    }
-
-    enum class BitSign {
-        s, u
     }
 }

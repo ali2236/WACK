@@ -1,11 +1,11 @@
-package ir.statement
+package ir.expression
 
 import generation.WatWriter
-import ir.expression.BinaryOP
-import ir.expression.Expression
-import ir.expression.Symbol
-import ir.expression.Value
+import ir.finder.Finders
 import ir.finder.Visitor
+import ir.statement.AssignmentStore
+import ir.statement.SymbolLoad
+import ir.wasm.WasmValueType
 
 
 open class Assignment(
@@ -13,7 +13,7 @@ open class Assignment(
     var value: Expression,
     var inline: Boolean = false,
     var tee: Boolean = false
-) : BasicStatement(), AssignmentStore {
+) : Expression(), AssignmentStore {
 
     init {
         // validate
@@ -25,12 +25,15 @@ open class Assignment(
 
     override fun write(out: Appendable) {
         symbol.write(out)
-        out.append(" = ")
+        if (tee) {
+            out.append(" := ")
+        } else {
+            out.append(" = ")
+        }
         value.write(out)
         if (!inline) {
             out.append(";\n")
         }
-        // TODO: Tee
     }
 
     override fun wat(wat: WatWriter) {
@@ -46,6 +49,31 @@ open class Assignment(
     override fun visit(v: Visitor) {
         v.visit(symbol) { symbol = it as Symbol }
         v.visit(value) { value = it as Expression }
+    }
+
+    override fun clone(): Expression {
+        return Assignment(
+            symbol.clone() as Symbol,
+            value.clone(),
+            inline, tee
+        ).also { it.id = this.id }
+    }
+
+    override fun getType(): List<WasmValueType> {
+        if (tee) {
+            return listOf(symbol.type)
+        } else {
+            return listOf()
+        }
+    }
+
+    fun teeValue(): Expression {
+        val dependant = Finders.symbols(value).any { it == symbol }
+        if (dependant) {
+            return symbol
+        } else {
+            return value
+        }
     }
 
     override fun assignedWith(): Expression {

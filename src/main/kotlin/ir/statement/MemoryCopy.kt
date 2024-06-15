@@ -1,6 +1,7 @@
 package ir.statement
 
 import generation.WatWriter
+import ir.Mode
 import ir.expression.Expression
 import ir.finder.Visitor
 import ir.wasm.Index
@@ -26,12 +27,13 @@ class MemoryCopy(
         i1.wat(wat)
         i2.wat(wat)
         n.wat(wat)
-        wat.writeLine("memory.copy $fromMemoryIndex $toMemoryIndex", this)
+        val indexes = if (Mode.multipleMemories) " $fromMemoryIndex $toMemoryIndex" else ""
+        wat.writeLine("memory.copy$indexes", this)
     }
 
     override fun visit(v: Visitor) {
-        v.visit(n){n = it as Expression}
-        v.visit(i1){i1 = it as Expression}
-        v.visit(i2){i2 = it as Expression}
+        v.visit(n) { n = it as Expression }
+        v.visit(i1) { i1 = it as Expression }
+        v.visit(i2) { i2 = it as Expression }
     }
 }

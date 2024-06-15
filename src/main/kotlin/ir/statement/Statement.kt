@@ -11,8 +11,11 @@ interface Statement : Visitable, WebAssemblyInstruction {
     companion object {
 
         private var statementId : Long = 0L
+
         fun newId() : Long{
             return statementId++
         }
+
+        fun lastId(): Long = statementId - 1
     }
 }

@@ -6,8 +6,9 @@ import ir.finder.Visitor
 
 class Drop(var value: Expression) : BasicStatement() {
     override fun write(out: Appendable) {
+        out.append("drop(")
         value.write(out)
-        out.append(";\n")
+        out.append(");\n")
     }
 
     override fun visit(v: Visitor) {
@@ -16,6 +17,6 @@ class Drop(var value: Expression) : BasicStatement() {
 
     override fun wat(wat: WatWriter) {
         value.wat(wat)
-        wat.writeLine("drop")
+        wat.writeLine("drop", this)
     }
 }

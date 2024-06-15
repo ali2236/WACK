@@ -244,8 +244,12 @@ object DfaBuilder {
                 }
             }
 
-            is TeeValue -> {
-                return explainExpression(expr.expr, dfaFacts)
+            is Assignment -> {
+                if(expr.tee){
+                    return explainExpression(expr.teeValue(), dfaFacts)
+                }else {
+                    throw Exception("Assignment Expression is not TEE")
+                }
             }
 
             is FunctionCall, is BlockResult -> {

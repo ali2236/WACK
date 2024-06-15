@@ -8,7 +8,6 @@ import ir.finder.Finders
 import ir.statement.*
 import ir.statement.Function
 import ir.wasm.*
-import wasm.*
 
 object ThreadKernelGenerator {
     fun generate(
@@ -73,7 +72,7 @@ object ThreadKernelGenerator {
                                     BinaryOP.Operator.mul,
                                     BinaryOP(
                                         WasmValueType.i32,
-                                        BinaryOP.Operator.div.copy(signed = BinaryOP.BitSign.s),
+                                        BinaryOP.Operator.div.copy(signed = WasmBitSign.s),
                                         size,
                                         threadCount.symbol,
                                     ),
@@ -92,7 +91,7 @@ object ThreadKernelGenerator {
                                         BinaryOP.Operator.mul,
                                         BinaryOP(
                                             WasmValueType.i32,
-                                            BinaryOP.Operator.div.copy(signed = BinaryOP.BitSign.s),
+                                            BinaryOP.Operator.div.copy(signed = WasmBitSign.s),
                                             size,
                                             threadCount.symbol,
                                         ),
@@ -159,7 +158,7 @@ object ThreadKernelGenerator {
                             If(
                                 BinaryOP(
                                     WasmValueType.i32,
-                                    BinaryOP. Operator.lt.copy(signed = BinaryOP.BitSign.s),
+                                    BinaryOP. Operator.lt.copy(signed = WasmBitSign.s),
                                     threadSpawn.call(arg.encode.call(threadId, Value(WasmValueType.i32, "$kernelId"))),
                                     Value.zero
                                 ), mutableListOf(Unreachable())

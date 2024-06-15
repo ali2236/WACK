@@ -1,15 +1,5 @@
 package optimization.restructure.archive
 
-import ir.Names
-import ir.expression.*
-import ir.finder.Finders
-import ir.finder.Replaceable
-import ir.statement.Assignment
-import ir.statement.Statement
-import ir.statement.Store
-import ir.wasm.Index
-import ir.wasm.WasmScope
-
 
 /*
 @Deprecated("Shouldn't be used")

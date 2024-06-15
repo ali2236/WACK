@@ -7,4 +7,10 @@ abstract class BasicStatement : Statement {
     override fun visit(v: Visitor) {
 
     }
+
+    override fun toString(): String {
+        val b = StringBuffer()
+        write(b)
+        return b.toString()
+    }
 }

@@ -4,6 +4,7 @@ import generation.wasm.threads.MutexLibrary
 import ir.annotations.Parallel
 import ir.expression.*
 import ir.statement.*
+import ir.wasm.WasmBitSign
 import ir.wasm.WasmGlobal
 import ir.wasm.WasmValueType
 
@@ -30,7 +31,7 @@ object ParallelBlockGenerator {
                                 BrIf(
                                     BinaryOP(
                                         WasmValueType.i32,
-                                        BinaryOP.Operator.lt.copy(signed = BinaryOP.BitSign.s),
+                                        BinaryOP.Operator.lt.copy(signed = WasmBitSign.s),
                                         threadId,
                                         threadCount.symbol
                                     ),
@@ -55,7 +56,7 @@ object ParallelBlockGenerator {
                                 BrIf(
                                     BinaryOP(
                                         WasmValueType.i32,
-                                        BinaryOP.Operator.lt.copy(signed = BinaryOP.BitSign.s),
+                                        BinaryOP.Operator.lt.copy(signed = WasmBitSign.s),
                                         threadId,
                                         threadCount.symbol
                                     ),

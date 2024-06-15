@@ -1,12 +1,13 @@
 package external
 
+import ir.Mode
 import java.io.File
 
 // wat2wasm.exe .\wat_seq.wat --enable-threads --enable-multi-memory
 class Wat2Wasm : FileProcessor {
-    override fun process(input: File) : File{
+    override fun process(input: File): File {
         // validate input
-        if(input.extension != "wat"){
+        if (input.extension != "wat") {
             return input
         }
 
@@ -14,20 +15,22 @@ class Wat2Wasm : FileProcessor {
 
         // make output file
         val output = File("./out/${input.nameWithoutExtension}.wasm")
-        if(output.exists()){
+        if (output.exists()) {
             output.delete()
         }
 
 
         // run process
-        val process = ProcessBuilder(
-            "wat2wasm",
-            input.absolutePath,
-            "--enable-threads",
-            "--enable-multi-memory",
-            "-o",
-            output.absolutePath,
-        ).start()
+        val commands = mutableListOf<String>()
+        commands.add("wat2wasm")
+        commands.add(input.absolutePath)
+        commands.add("--enable-threads")
+        if (Mode.multipleMemories) {
+            commands.add("--enable-multi-memory")
+        }
+        commands.add("-o")
+        commands.add(output.absolutePath)
+        val process = ProcessBuilder(commands).start()
 
         val errors = process.errorStream.reader()
         errors.forEachLine {

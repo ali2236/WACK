@@ -1,7 +1,6 @@
 package ir.parser
 
 import ir.expression.*
-import ir.finder.Finders
 import ir.statement.*
 import ir.wasm.*
 import org.antlr.v4.runtime.tree.ParseTree
@@ -131,13 +130,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val type = function!!.allLocals[index]
             val symbol = Symbol(WasmScope.local, type, Index(index))
             val value = stack.pop()
-            val dependant = Finders.symbols(value).any { it == symbol }
             stack.push(Assignment(symbol, value, tee = true))
-            if (dependant) {
-                stack.push(TeeSymbol(symbol))
-            } else {
-                stack.push(TeeValue(value))
-            }
         } else if (ctx.GLOBAL_GET() != null) {
             val index = ctx.var_().first().text.toInt()
             val type = module.globals[index].type.type
@@ -168,7 +161,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
                 "ge", "ge_s", "ge_u" -> BinaryOP.Operator.ge
                 else -> throw Error()
             }
-            val signed = if (operatorName.length > 2) BinaryOP.BitSign.valueOf(operatorName.last().toString()) else null
+            val signed = if (operatorName.length > 2) WasmBitSign.valueOf(operatorName.last().toString()) else null
             val operator = BinaryOP.Operator(operatorSign.sign, operatorSign.watName, signed)
             val second = stack.pop()
             val first = stack.pop()
@@ -183,13 +176,13 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
                 "shl" -> BinaryOP.Operator.shl
                 "mul" -> BinaryOP.Operator.mul
                 "or" -> BinaryOP.Operator.or
-                "shr_u" -> BinaryOP.Operator.shr.copy(signed = BinaryOP.BitSign.u)
-                "shr_s" -> BinaryOP.Operator.shr.copy(signed = BinaryOP.BitSign.s)
+                "shr_u" -> BinaryOP.Operator.shr.copy(signed = WasmBitSign.u)
+                "shr_s" -> BinaryOP.Operator.shr.copy(signed = WasmBitSign.s)
                 "xor" -> BinaryOP.Operator.xor
-                "div_u" -> BinaryOP.Operator.div.copy(signed = BinaryOP.BitSign.u)
-                "div_s" -> BinaryOP.Operator.div.copy(signed = BinaryOP.BitSign.s)
-                "rem_u" -> BinaryOP.Operator.rem.copy(signed = BinaryOP.BitSign.u)
-                "rem_s" -> BinaryOP.Operator.rem.copy(signed = BinaryOP.BitSign.s)
+                "div_u" -> BinaryOP.Operator.div.copy(signed = WasmBitSign.u)
+                "div_s" -> BinaryOP.Operator.div.copy(signed = WasmBitSign.s)
+                "rem_u" -> BinaryOP.Operator.rem.copy(signed = WasmBitSign.u)
+                "rem_s" -> BinaryOP.Operator.rem.copy(signed = WasmBitSign.s)
                 else -> throw Error("unkown binary operator $operatorName")
             }
             val second = stack.pop()
@@ -201,7 +194,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val operatorSign = when (operatorName) {
                 "neg" -> UnaryOP.Operator.neg
                 "abs" -> UnaryOP.Operator.abs
-                else -> throw Error("unkown unary operator $operatorName")
+                else -> throw Error("unknown unary operator $operatorName")
             }
             stack.push(UnaryOP(type, operatorSign, stack.pop()))
         } else if (ctx.LOAD() != null) {
@@ -210,7 +203,15 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val addr = stack.pop()
             val memoryIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
-            val load = Load(type, addr, memoryIndex, offset, align)
+            val _meta = ctx.LOAD()!!.text.split("load").last()
+            var memSize : Int? = null
+            var memSign : WasmBitSign? = null
+            if(_meta.isNotEmpty()) {
+                val (_size, _sign) = _meta.split("_")
+                memSize = _size.toInt()
+                memSign = WasmBitSign.valueOf(_sign)
+            }
+            val load = Load(type, addr, memoryIndex, offset, align, memSize, memSign)
             stack.push(load)
         } else if (ctx.STORE() != null) {
             val type = WasmValueType.parse(ctx.STORE()!!.text.substring(0, 3))
@@ -224,12 +225,15 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
         } else if (ctx.NOP() != null) {
             stack.push(Nop())
         } else if (ctx.DROP() != null) {
-            stack.push(Drop(stack.pop()))
+            val value = stack.pop()
+            val drop = Drop(value)
+            stack.push(drop)
         } else if (ctx.CONVERT() != null) {
             val (typeRaw, instruction) = ctx.CONVERT()!!.text.split(".")
             val type = WasmValueType.parse(typeRaw)
             stack.push(Convert(type, instruction, stack.pop()))
         } else if (ctx.SELECT() != null) {
+            val selector = stack.pop()
             val val2 = stack.pop()
             val val1 = stack.pop()
             val type = if (ctx.select_type() != null) {
@@ -237,7 +241,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             } else {
                 null
             }
-            stack.push(Select(val1, val2, stack.pop(), type))
+            stack.push(Select(val1, val2, selector, type))
         } else if (ctx.BR_TABLE() != null) {
             val jumps = ctx.var_().map { it.text.toInt() }
             stack.push(BrTable(stack.pop(), jumps))

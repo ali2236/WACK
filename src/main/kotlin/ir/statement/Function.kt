@@ -1,6 +1,7 @@
 package ir.statement
 
 import generation.WatWriter
+import ir.Mode
 import ir.Names
 import ir.wasm.WasmFunction
 import ir.wasm.WasmValueType
@@ -67,8 +68,9 @@ class Function(
     }
 
     override fun watHeader(wat: WatWriter) {
+        val functionIndex = if(Mode.callByIndex) "(;${functionData.index};)" else "\$f${functionData.index}"
         val funcStart =
-            "(func \$f${functionData.index} (type ${functionData.type.index})${functionData.type.paramsWat()}${functionData.type.resultWat()}"
+            "(func $functionIndex (type ${functionData.type.index})${functionData.type.paramsWat()}${functionData.type.resultWat()}"
         if (functionData.import == null) {
             wat.writeLine(funcStart)
             if (functionData.locals.size > 0) {

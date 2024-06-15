@@ -1,9 +1,11 @@
 package ir.expression
 
 import generation.WatWriter
+import ir.Mode
 import ir.Names
 import ir.finder.Visitor
 import ir.statement.SymbolLoad
+import ir.wasm.WasmBitSign
 import ir.wasm.Index
 import ir.wasm.WasmValueType
 
@@ -14,6 +16,8 @@ class Load(
     val memoryIndex: Index,
     val offset: Int = 0,
     val align: Int = 0,
+    val memorySize: Int? = null,
+    val sign: WasmBitSign? = null,
 ) : Expression(), SymbolLoad {
 
     override fun write(out: Appendable) {
@@ -42,7 +46,9 @@ class Load(
         address.wat(wat)
         val ofst = if (offset != 0) " offset=$offset" else ""
         val algn = if (align != 0) " align=$align" else ""
-        wat.writeLine("${type}.load $memoryIndex${ofst}${algn}", this)
+        val sgn = if(sign != null && memorySize != null) "${memorySize}_${sign}" else ""
+        val memIndex = if(Mode.multipleMemories) " $memoryIndex" else ""
+        wat.writeLine("${type}.load$sgn$memIndex${ofst}${algn}", this)
     }
 
     override fun clone(): Load {

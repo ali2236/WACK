@@ -3,10 +3,7 @@ package generation.wack
 import ir.expression.*
 import ir.statement.Function
 import ir.statement.Program
-import ir.wasm.Index
-import ir.wasm.WasmFunction
-import ir.wasm.WasmScope
-import ir.wasm.WasmValueType
+import ir.wasm.*
 
 object ThreadArgEncoderGenerator {
 
@@ -56,7 +53,7 @@ object ThreadArgEncoderGenerator {
             // kernel_id
             it.instructions.add(
                 BinaryOP(
-                    WasmValueType.i32, BinaryOP.Operator.shr.copy(signed = BinaryOP.BitSign.u), BinaryOP(
+                    WasmValueType.i32, BinaryOP.Operator.shr.copy(signed = WasmBitSign.u), BinaryOP(
                         WasmValueType.i32, BinaryOP.Operator.and, arg, Value(WasmValueType.i32, "0xFFFF0000")
                     ), Value(WasmValueType.i32, "16")
                 ),
