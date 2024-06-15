@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
 
     // run
     val wasm2wat = Wasm2Wat()
-    val samples = listOf(File("./samples/matrix_multiply.wasm"))// File("./samples").listFiles()
+    val samples = listOf(File("./samples/print.wasm"))// File("./samples").listFiles()
     for (sample in samples!!) {
         val watInput = wasm2wat.process(sample)
         val parseTree = Wat.parse(watInput.path)

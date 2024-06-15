@@ -1,7 +1,7 @@
 package ir
 
 object Mode {
-    val debug = true
+    val debug = false
     val multipleMemories = false
     val callByIndex = true
 }

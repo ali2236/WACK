@@ -8,6 +8,7 @@
 - [x] Block WasmBlockType
 - [x] Else for If block
 - [x] Move RangeLoop Restructure to Optimization Passes
+- [ ] Element & Data Section Parsing
 - [ ] Move Increment Restructure to Optimization Passes
 - [ ] Dependence Analysis P54
 - [ ] GCD Test
