@@ -5,9 +5,9 @@ import ir.wasm.Index
 import ir.wasm.WasmValueType
 
 class IndirectFunctionCall(
-    val tableIndex : Index,
-    val typeIndex : Index,
-    val functionIndex : Expression,
+    val tableIndex: Index,
+    val typeIndex: Index,
+    val functionIndex: Expression,
     val params: List<Expression>,
     val returnType: List<WasmValueType>
 ) : Expression() {
@@ -21,17 +21,20 @@ class IndirectFunctionCall(
 
     override fun write(out: Appendable) {
         out.append("T[$tableIndex][$functionIndex](")
-        params.forEach {
+        params.forEachIndexed { i, it ->
             it.write(out)
+            if (i != params.size - 1) {
+                out.append(",")
+            }
         }
         out.append(")")
-        if(returnType.isEmpty()){
+        if (returnType.isEmpty()) {
             out.append(";\n")
         }
     }
 
     override fun wat(wat: WatWriter) {
-        wat.writeAll(params)
+        wat.writeAll(params.asReversed())
         functionIndex.wat(wat)
         wat.writeLine("call_indirect $tableIndex (type $typeIndex)", this)
     }

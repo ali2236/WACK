@@ -29,7 +29,8 @@ class Store(
         val ofst = if (symbol.offset != 0) " offset=${symbol.offset}" else ""
         val algn = if (symbol.align != 0) " align=${symbol.align}" else ""
         val memIndex = if(Mode.multipleMemories) " ${symbol.memoryIndex}" else ""
-        wat.writeLine("${symbol.type}.store${memIndex}${ofst}${algn}", this)
+        val memSize = if (symbol.memorySize != null) "${symbol.memorySize}" else ""
+        wat.writeLine("${symbol.type}.store${memSize}${memIndex}${ofst}${algn}", this)
     }
 
     override fun assignedWith(): Expression {

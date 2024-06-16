@@ -8,7 +8,8 @@
 - [x] Block WasmBlockType
 - [x] Else for If block
 - [x] Move RangeLoop Restructure to Optimization Passes
-- [ ] Element & Data Section Parsing
+- [x] Element & Data Section Parsing
+- [ ] Store 8/u8 types not support
 - [ ] Move Increment Restructure to Optimization Passes
 - [ ] Dependence Analysis P54
 - [ ] GCD Test

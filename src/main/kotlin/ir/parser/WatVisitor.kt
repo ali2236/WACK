@@ -236,7 +236,12 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val data = stack.pop()
             val addr = stack.pop()
             val memoryIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
-            val store = Store(Load(type, addr, memoryIndex, offset, align), data)
+            val _meta = ctx.STORE()!!.text.split("store").last()
+            var memSize: Int? = null
+            if (_meta.isNotEmpty()) {
+                memSize = _meta.toInt()
+            }
+            val store = Store(Load(type, addr, memoryIndex, offset, align, memSize), data)
             stack.push(store)
         } else if (ctx.NOP() != null) {
             stack.push(Nop())
