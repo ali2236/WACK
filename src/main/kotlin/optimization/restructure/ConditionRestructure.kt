@@ -25,6 +25,7 @@ class ConditionRestructure : Restructure() {
                 if (condition.operator == BinaryOP.Operator.eq
                     && condition.right == Value.zero
                     && condition.left is BinaryOP
+                    && (condition.left as BinaryOP).operator.boolean
                 ) {
                     val innerCondition = condition.left.clone() as BinaryOP
                     val modified = BinaryOP(

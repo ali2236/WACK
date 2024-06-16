@@ -111,7 +111,7 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
                 ">>" -> shl
                 "&" -> or
                 "|" -> and
-                else -> throw Exception("Unknown Invert for Binary Operator $sign")
+                else -> this
             }.copy(signed = signed)
         }
 
