@@ -36,7 +36,7 @@ class RangeLoopRestructure : Restructure() {
 
     private fun transformIntoRangeLoop(loop: ConditionLoop) {
         val condition = loop.condition
-        val conditionSymbols = Finders.symbols(loop.condition)
+        val conditionSymbols = loop.findSymbols()
         if (condition is BinaryOP && conditionSymbols.size == 1) {
             val symbol = conditionSymbols.first()
 

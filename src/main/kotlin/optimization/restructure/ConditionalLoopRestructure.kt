@@ -53,10 +53,6 @@ class ConditionalLoopRestructure : Restructure() {
             val indexedCondition = continueConditions.last()
             val condition = indexedCondition.value
 
-
-            // remove original condition from code
-            //loop.instructions.removeAt(indexedCondition.index)
-
             // update loop condition
             val conditionLoop = ConditionLoop(condition.condition, loop.instructions)
             replaceCurrentBlock(conditionLoop)

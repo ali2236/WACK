@@ -11,6 +11,7 @@ import ir.statement.Store
 import ir.wasm.Index
 import ir.wasm.WasmScope
 
+@Deprecated("doesn't Alias Stack Allocated Variables")
 class AliasMemory : Optimizer {
     override fun apply(program: Program) {
         program.statements

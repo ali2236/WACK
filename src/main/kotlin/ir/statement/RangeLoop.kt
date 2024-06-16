@@ -4,7 +4,7 @@ import analysis.dfa.DfaValue
 import ir.expression.BinaryOP
 import ir.expression.Symbol
 
-class RangeLoop(val symbol : Symbol, var range: DfaValue.Range, condition: BinaryOP, instructions: MutableList<Statement>) :
+class RangeLoop(val symbol : SymbolLoad, var range: DfaValue.Range, condition: BinaryOP, instructions: MutableList<Statement>) :
     ConditionLoop(condition, instructions) {
 
     override fun writeHeader(out: Appendable) {
