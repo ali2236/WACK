@@ -144,7 +144,28 @@ object DfaBuilder {
 
     private fun addFunctionLocals(dfa: Dfa, function: Function) {
         val start = dfa.nodes.first()
-        function.functionData.locals.forEachIndexed { index, localType ->
+        // add function params
+        val params = function.functionData.type.params
+        for (i in 0 until params.size){
+            start.IN.put(
+                DfaFact(
+                    Symbol(WasmScope.local, params[i], Index(i)),
+                    DfaValue.Unknown(),
+                )
+            )
+        }
+        // add function locals
+        val locals = function.functionData.locals
+        for (i in 0 until locals.size){
+            val localType = locals[i]
+            start.IN.put(
+                DfaFact(
+                    Symbol(WasmScope.local, localType, Index(i+params.size)),
+                    DfaValue.Expr(Value(localType, localType.defaultValue()))
+                )
+            )
+        }
+        (function.functionData.type.params + function.functionData.locals).forEachIndexed { index, localType ->
             start.IN.put(
                 DfaFact(
                     Symbol(WasmScope.local, localType, Index(index)),
@@ -158,36 +179,7 @@ object DfaBuilder {
         for (block in dfa.nodes) {
             if (block.statement != null) {
                 val stmt = block.statement
-                genFacts(dfa, block, stmt)
-            }
-        }
-    }
-
-    private fun genFacts(dfa: Dfa, block: DfaNode, stmt: Statement) {
-        when (stmt) {
-            is AssignmentStore -> {
-                val fact = DfaFact(
-                    symbol = stmt.assignedTo().clone() as SymbolLoad,
-                    value = explainExpression(stmt.assignedWith().clone(), setOf())
-                )
-                block.GEN.add(fact)
-            }
-
-            is If -> {
-                genFacts(dfa, block, stmt.condition)
-            }
-
-            is BinaryOP -> {
-                genFacts(dfa, block, stmt.left)
-                genFacts(dfa, block, stmt.right)
-            }
-
-            is RangeLoop -> {
-                val fact = DfaFact(stmt.symbol, stmt.range)
-                block.GEN.add(fact)
-                if (block.next != null) { // kina works
-                    dfa.nodes[block.next].GEN.add(DfaFact(stmt.symbol, DfaValue.Expr(stmt.range.to)))
-                }
+                FactsFinder(dfa, block, stmt)
             }
         }
     }
@@ -257,11 +249,11 @@ object DfaBuilder {
                 }
             }
 
-            is TeeValue -> {
-                return explainExpression(expr.expr, dfaFacts)
+            is Tee -> {
+                return explainExpression(expr.teeValue(), dfaFacts)
             }
 
-            is FunctionResult, is BlockResult -> {
+            is FunctionResult, is SingleResultFunction, is BlockResult -> {
                 return DfaValue.Unknown()
             }
 

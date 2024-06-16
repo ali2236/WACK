@@ -8,11 +8,11 @@ object OptimizationPasses {
     fun apply(program: Program){
         val passes = listOf<Optimizer>(
             ShiftToMultiply(),
-            //ConstantPropagation(),
+            ConstantPropagation(),
             //AliasMemory(),
-            //ConditionRestructure(),
+            // ConditionRestructure(),
             //ConditionalLoopRestructure(),
-            //IncrementRestructure(),
+            // IncrementRestructure(),
             //RangeLoopRestructure(),
             //ParallelForAnnotator(),
         )

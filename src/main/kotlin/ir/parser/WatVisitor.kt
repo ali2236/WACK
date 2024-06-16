@@ -119,11 +119,19 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val calledFunction = module.functions.first { it.index == functionIndex }
             val (paramsTypes, resultTypes) = calledFunction.type.getParamsAndResults(module)
             val params = paramsTypes.map { stack.pop() }
-            stack.push(FunctionCall(functionIndex, params, resultTypes))
-            resultTypes.forEach {
-                stack.push(FunctionResult(it))
+            val call = FunctionCall(functionIndex, params, resultTypes)
+            if (resultTypes.size == 0) {
+                stack.push(call)
+            } else if (resultTypes.size == 1) {
+                stack.push(SingleResultFunction(call, resultTypes.first()))
+            } else {
+                throw Exception("two returns!")
+                stack.push(call)
+                resultTypes.forEach {
+                    stack.push(FunctionResult(it))
+                }
             }
-        } else if(ctx.CALL_INDIRECT() != null){
+        } else if (ctx.CALL_INDIRECT() != null) {
             val tableIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
             val typeIndex = Index(ctx.type_use().var_().text?.toIntOrNull() ?: 0)
             val type = module.functionTypes.first { it.index == typeIndex }
@@ -133,10 +141,19 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
                 params.add(stack.pop())
             }
 
-            stack.push(IndirectFunctionCall(tableIndex, typeIndex, functionIndex, params, type.result))
+            val call = IndirectFunctionCall(tableIndex, typeIndex, functionIndex, params, type.result)
+            val resultTypes = type.result
 
-            type.result.forEach {
-                stack.push(FunctionResult(it))
+            if (resultTypes.size == 0) {
+                stack.push(call)
+            } else if (resultTypes.size == 1) {
+                stack.push(SingleResultFunction(call, resultTypes.first()))
+            } else {
+                throw Exception("two returns!")
+                stack.push(call)
+                resultTypes.forEach {
+                    stack.push(FunctionResult(it))
+                }
             }
         } else if (ctx.LOCAL_GET() != null) {
             val index = ctx.var_().first().text.toInt()
@@ -154,13 +171,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val type = function!!.allLocals[index]
             val symbol = Symbol(WasmScope.local, type, Index(index))
             val value = stack.pop()
-            stack.push(Assignment(symbol, value, tee = true))
-            val dependant = Finders.symbols(value).any { it == symbol }
-            if (dependant) {
-                stack.push(TeeSymbol(symbol))
-            } else {
-                stack.push(TeeValue(value))
-            }
+            stack.push(Tee(symbol, value))
         } else if (ctx.GLOBAL_GET() != null) {
             val index = ctx.var_().first().text.toInt()
             val type = module.globals[index].type.type
@@ -264,7 +275,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
                 val value = stack.pop()
                 val drop = Drop(value)
                 stack.push(drop)
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 stack.push(RawWat(ctx.text))
             }
         } else if (ctx.CONVERT() != null) {

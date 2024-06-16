@@ -27,7 +27,6 @@ internal class CfgBuilder(val function: Function) {
         pushScope(function, endBlock, endBlock)
         runOnBlock(function, body)
         popScope()
-        function.statements.clear()
         removeEmptyBlocks()
         return CFG(blocks)
     }

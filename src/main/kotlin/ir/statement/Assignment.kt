@@ -9,8 +9,7 @@ import ir.finder.Visitor
 
 open class Assignment(
     var symbol: Symbol,
-    var value: Expression,
-    var tee: Boolean = false
+    var value: Expression
 ) : BasicStatement(), AssignmentStore {
 
     init {
@@ -23,23 +22,14 @@ open class Assignment(
 
     override fun write(out: Appendable) {
         symbol.write(out)
-        if (tee) {
-            out.append(" := ")
-        } else {
-            out.append(" = ")
-        }
+        out.append(" = ")
         value.write(out)
         out.append(";\n")
     }
 
     override fun wat(wat: WatWriter) {
         value.wat(wat)
-        if (tee) {
-            wat.writeLine("${symbol.scope}.tee ${symbol.index}", this)
-        } else {
-            wat.writeLine("${symbol.scope}.set ${symbol.index}", this)
-
-        }
+        wat.writeLine("${symbol.scope}.set ${symbol.index}", this)
     }
 
     override fun visit(v: Visitor) {
