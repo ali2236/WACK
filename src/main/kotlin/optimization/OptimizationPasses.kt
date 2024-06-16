@@ -9,12 +9,12 @@ object OptimizationPasses {
         val passes = listOf<Optimizer>(
             ShiftToMultiply(),
             ConstantPropagation(),
-            // AliasMemory(),
+            AliasMemory(),
             ConditionRestructure(),
             ConditionalLoopRestructure(),
             IncrementRestructure(),
             RangeLoopRestructure(),
-            //ParallelForAnnotator(),
+            ParallelForAnnotator(),
         )
         for (pass in passes){
             pass.apply(program)

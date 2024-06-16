@@ -8,10 +8,17 @@ import generation.wack.ThreadKernelGenerator
 import generation.wasi.threads.WasiThreadSpawnGenerator
 import generation.wasi.threads.WasiThreadStartGenerator
 import generation.wasm.threads.MutexLibraryGenerator
+import ir.Mode
 import ir.statement.Program
 
 class WasiThreadsGenerator : Generator {
     override fun apply(program: Program) {
+        if(!Mode.multipleMemories){
+            throw Exception("Mode.MultipleMemories must be enabled!")
+        }
+        if(Mode.callByIndex){
+            throw Exception("Mode.callByIndex must be disabled!")
+        }
         val mutex = MutexLibraryGenerator.generate(program)
         val threadArg = ThreadArgEncoderGenerator.generate(program)
         val threadCount = ThreadCountGenerator.generate(program)

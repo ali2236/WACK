@@ -20,8 +20,9 @@ class AliasMemory : Optimizer {
 
                 // Alias Map
                 val aliases = mutableMapOf<Load, Symbol>()
+                val params = function.functionData.type.params.size
                 val makeAlias: (Load) -> Unit = { load ->
-                    aliases[load] = Symbol(WasmScope.local, load.type, Index.next(function.functionData.locals))
+                    aliases[load] = Symbol(WasmScope.local, load.type, Index(params + function.functionData.locals.size))
                     function.functionData.locals.add(load.type)
                 }
 

@@ -23,7 +23,7 @@ class Increment(var symbol: Symbol) : BasicStatement() {
         symbol.wat(wat)
         wat.writeLine("${symbol.type}.const 1")
         wat.writeLine("${symbol.type}.add")
-        wat.writeLine("${symbol.scope}.set ${symbol.index} ;; $this")
+        wat.writeLine("${symbol.scope}.set ${symbol.index}", this)
     }
 }
 

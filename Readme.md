@@ -27,5 +27,5 @@ else false
 
 ### How to Run
 ```
-wasmtime -S threads .\wat_seq.wasm
+wasmtime -S threads .\wack_matrix_multiply.wasm
 ```

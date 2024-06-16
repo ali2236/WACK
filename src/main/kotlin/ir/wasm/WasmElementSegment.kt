@@ -2,6 +2,7 @@ package ir.wasm
 
 import generation.WatWriter
 import generation.WebAssemblyInstruction
+import ir.Mode
 import ir.statement.Statement
 
 data class WasmElementSegment(
@@ -11,7 +12,7 @@ data class WasmElementSegment(
     val functionIndexes: List<Index>,
 ) :
     WebAssemblyInstruction {
-    val funIndxs = if(functionIndexes.isNotEmpty()) " func ${functionIndexes.joinToString(" ")}" else ""
+    val funIndxs = if(functionIndexes.isNotEmpty()) " func ${functionIndexes.map { if(Mode.callByIndex) "$it" else "\$f$it" }.joinToString(" ")}" else ""
     override fun wat(wat: WatWriter) {
         val index = elementIndex
         wat.startLine()
