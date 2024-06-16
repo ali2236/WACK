@@ -55,6 +55,26 @@ enum class WasmValueType {
         }.toString()
     }
 
+    fun number(value: String): Number {
+        return when (this) {
+            i32 -> value.toInt()
+            i64 -> value.toLong()
+            f32 -> value.toFloat()
+            f64 -> value.toDouble()
+            Unknown -> Double.NaN
+        }
+    }
+
+    fun fromNumber(number: Number): String {
+        return when(this){
+            i32 -> number.toInt()
+            i64 -> number.toLong()
+            f32 -> number.toFloat()
+            f64 -> number.toDouble()
+            Unknown -> Double.NaN
+        }.toString()
+    }
+
     companion object {
         fun parse(text: String): WasmValueType {
             return valueOf(text.trim().lowercase())

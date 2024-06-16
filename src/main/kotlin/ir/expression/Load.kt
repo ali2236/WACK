@@ -9,7 +9,6 @@ import ir.wasm.WasmBitSign
 import ir.wasm.Index
 import ir.wasm.WasmValueType
 
-// TODO: i32.load8_u not supported
 class Load(
     val type: WasmValueType,
     var address: Expression,
@@ -55,8 +54,8 @@ class Load(
         return Load(type, address.clone(), memoryIndex, offset, align)
     }
 
-    override fun getType(): List<WasmValueType> {
-        return listOf(type)
+    override fun exprType(): WasmValueType {
+        return type
     }
 
     override fun equals(other: Any?): Boolean {

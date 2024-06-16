@@ -4,10 +4,8 @@ import generation.wack.ThreadArg
 import generation.wasm.threads.MutexLibrary
 import ir.annotations.Kernel
 import ir.expression.*
-import ir.expression.Assignment
+import ir.statement.*
 import ir.statement.Function
-import ir.statement.Program
-import ir.statement.RawWat
 import ir.wasm.*
 
 object WasiThreadStartGenerator {
@@ -60,8 +58,9 @@ object WasiThreadStartGenerator {
             val kernelIndex = Symbol(WasmScope.local, WasmValueType.i32, Index(3))
 
             // thread_id, kernel_index = decode_arg(args)
+            it.instructions.add(arg.decode.call(args))
             it.instructions.add(
-                Assignment(kernelIndex, arg.decode.call(args))
+                Assignment(kernelIndex, FunctionResult(WasmValueType.i32))
             )
             it.instructions.add(RawWat("local.set ${threadId.index}"))
 

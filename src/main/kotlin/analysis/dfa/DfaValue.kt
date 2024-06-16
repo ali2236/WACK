@@ -49,7 +49,7 @@ interface DfaValue {
         }
     }
 
-    class Undeclared : DfaValue {
+/*    class Undeclared : DfaValue {
         override fun join(other: DfaValue): DfaValue {
             return other
         }
@@ -69,7 +69,7 @@ interface DfaValue {
         override fun hashCode(): Int {
             return javaClass.hashCode()
         }
-    }
+    }*/
 
     open class Unknown() : DfaValue {
         override fun join(other: DfaValue): DfaValue {

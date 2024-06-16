@@ -20,7 +20,7 @@ abstract class Expression : Statement {
 
     abstract fun clone(): Expression
 
-    abstract fun getType(): List<WasmValueType>
+    abstract fun exprType(): WasmValueType
 }
 
 

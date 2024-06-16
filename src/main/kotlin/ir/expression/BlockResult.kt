@@ -9,8 +9,8 @@ class BlockResult(val type: WasmValueType, val block: Block) : Expression() {
         return this
     }
 
-    override fun getType(): List<WasmValueType> {
-        return listOf(type)
+    override fun exprType(): WasmValueType {
+        return type
     }
 
     override fun write(out: Appendable) {

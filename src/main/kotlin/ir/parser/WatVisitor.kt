@@ -1,6 +1,7 @@
 package ir.parser
 
 import ir.expression.*
+import ir.finder.Finders
 import ir.statement.*
 import ir.wasm.*
 import org.antlr.v4.runtime.tree.ParseTree
@@ -119,6 +120,9 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val (paramsTypes, resultTypes) = calledFunction.type.getParamsAndResults(module)
             val params = paramsTypes.map { stack.pop() }
             stack.push(FunctionCall(functionIndex, params, resultTypes))
+            resultTypes.forEach {
+                stack.push(FunctionResult(it))
+            }
         } else if(ctx.CALL_INDIRECT() != null){
             val tableIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
             val typeIndex = Index(ctx.type_use().var_().text?.toIntOrNull() ?: 0)
@@ -130,6 +134,10 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             }
 
             stack.push(IndirectFunctionCall(tableIndex, typeIndex, functionIndex, params, type.result))
+
+            type.result.forEach {
+                stack.push(FunctionResult(it))
+            }
         } else if (ctx.LOCAL_GET() != null) {
             val index = ctx.var_().first().text.toInt()
             val type = function!!.allLocals[index]
@@ -147,6 +155,12 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val symbol = Symbol(WasmScope.local, type, Index(index))
             val value = stack.pop()
             stack.push(Assignment(symbol, value, tee = true))
+            val dependant = Finders.symbols(value).any { it == symbol }
+            if (dependant) {
+                stack.push(TeeSymbol(symbol))
+            } else {
+                stack.push(TeeValue(value))
+            }
         } else if (ctx.GLOBAL_GET() != null) {
             val index = ctx.var_().first().text.toInt()
             val type = module.globals[index].type.type

@@ -31,9 +31,6 @@ open class Block(
             if (instr !is Expression) {
                 continue
             }
-            if(instr.getType().isEmpty()){
-                continue
-            }
             return instructions.removeAt(i) as Expression
         }
         /*if(parent != null){

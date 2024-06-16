@@ -1,6 +1,6 @@
 package ir
 
-import ir.expression.Assignment
+import ir.statement.Assignment
 import ir.expression.Symbol
 import ir.expression.Value
 import ir.statement.*

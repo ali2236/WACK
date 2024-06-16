@@ -16,8 +16,8 @@ open class Symbol(val scope: WasmScope, val type: WasmValueType, val index : Ind
         wat.writeLine("${scope.name}.get $index", this)
     }
 
-    override fun getType(): List<WasmValueType> {
-        return listOf(type)
+    override fun exprType(): WasmValueType {
+        return type
     }
 
     override fun equals(other: Any?): Boolean {

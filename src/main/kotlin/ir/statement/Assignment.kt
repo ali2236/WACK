@@ -1,24 +1,22 @@
-package ir.expression
+package ir.statement
 
 import generation.WatWriter
+import ir.expression.Expression
+import ir.expression.Symbol
 import ir.finder.Finders
 import ir.finder.Visitor
-import ir.statement.AssignmentStore
-import ir.statement.SymbolLoad
-import ir.wasm.WasmValueType
 
 
 open class Assignment(
     var symbol: Symbol,
     var value: Expression,
-    var inline: Boolean = false,
     var tee: Boolean = false
-) : Expression(), AssignmentStore {
+) : BasicStatement(), AssignmentStore {
 
     init {
         // validate
-        if (value.getType().first() != symbol.getType().first()) {
-            throw Exception("Can't assign type ${value.getType()} to ${symbol.getType()}")
+        if (value.exprType() != symbol.exprType()) {
+            throw Exception("Can't assign type ${value.exprType()} to ${symbol.exprType()}")
         }
     }
 
@@ -31,9 +29,7 @@ open class Assignment(
             out.append(" = ")
         }
         value.write(out)
-        if (!inline) {
-            out.append(";\n")
-        }
+        out.append(";\n")
     }
 
     override fun wat(wat: WatWriter) {
@@ -49,22 +45,6 @@ open class Assignment(
     override fun visit(v: Visitor) {
         v.visit(symbol) { symbol = it as Symbol }
         v.visit(value) { value = it as Expression }
-    }
-
-    override fun clone(): Expression {
-        return Assignment(
-            symbol.clone() as Symbol,
-            value.clone(),
-            inline, tee
-        ).also { it.id = this.id }
-    }
-
-    override fun getType(): List<WasmValueType> {
-        if (tee) {
-            return listOf(symbol.type)
-        } else {
-            return listOf()
-        }
     }
 
     fun teeValue(): Expression {

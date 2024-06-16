@@ -4,7 +4,7 @@ import analysis.dfa.Dfa
 import ir.expression.Load
 import ir.expression.Symbol
 import ir.finder.ReplaceableFinder
-import ir.expression.Assignment
+import ir.statement.Assignment
 import ir.statement.Function
 import ir.statement.Program
 import ir.statement.Store

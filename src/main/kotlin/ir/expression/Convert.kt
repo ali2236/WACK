@@ -8,8 +8,8 @@ class Convert(val toType: WasmValueType, val instruction: String, val value: Exp
         return Convert(toType, instruction, value.clone())
     }
 
-    override fun getType(): List<WasmValueType> {
-        return listOf(toType)
+    override fun exprType(): WasmValueType {
+        return toType
     }
 
     override fun write(out: Appendable) {

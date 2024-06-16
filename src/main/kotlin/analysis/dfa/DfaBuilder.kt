@@ -158,22 +158,35 @@ object DfaBuilder {
         for (block in dfa.nodes) {
             if (block.statement != null) {
                 val stmt = block.statement
-                when (stmt) {
-                    is AssignmentStore -> {
-                        val fact = DfaFact(
-                            symbol = stmt.assignedTo().clone() as SymbolLoad,
-                            value = DfaValue.Expr(stmt.assignedWith().clone())
-                        )
-                        block.GEN.add(fact)
-                    }
+                genFacts(dfa, block, stmt)
+            }
+        }
+    }
 
-                    is RangeLoop -> {
-                        val fact = DfaFact(stmt.symbol, stmt.range)
-                        block.GEN.add(fact)
-                        if(block.next != null){ // kina works
-                            dfa.nodes[block.next].GEN.add(DfaFact(stmt.symbol, DfaValue.Expr(stmt.range.to)))
-                        }
-                    }
+    private fun genFacts(dfa: Dfa, block: DfaNode, stmt: Statement) {
+        when (stmt) {
+            is AssignmentStore -> {
+                val fact = DfaFact(
+                    symbol = stmt.assignedTo().clone() as SymbolLoad,
+                    value = explainExpression(stmt.assignedWith().clone(), setOf())
+                )
+                block.GEN.add(fact)
+            }
+
+            is If -> {
+                genFacts(dfa, block, stmt.condition)
+            }
+
+            is BinaryOP -> {
+                genFacts(dfa, block, stmt.left)
+                genFacts(dfa, block, stmt.right)
+            }
+
+            is RangeLoop -> {
+                val fact = DfaFact(stmt.symbol, stmt.range)
+                block.GEN.add(fact)
+                if (block.next != null) { // kina works
+                    dfa.nodes[block.next].GEN.add(DfaFact(stmt.symbol, DfaValue.Expr(stmt.range.to)))
                 }
             }
         }
@@ -219,10 +232,10 @@ object DfaBuilder {
                         }
                         return DfaValue.Expr(expr)
                     } else {
-                        return DfaValue.Undeclared()
+                        return DfaValue.Unknown()
                     }
                 } else {
-                    return DfaValue.Undeclared()
+                    return DfaValue.Unknown()
                 }
             }
 
@@ -244,15 +257,11 @@ object DfaBuilder {
                 }
             }
 
-            is Assignment -> {
-                if(expr.tee){
-                    return explainExpression(expr.teeValue(), dfaFacts)
-                }else {
-                    throw Exception("Assignment Expression is not TEE")
-                }
+            is TeeValue -> {
+                return explainExpression(expr.expr, dfaFacts)
             }
 
-            is FunctionCall, is BlockResult -> {
+            is FunctionResult, is BlockResult -> {
                 return DfaValue.Unknown()
             }
 
@@ -276,12 +285,8 @@ object DfaBuilder {
                 }
             }
 
-            is IndirectFunctionCall -> {
-                return DfaValue.Unknown()
-            }
-
             else -> {
-                throw Error("Unknown Type $expr")
+                throw Error("Unknown Type ${expr.javaClass.simpleName}")
             }
         }
     }
@@ -300,13 +305,13 @@ object DfaBuilder {
 
         if (leftL is DfaValue.Expr && rightL is DfaValue.Expr && leftL.value is Value && rightL.value is Value) {
             // type
-            val type = op.getType().first()
+            val type = op.exprType()
             when (type) {
                 WasmValueType.i32, WasmValueType.i64 -> {
                     // calculate
                     val l = (leftL.value as Value).value.toLong()
                     val r = (rightL.value as Value).value.toLong()
-                    val value : Number = when (op.operator.sign) {
+                    val value: Number = when (op.operator.sign) {
                         "+" -> l + r
                         "-" -> l - r
                         "*" -> l * r
@@ -331,7 +336,7 @@ object DfaBuilder {
                     // calculate
                     val l = (leftL.value as Value).value.toDouble()
                     val r = (rightL.value as Value).value.toDouble()
-                    val value : Number = when (op.operator.sign) {
+                    val value: Number = when (op.operator.sign) {
                         "+" -> l + r
                         "-" -> l - r
                         "*" -> l * r
@@ -396,7 +401,7 @@ object DfaBuilder {
 }
 
 private fun Boolean.toInt(): Int {
-    if (true){
+    if (true) {
         return 1
     } else {
         return 0

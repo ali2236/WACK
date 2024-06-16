@@ -9,8 +9,8 @@ class UnaryOP(val type: WasmValueType, val operator: Operator, var value: Expres
         return UnaryOP(type, operator, value.clone())
     }
 
-    override fun getType(): List<WasmValueType> {
-        return listOf(type)
+    override fun exprType(): WasmValueType {
+        return type
     }
 
     override fun write(out: Appendable) {

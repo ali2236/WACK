@@ -1,8 +1,7 @@
 package ir.wasm
 
 import ir.expression.Expression
-import ir.expression.FunctionCall
-import ir.statement.Statement
+import ir.statement.FunctionCall
 import org.antlr.v4.runtime.tree.ParseTree
 
 data class WasmFunction(

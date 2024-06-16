@@ -40,11 +40,11 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
         return BinaryOP(type, operator.copy(), left.clone(), right.clone())
     }
 
-    override fun getType(): List<WasmValueType> {
+    override fun exprType(): WasmValueType {
         if (operator.boolean) {
-            return listOf(WasmValueType.i32)
+            return WasmValueType.i32
         }
-        return listOf(type)
+        return type
     }
 
     override fun equals(other: Any?): Boolean {

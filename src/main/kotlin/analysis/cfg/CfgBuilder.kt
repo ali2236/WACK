@@ -1,7 +1,7 @@
 package analysis.cfg
 
-import ir.expression.FunctionCall
-import ir.expression.IndirectFunctionCall
+import ir.statement.FunctionCall
+import ir.statement.IndirectFunctionCall
 import ir.statement.*
 import ir.statement.Function
 import java.util.*

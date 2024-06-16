@@ -9,7 +9,7 @@ class DfaOUT {
         get() = _facts.values.toSet()
 
     fun get(symbol: SymbolLoad): DfaFact {
-        return _facts.getOrPut(symbol) { DfaFact(symbol, DfaValue.Undeclared()) }
+        return _facts.getOrPut(symbol) { DfaFact(symbol, DfaValue.Unknown()) }
     }
 
     // return changed or not

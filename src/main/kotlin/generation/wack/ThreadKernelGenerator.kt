@@ -154,12 +154,14 @@ object ThreadKernelGenerator {
                             mutex.lock.call(threadId),
                         )
                         // spawn thread
+                        instructions.add(arg.encode.call(threadId, Value(WasmValueType.i32, "$kernelId")))
+                        instructions.add(threadSpawn.call(FunctionResult(WasmValueType.i32)))
                         instructions.add(
                             If(
                                 BinaryOP(
                                     WasmValueType.i32,
                                     BinaryOP. Operator.lt.copy(signed = WasmBitSign.s),
-                                    threadSpawn.call(arg.encode.call(threadId, Value(WasmValueType.i32, "$kernelId"))),
+                                    FunctionResult(WasmValueType.i32),
                                     Value.zero
                                 ), mutableListOf(Unreachable())
                             ),

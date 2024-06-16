@@ -38,9 +38,12 @@ class ConstantPropagator : Visitor() {
                 // look it up
                 val fact = facts.firstOrNull { it.symbol == v }
 
+
+
                 // replace if existed
                 if (fact != null && fact.value is DfaValue.Expr && fact.value.value is Value) {
-                    replace(fact.value.value)
+                    val value = fact.value.value
+                    replace(value.cast((v as Expression).exprType()))
                 }
             }
 

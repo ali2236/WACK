@@ -49,13 +49,12 @@ object MutexLibraryGenerator {
             block.instructions.add(
                 Loop(
                     mutableListOf(
-                        BrIf(
-                            FunctionCall(
-                                tryLockMutex.functionData.index,
-                                listOf(Symbol(WasmScope.local, WasmValueType.i32, Index(0))),
-                                tryLockMutex.functionData.type.result,
-                            ), block, 1
+                        FunctionCall(
+                            tryLockMutex.functionData.index,
+                            listOf(Symbol(WasmScope.local, WasmValueType.i32, Index(0))),
+                            tryLockMutex.functionData.type.result,
                         ),
+                        BrIf(FunctionResult(WasmValueType.i32), block, 1),
                         Symbol(WasmScope.local, WasmValueType.i32, Index(0)),
                         Value(WasmValueType.i32, "1"),
                         Value(WasmValueType.i64, "-1"),

@@ -9,7 +9,8 @@
 - [x] Else for If block
 - [x] Move RangeLoop Restructure to Optimization Passes
 - [x] Element & Data Section Parsing
-- [x] Store 8/u8 types not support
+- [x] Support Store 8/16/32 types
+- [ ] Fix Memory Alias Type Issues
 - [ ] Move Increment Restructure to Optimization Passes
 - [ ] Dependence Analysis P54
 - [ ] GCD Test

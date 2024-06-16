@@ -1,23 +1,22 @@
 package ir.expression
 
 import generation.WatWriter
-import ir.wasm.Index
 import ir.wasm.WasmValueType
 
-class MemorySize(val memoryId: Index) : Expression() {
+open class TeeValue(val expr: Expression) : Expression() {
     override fun clone(): Expression {
-        return MemorySize(memoryId)
+        return TeeValue(expr.clone())
     }
 
     override fun exprType(): WasmValueType {
-        return WasmValueType.i32
+        return expr.exprType()
     }
 
     override fun write(out: Appendable) {
-        out.append("memory[$memoryId].size")
+        expr.write(out)
     }
 
     override fun wat(wat: WatWriter) {
-        wat.writeLine("memory.size $memoryId", this)
+       wat.writeLine("nop", this)
     }
 }

@@ -1,12 +1,13 @@
 package ir.expression
 
 import generation.WatWriter
+import ir.statement.Statement
 import ir.wasm.WasmValueType
 import java.lang.Exception
 
 open class Value(val type: WasmValueType, val value: String) : ImmutableExpression() {
-    override fun getType(): List<WasmValueType> {
-        return listOf(type)
+    override fun exprType(): WasmValueType {
+        return type
     }
 
     override fun write(out: Appendable) {
@@ -67,6 +68,10 @@ open class Value(val type: WasmValueType, val value: String) : ImmutableExpressi
             WasmValueType.i64 -> multiply(i.value.toLong())
             else -> throw Exception("should use an integer add")
         }
+    }
+
+    fun cast(toType: WasmValueType): Statement {
+        return Value(toType, toType.fromNumber(type.number(value)))
     }
 
     companion object {

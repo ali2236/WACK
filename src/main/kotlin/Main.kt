@@ -7,6 +7,7 @@ import ir.IRConstructor
 import ir.parser.Wat
 import ir.statement.Function
 import ir.statement.Program
+import optimization.OptimizationPasses
 import java.io.File
 
 fun main(args: Array<String>) {
@@ -23,7 +24,7 @@ fun main(args: Array<String>) {
 
     // run
     val wasm2wat = Wasm2Wat()
-    val samples = listOf(File("./samples/print.wasm"))// File("./samples").listFiles()
+    val samples = listOf(File("./samples/matrix_multiply.wasm"))// File("./samples").listFiles()
     for (sample in samples!!) {
         val watInput = wasm2wat.process(sample)
         val parseTree = Wat.parse(watInput.path)
@@ -37,7 +38,7 @@ fun main(args: Array<String>) {
         val ir = IRConstructor(module)
         val program = ir.program()
 
-        //OptimizationPasses.apply(program)
+        OptimizationPasses.apply(program)
 
         analysis2Dot(program, watInput)
 

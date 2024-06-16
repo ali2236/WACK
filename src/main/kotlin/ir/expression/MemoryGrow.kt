@@ -10,8 +10,8 @@ class MemoryGrow(val memoryId : Index, var amount: Expression) : Expression() {
         return MemoryGrow(memoryId, amount.clone())
     }
 
-    override fun getType(): List<WasmValueType> {
-        return listOf(WasmValueType.i32)
+    override fun exprType(): WasmValueType {
+        return WasmValueType.i32
     }
 
     override fun write(out: Appendable) {

@@ -1,7 +1,8 @@
-package ir.expression
+package ir.statement
 
 import generation.WatWriter
 import ir.Mode
+import ir.expression.Expression
 import ir.wasm.Index
 import ir.wasm.WasmValueType
 
@@ -9,14 +10,7 @@ class FunctionCall(
     val functionIndex: Index,
     val params: List<Expression>,
     val returnType: List<WasmValueType>,
-) : Expression() {
-    override fun clone(): Expression {
-        return FunctionCall(functionIndex, params.map { it.clone() }, returnType)
-    }
-
-    override fun getType(): List<WasmValueType> {
-        return returnType
-    }
+) : BasicStatement() {
 
     override fun write(out: Appendable) {
         out.append("f${functionIndex}")
