@@ -14,7 +14,6 @@ open class Loop(instructions: MutableList<Statement> = mutableListOf()) : Block(
         out.append("loop")
     }
 
-    override fun watHeader(wat: WatWriter) {
-        wat.writeLine("loop${watBlockType()}")
-    }
+    override val blockName: String
+        get() = "loop"
 }

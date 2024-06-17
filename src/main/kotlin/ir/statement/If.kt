@@ -32,16 +32,15 @@ open class If(
         }
     }
 
-    override fun watHeader(wat: WatWriter) {
-        condition.wat(wat)
-        wat.writeLine("if${watBlockType()}")
-    }
+    override val blockName: String
+        get() = "if"
 
     override fun watEnd(wat: WatWriter) {
         // do nothing
     }
 
     override fun wat(wat: WatWriter) {
+        condition.wat(wat)
         super.wat(wat)
         if (elseBody != null && elseBody!!.isNotEmpty()) {
             wat.writeLine("else")

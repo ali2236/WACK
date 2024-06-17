@@ -2,9 +2,10 @@ package analysis.ddt
 
 import ir.expression.Symbol
 import ir.expression.Value
+import ir.statement.SymbolLoad
 
 open class Polynomial {
-    private var symbolMultiplier = mutableMapOf<Symbol, Value>()
+    private var symbolMultiplier = mutableMapOf<SymbolLoad, Value>()
     private var offset: Value = Value.zero
 
     fun addOffset(v: Value) {
@@ -15,15 +16,15 @@ open class Polynomial {
         return offset
     }
 
-    fun addMultiplier(symbol: Symbol, value: Value = Value.one) {
+    fun addMultiplier(symbol: SymbolLoad, value: Value = Value.one) {
         symbolMultiplier[symbol] = symbolMultiplier.getOrDefault(symbol, value).add(value)
     }
 
-    fun symbols(): Set<Symbol> {
+    fun symbols(): Set<SymbolLoad> {
         return symbolMultiplier.keys
     }
 
-    fun calculate(symbolValue: Map<Symbol, Value>): Value {
+    fun calculate(symbolValue: Map<SymbolLoad, Value>): Value {
         // validate
         for (symbol in symbols()) {
             if (!symbolValue.containsKey(symbol)) {
@@ -58,5 +59,9 @@ open class Polynomial {
                     .add(other.symbolMultiplier[symbol]!!.multiply(-1))
         }
         return p
+    }
+
+    override fun toString(): String {
+        return symbolMultiplier.entries.joinToString("+") { "${it.value}x${it.key}" } + "+$offset"
     }
 }

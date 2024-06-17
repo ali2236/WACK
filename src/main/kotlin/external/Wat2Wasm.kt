@@ -28,6 +28,9 @@ class Wat2Wasm : FileProcessor {
         if (Mode.multipleMemories) {
             commands.add("--enable-multi-memory")
         }
+        if(Mode.annotations){
+            commands.add("--enable-annotations")
+        }
         commands.add("-o")
         commands.add(output.absolutePath)
         val process = ProcessBuilder(commands).start()

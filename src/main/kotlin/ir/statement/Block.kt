@@ -3,6 +3,7 @@ package ir.statement
 import ir.annotations.WackAnnotation
 import generation.WatWriter
 import generation.WebAssemblyBlock
+import ir.Mode
 import ir.expression.Expression
 import ir.finder.Visitor
 import ir.wasm.WasmValueType
@@ -73,16 +74,29 @@ open class Block(
         }
     }
 
-    fun watBlockType() : String {
-        if(type == null){
-            return ""
-        } else {
-            return " (result ${type.name})"
+    fun watBlockAnnotations(wat: WatWriter) {
+        if (Mode.annotations) {
+            for (annotation in annotations){
+                wat.write(" ")
+                annotation.wat(wat)
+            }
         }
     }
 
+    fun watBlockType(wat: WatWriter) {
+        if (type != null){
+            wat.write(" (result ${type.name})")
+        }
+    }
+
+    open val blockName = "block"
+
     override fun watHeader(wat: WatWriter) {
-        wat.writeLine("block${watBlockType()}")
+        wat.startLine()
+        wat.write(blockName)
+        watBlockType(wat)
+        watBlockAnnotations(wat)
+        wat.endLine()
     }
 
     override fun watEnd(wat: WatWriter) {
@@ -97,7 +111,7 @@ open class Block(
         watEnd(wat)
     }
 
-    fun <T : WackAnnotation> hasAnnotation(clazz: Class<T>) : Boolean{
+    fun <T : WackAnnotation> hasAnnotation(clazz: Class<T>): Boolean {
         return annotations.any { clazz.isInstance(it) }
     }
 }

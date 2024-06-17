@@ -3,12 +3,14 @@ import analysis.cfg.CFG
 import analysis.dfa.Dfa
 import external.Wasm2Wat
 import external.Wat2Wasm
+import generation.WasiThreadsGenerator
 import generation.WatWriter
 import ir.IRConstructor
 import ir.annotations.Skip
 import ir.parser.Wat
 import ir.statement.Function
 import ir.statement.Program
+import optimization.OptimizationPasses
 import java.io.File
 
 fun main(args: Array<String>) {
@@ -18,7 +20,7 @@ fun main(args: Array<String>) {
     insureDirectoryExists("./out/intermediate")
 
     // run
-    val samples = listOf(File("./samples/go_matrix_multiply.wasm"))// File("./samples").listFiles()
+    val samples = listOf(File("./samples/matrix_multiply.wasm"))// File("./samples").listFiles()
     for (sample in samples) {
         val watInput = Wasm2Wat.process(sample)
         val parseTree = Wat.parse(watInput.path)
@@ -26,7 +28,7 @@ fun main(args: Array<String>) {
         val ir = IRConstructor(module)
         val program = ir.program()
 
-        // OptimizationPasses.apply(program)
+        OptimizationPasses.apply(program)
 
         // runtime injection / parallel loop transformer
         // WasiThreadsGenerator().apply(program)

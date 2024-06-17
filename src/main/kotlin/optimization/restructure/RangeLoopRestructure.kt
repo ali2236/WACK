@@ -41,7 +41,7 @@ class RangeLoopRestructure : Restructure() {
             val symbol = conditionSymbols.first()
 
             // symbol initial value
-            val initial = functionFacts.at(loop).whatIs(symbol)?.asValue() ?: return
+            val initial = initialValueOf(loop.parent, loop.indexInParent, symbol) ?: return
 
             // symbol end value
             val endExclusive = condition.endExclusive
@@ -56,6 +56,19 @@ class RangeLoopRestructure : Restructure() {
             val rangeLoop = RangeLoop(symbol, DfaValue.Range(initial, endExclusive), condition, loop.instructions)
             replaceCurrentBlock(rangeLoop)
         }
+    }
+
+    private fun initialValueOf(block: Block?, startIndex: Int?, symbol: SymbolLoad) : Value?{
+        if (block == null || startIndex == null){
+            return null
+        }
+        for (i in (startIndex - 1) downTo 0){
+            val value = functionFacts.at(block.instructions[i]).whatIs(symbol)?.asValue()
+            if(value != null){
+                return value
+            }
+        }
+        return initialValueOf(block.parent, block.indexInParent, symbol)
     }
 
     private val BinaryOP.endExclusive: Value

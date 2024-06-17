@@ -6,6 +6,7 @@ import ir.expression.Symbol
 import ir.expression.Value
 import ir.finder.Visitor
 import ir.statement.Statement
+import ir.statement.SymbolLoad
 
 class AddressPolynomialFinder(address: Expression) : Visitor() {
 
@@ -20,10 +21,10 @@ class AddressPolynomialFinder(address: Expression) : Visitor() {
             is BinaryOP -> {
                 when(v.operator.sign){
                     BinaryOP.Operator.mul.sign -> {
-                        if(v.left is Value && v.right is Symbol){
-                            p.addMultiplier(v.right as Symbol, v.left as Value)
-                        } else if(v.right is Value && v.left is Symbol) {
-                            p.addMultiplier(v.left as Symbol, v.right as Value)
+                        if(v.left is Value && v.right is SymbolLoad){
+                            p.addMultiplier(v.right as SymbolLoad, v.left as Value)
+                        } else if(v.right is Value && v.left is SymbolLoad) {
+                            p.addMultiplier(v.left as SymbolLoad, v.right as Value)
                         } else {
                             // no way
                             throw Exception("couldn't decode $v")

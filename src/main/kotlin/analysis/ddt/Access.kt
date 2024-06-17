@@ -2,9 +2,11 @@ package analysis.ddt
 
 import analysis.dfa.DfaFact
 import analysis.dfa.DfaValue
+import ir.expression.Expression
 import ir.expression.Load
 import ir.expression.Symbol
 import ir.expression.Value
+import ir.finder.BreadthFirstExpressionFinder
 import ir.finder.Finders
 import ir.statement.SymbolLoad
 import ir.wasm.WasmValueType
@@ -64,15 +66,17 @@ data class Access(
             throw Exception("Bound Only usable on Load Symbols!")
         }
 
-        val symbols = Finders.symbols(symbol.address)
-        val symbolsRange = mutableMapOf<Symbol, DfaValue.Range>()
+        val symbols =
+            BreadthFirstExpressionFinder(SymbolLoad::class.java, true).also { it.visit(symbol.address) {} }.result()
+        val symbolsRange = mutableMapOf<SymbolLoad, DfaValue.Range>()
         for (s in symbols) {
             val fact = facts.first { it.symbol == s }
             var value = fact.value
             if (value !is DfaValue.Range) {
-                value = DfaValue.Range(Value(s.type, s.type.lb()), Value(s.type, s.type.ub()))
+                val ss = s as Expression
+                value = DfaValue.Range(Value(ss.exprType(), ss.exprType().lb()), Value(ss.exprType(), ss.exprType().ub()))
             }
-            symbolsRange.put(s, value)
+            symbolsRange[s] = value
         }
 
 

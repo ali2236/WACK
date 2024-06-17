@@ -86,6 +86,7 @@ object DfaBuilder {
                 changed = node.OUT.put(fact) || changed
             } catch (e: Exception) {
                 // dont add
+                // TODO: when Load address is tee
                 // println("didn't add $gen")
             }
         }
@@ -188,10 +189,12 @@ object DfaBuilder {
         if (gen.symbol is Load) {
             val expl = explainExpression(gen.symbol.address, dfaFacts)
             if (expl is DfaValue.Expr) {
-
                 gen.symbol.address = expl.value
+            } else if (gen.symbol.address is Symbol) {
+                // allowed
             } else {
-                throw java.lang.Exception()
+                // only single symbol addresses are allowed
+                throw Exception()
             }
         }
         if (gen.value is DfaValue.Expr) {

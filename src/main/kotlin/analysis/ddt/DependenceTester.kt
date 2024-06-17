@@ -24,6 +24,7 @@ object DependenceTester {
             // make all access pairs
             for (i in 0 until accessSize){
                 for (j in 0 until accessSize){
+                    if(i == j) continue
                     val a1 = accesses[i]
                     val a2 = accesses[j]
 

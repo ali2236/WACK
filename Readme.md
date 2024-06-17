@@ -10,8 +10,8 @@
 - [x] Move RangeLoop Restructure to Optimization Passes
 - [x] Element & Data Section Parsing
 - [x] Support Store 8/16/32 types
-- [ ] Fix Memory Alias Type Issues
-- [ ] Move Increment Restructure to Optimization Passes
+- [x] Move Increment Restructure to Optimization Passes
+- [ ] Privatize Loop Symbol if needed
 - [ ] Dependence Analysis P54
 - [ ] GCD Test
 - [ ] Data Dependency Test

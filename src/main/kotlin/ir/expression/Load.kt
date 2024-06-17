@@ -22,11 +22,8 @@ class Load(
     override fun write(out: Appendable) {
         out.append(Names.memory + memoryIndex)
         out.append("[")
-        if (offset != 0) {
-            BinaryOP(type, BinaryOP.Operator.add, address, Value(WasmValueType.i32, offset.toString())).write(out)
-        } else {
-            address.write(out)
-        }
+        address.write(out)
+        out.append("+$offset")
         out.append("]")
     }
 

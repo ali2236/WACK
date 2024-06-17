@@ -1,5 +1,6 @@
 package optimization.restructure
 
+import ir.annotations.Skip
 import ir.statement.Block
 import ir.statement.Function
 import ir.statement.Program
@@ -18,6 +19,7 @@ abstract class Restructure : Optimizer {
     override fun apply(program: Program) {
         currentProgram = program
         val functions = program.statements.filterIsInstance<Function>()
+            .filter { !it.hasAnnotation(Skip::class.java) }
         for (function in functions) {
             currentFunction = function
             restructureFunction(function)

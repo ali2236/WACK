@@ -1,5 +1,8 @@
 package ir.annotations
 
-interface WackAnnotation {
+import generation.WebAssemblyInstruction
+
+
+interface WackAnnotation : WebAssemblyInstruction {
 
 }

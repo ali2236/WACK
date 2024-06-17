@@ -1,23 +1,26 @@
 package optimization.restructure.archive
 
 import ir.finder.Replaceable
-import ir.Names
 import ir.expression.*
 import ir.finder.Finders
 import ir.statement.*
 import ir.wasm.Index
 import ir.wasm.WasmScope
+import optimization.restructure.Restructure
+import kotlin.math.max
 
 // replaces load with constload/symbol around loops
-//@Deprecated("Doesn't work correctly")
-/*class LoopMemoryCounterAlias : Restructure() {
+@Deprecated("Doesn't work correctly")
+class LoopMemoryCounterAlias : Restructure() {
 
     private val memRef = mutableMapOf<Load, Symbol>()
     private fun getMemRef(load: Load): Symbol {
         if (!memRef.containsKey(load)) {
             // make symbol
+            val params = currentFunction.functionData.type.params
             val functionLocals = currentFunction.functionData.locals
-            val symbol = Symbol(WasmScope.local, load.type, Index.next(functionLocals))
+            val index = Index(functionLocals.size + params.size)
+            val symbol = Symbol(WasmScope.local, load.type, index)
             functionLocals.add(load.type)
             memRef[load] = symbol
         }
@@ -33,7 +36,7 @@ import ir.wasm.WasmScope
                 val assign = Assignment(symbol, load)
                 currentBlock.parent!!
                     .instructions
-                    .add(currentBlock.indexInParent!!-1, assign)
+                    .add(max(0, currentBlock.indexInParent!!-1), assign)
                 currentBlock.indexInParent = currentBlock.indexInParent!! + 1
                 // post
                 val store = Store(load, symbol)
@@ -73,7 +76,7 @@ import ir.wasm.WasmScope
         }
         if (stmt is Store && stmt.symbol.address is Symbol) {
             val smbl = getMemRef(stmt.symbol)
-            replaceCurrentInstruction(ConstStore(stmt, smbl, stmt.data))
+            replaceCurrentInstruction(Assignment(smbl, stmt.data))
         }
     }
 
@@ -81,8 +84,8 @@ import ir.wasm.WasmScope
         if (expr.statement is Load && expr.statement.address is Symbol) {
             val load = expr.statement
             val smbl = getMemRef(load)
-            expr.replace(ConstLoad(load, smbl))
+            expr.replace(smbl)
         }
     }
 
-}*/
+}
