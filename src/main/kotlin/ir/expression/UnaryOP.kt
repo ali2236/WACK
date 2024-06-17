@@ -2,6 +2,7 @@ package ir.expression
 
 import generation.WatWriter
 import ir.finder.Visitor
+import ir.wasm.WasmBitSign
 import ir.wasm.WasmValueType
 
 class UnaryOP(val type: WasmValueType, val operator: Operator, var value: Expression) : Expression() {
@@ -27,7 +28,12 @@ class UnaryOP(val type: WasmValueType, val operator: Operator, var value: Expres
         v.visit(value) { this.value = it as Expression }
     }
 
-    data class Operator(val sign: String, val watName: String) {
+    data class Operator(
+        val sign: String,
+        val watName: String,
+        val memorySize: Int? = null,
+        val bitSign: WasmBitSign? = null
+    ) {
 
         companion object {
             val clz = Operator("clz:", "clz")
@@ -40,10 +46,12 @@ class UnaryOP(val type: WasmValueType, val operator: Operator, var value: Expres
             val floor = Operator("floor:", "floor")
             val trunc = Operator("trunc:", "trunc")
             val nearest = Operator("nearest:", "nearest")
+            val extend = Operator("extend:", "extend")
         }
 
         fun wat(): String {
-            return watName
+            val postFix = if(memorySize != null && bitSign != null) "${memorySize}_${bitSign.name}" else ""
+            return "${watName}$postFix"
         }
     }
 }

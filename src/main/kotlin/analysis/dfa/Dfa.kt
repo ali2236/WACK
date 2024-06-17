@@ -5,6 +5,7 @@ import generation.DotGraph
 import generation.DotSanitizer
 import ir.statement.Function
 
+// Data Flow Analysis
 class Dfa(val nodes : MutableList<DfaNode>) : DotGraph() {
 
     override val graphName: String = "dfa"
@@ -53,7 +54,7 @@ class Dfa(val nodes : MutableList<DfaNode>) : DotGraph() {
 
             // label & statement
             if (dfaNode.label != null){
-                dfaNode.label?.let {
+                dfaNode.label.let {
                     dot.append(it)
                     out.append("<BR ALIGN=\"LEFT\"/>")
                 }
@@ -65,7 +66,7 @@ class Dfa(val nodes : MutableList<DfaNode>) : DotGraph() {
             }
             dot.append("IN = {" + dfaNode.IN + "}")
             out.append("<BR ALIGN=\"LEFT\"/>")
-            dot.append("GEN = {" + dfaNode.GEN.map { it.toString() }.joinToString(", ") +"}")
+            dot.append("GEN = {" + dfaNode.GEN +"}")
             out.append("<BR ALIGN=\"LEFT\"/>")
             dot.append("OUT = {" + dfaNode.OUT + "}")
             out.append("<BR ALIGN=\"LEFT\"/>")

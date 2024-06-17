@@ -1,6 +1,7 @@
 package ir.expression
 
 import generation.WatWriter
+import ir.Mode
 import ir.wasm.Index
 import ir.wasm.WasmValueType
 
@@ -18,6 +19,7 @@ class MemorySize(val memoryId: Index) : Expression() {
     }
 
     override fun wat(wat: WatWriter) {
-        wat.writeLine("memory.size $memoryId", this)
+        val idx = if(Mode.multipleMemories) " $memoryId" else ""
+        wat.writeLine("memory.size$idx", this)
     }
 }

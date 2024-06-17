@@ -4,6 +4,7 @@ import generation.DotGraph
 import generation.DotSanitizer
 import ir.statement.Function
 
+// Control Flow Graph
 class CFG(val nodes: List<CfgBlock>) : DotGraph() {
 
     override val graphName: String = "cfg"

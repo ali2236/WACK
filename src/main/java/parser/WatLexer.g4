@@ -87,6 +87,7 @@ UNARY:
     | FXX '.floor'
     | FXX '.trunc'
     | FXX '.nearest'
+    | IXX '.extend' MEM_SIZE '_' SIGN
 ;
 
 BINARY:

@@ -232,9 +232,16 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
         } else if (ctx.UNARY() != null) {
             val (typeString, operatorName) = ctx.UNARY()!!.text.split(".")
             val type = WasmValueType.parse(typeString)
-            val operatorSign = when (operatorName) {
+            val operatorSign = if (operatorName.startsWith("extend")) {
+                val (_mem, _sign) = operatorName.substringAfter("extend").split("_")
+                val mem = _mem.toInt()
+                val bitSign = WasmBitSign.valueOf(_sign)
+                UnaryOP.Operator.extend.copy(memorySize = mem, bitSign = bitSign)
+            } else when (operatorName) {
                 "neg" -> UnaryOP.Operator.neg
                 "abs" -> UnaryOP.Operator.abs
+                "ctz" -> UnaryOP.Operator.ctz
+                "clz" -> UnaryOP.Operator.clz
                 else -> throw Error("unknown unary operator $operatorName")
             }
             stack.push(UnaryOP(type, operatorSign, stack.pop()))

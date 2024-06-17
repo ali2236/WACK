@@ -59,7 +59,7 @@ object DfaBuilder {
         var changed = false
         // propagate IN -> OUT except those in GEN
         node.IN.facts.filter { inIt ->
-            !node.GEN.any { genIt ->
+            !node.GEN.facts.any { genIt ->
                 if (genIt.symbol is Load) {
                     try {
                         val address = explainExpression(genIt.symbol.address.clone(), node.IN.facts)
@@ -80,7 +80,7 @@ object DfaBuilder {
         }
 
         // propagate GEN -> OUT override Symbol From IN
-        node.GEN.forEach { gen ->
+        node.GEN.facts.forEach { gen ->
             try {
                 val fact = explainFact(gen.clone(), node.IN.facts)
                 changed = node.OUT.put(fact) || changed
@@ -253,7 +253,7 @@ object DfaBuilder {
                 return explainExpression(expr.teeValue(), dfaFacts)
             }
 
-            is FunctionResult, is SingleResultFunction, is BlockResult -> {
+            is FunctionResult, is SingleResultFunction, is BlockResult, is MemoryGrow, is MemorySize -> {
                 return DfaValue.Unknown()
             }
 

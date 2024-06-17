@@ -9,6 +9,7 @@ object OptimizationPasses {
         val passes = listOf<Optimizer>(
             ShiftToMultiply(),
             ConstantPropagation(),
+            //AliasMemory(),
             ConditionRestructure(),
             ConditionalLoopRestructure(),
             IncrementRestructure(),

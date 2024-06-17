@@ -28,28 +28,4 @@ class IRConstructor(val module: WasmModule) {
         }
         return Function(function, functionBlock.toMutableList())
     }
-
-    private fun getFunctionInitSection(functionData: WasmFunction): List<Statement> {
-        val inst = mutableListOf<Statement>()
-        // Local Variables
-        // declaration
-        val paramCount = functionData.type.params.size
-        val localCount = functionData.locals.size
-        for (i in 0 until localCount) {
-            val localType = functionData.locals[i]
-            val symbol = Symbol(WasmScope.local, localType, Index(paramCount + i))
-            val dec = Declaration(localType, symbol)
-            inst.add(dec)
-        }
-        // assignment
-        for (i in 0 until localCount) {
-            val localType = functionData.locals[i]
-            val symbol = Symbol(WasmScope.local, localType, Index(paramCount + i))
-            val value = Value(localType, localType.defaultValue())
-            val assignment = Assignment(symbol, value) // TODO: fake assignment
-            inst.add(assignment)
-        }
-
-        return inst
-    }
 }

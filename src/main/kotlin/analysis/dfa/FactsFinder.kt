@@ -17,7 +17,7 @@ class FactsFinder(val dfa: Dfa,val block: DfaNode, stmt: Statement) : Visitor() 
                     symbol = v.assignedTo().clone() as SymbolLoad,
                     value = DfaBuilder.explainExpression(v.assignedWith().clone(), setOf())
                 )
-                block.GEN.add(fact)
+                block.GEN.put(fact)
             }
 
             is If -> {
@@ -27,9 +27,9 @@ class FactsFinder(val dfa: Dfa,val block: DfaNode, stmt: Statement) : Visitor() 
 
             is RangeLoop -> {
                 val fact = DfaFact(v.symbol, v.range)
-                block.GEN.add(fact)
+                block.GEN.put(fact)
                 if (block.next != null) { // kina works
-                    dfa.nodes[block.next].GEN.add(DfaFact(v.symbol, DfaValue.Expr(v.range.to)))
+                    dfa.nodes[block.next].GEN.put(DfaFact(v.symbol, DfaValue.Expr(v.range.to)))
                 }
                 return
             }

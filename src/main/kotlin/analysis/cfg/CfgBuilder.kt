@@ -20,6 +20,13 @@ internal class CfgBuilder(val function: Function) {
     private val currentScope: CfgBlock
         get() = scope.last()
 
+    /*
+    function f_xd() {
+  var a:int;
+  88860[0]:int = (a = (a = 88724[0]:int) - (a - 27089280) / 65);
+  88868[0]:int = a - 27089344 >> 4;
+}
+     */
     fun build(): CFG {
         val body = function.instructions
         val function = makeBlock()

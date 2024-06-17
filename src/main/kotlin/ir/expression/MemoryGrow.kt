@@ -1,6 +1,7 @@
 package ir.expression
 
 import generation.WatWriter
+import ir.Mode
 import ir.finder.Visitor
 import ir.wasm.Index
 import ir.wasm.WasmValueType
@@ -22,7 +23,8 @@ class MemoryGrow(val memoryId : Index, var amount: Expression) : Expression() {
 
     override fun wat(wat: WatWriter) {
         amount.wat(wat)
-        wat.writeLine("memory.grow $memoryId", this)
+        val idx = if(Mode.multipleMemories) " $memoryId" else ""
+        wat.writeLine("memory.grow$idx", this)
     }
 
     override fun visit(v: Visitor) {

@@ -39,9 +39,9 @@ class Tee(var symbol: Symbol, var value: Expression) : Expression(), AssignmentS
     }
 
     override fun write(out: Appendable) {
-        out.append(":")
-        teeValue().write(out)
-        out.append(":")
+        out.append("(${symbol}=")
+        value.write(out)
+        out.append(")")
     }
 
     override fun wat(wat: WatWriter) {

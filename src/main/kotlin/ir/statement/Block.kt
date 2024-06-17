@@ -28,7 +28,7 @@ open class Block(
     open fun pop(): Expression {
         for (i in (instructions.size - 1) downTo 0) {
             val instr = instructions[i]
-            if (instr !is Expression) {
+            if (instr !is Expression) { // checks if instruction is statement - don't change!
                 continue
             }
             return instructions.removeAt(i) as Expression
