@@ -2,7 +2,9 @@ package generation
 
 import ir.Mode
 import ir.Names
+import ir.statement.Program
 import ir.statement.Statement
+import java.io.File
 
 
 class WatWriter(private val buffer: Appendable) {
@@ -13,7 +15,7 @@ class WatWriter(private val buffer: Appendable) {
     fun writeLine(instruction: String, debug: Statement? = null) {
         startLine()
         write(instruction)
-        if(Mode.debug) {
+        if (Mode.debug) {
             debug?.let {
                 for (i in 1..(debugIndent - (indent * Names.indent.length) - instruction.length)) {
                     buffer.append(' ')
@@ -45,6 +47,16 @@ class WatWriter(private val buffer: Appendable) {
     fun writeAll(stmts: List<Statement>) {
         stmts.forEach {
             it.wat(this)
+        }
+    }
+
+    companion object {
+        fun writeToFile(program: Program, watOut: File) {
+            val outWriter = watOut.writer()
+            val watWriter = WatWriter(outWriter)
+            program.wat(watWriter)
+            outWriter.flush()
+            outWriter.close()
         }
     }
 }

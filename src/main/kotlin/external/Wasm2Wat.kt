@@ -2,7 +2,7 @@ package external
 
 import java.io.File
 
-class Wasm2Wat : FileProcessor {
+object Wasm2Wat : FileProcessor {
     override fun process(input: File): File {
         // validate input
         if (input.extension != "wasm") {

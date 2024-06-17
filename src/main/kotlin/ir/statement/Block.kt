@@ -96,4 +96,8 @@ open class Block(
         wat.indent--
         watEnd(wat)
     }
+
+    fun <T : WackAnnotation> hasAnnotation(clazz: Class<T>) : Boolean{
+        return annotations.any { clazz.isInstance(it) }
+    }
 }
