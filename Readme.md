@@ -11,7 +11,8 @@
 - [x] Element & Data Section Parsing
 - [x] Support Store 8/16/32 types
 - [x] Move Increment Restructure to Optimization Passes
-- [ ] Privatize Loop Symbol if needed
+- [x] Privatize Loop Symbol if needed
+- [ ] Generate Deep-Loop Kernels correctly
 - [ ] Dependence Analysis P54
 - [ ] GCD Test
 - [ ] Data Dependency Test

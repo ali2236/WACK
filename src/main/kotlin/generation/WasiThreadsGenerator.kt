@@ -1,6 +1,6 @@
 package generation
 
-import generation.Generator
+import ir.Mode
 import generation.wack.ParallelBlockGenerator
 import generation.wack.ThreadArgEncoderGenerator
 import generation.wack.ThreadCountGenerator
@@ -8,7 +8,6 @@ import generation.wack.ThreadKernelGenerator
 import generation.wasi.threads.WasiThreadSpawnGenerator
 import generation.wasi.threads.WasiThreadStartGenerator
 import generation.wasm.threads.MutexLibraryGenerator
-import ir.Mode
 import ir.statement.Program
 
 class WasiThreadsGenerator : Generator {

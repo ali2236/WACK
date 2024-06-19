@@ -31,7 +31,7 @@ fun main(args: Array<String>) {
         OptimizationPasses.apply(program)
 
         // runtime injection / parallel loop transformer
-        // WasiThreadsGenerator().apply(program)
+        WasiThreadsGenerator().apply(program)
 
         Analysis.writeDotFiles(program, watInput.nameWithoutExtension)
 
