@@ -26,12 +26,8 @@ object ThreadKernelGenerator {
                     parallelBlock.indexInParent = forLoop.indexInParent
                     val parallelAnnotation = parallelBlock.annotations.filterIsInstance<Parallel>().first()
 
-                    // find function locals used
-                    val localsAccessed = Finders.symbols(forLoop.instructions).toSet()
-
 
                     // loop boundaries
-                    // TODO: determine value for local using dfa+eval+ssa
                     val rangeLoop = (forLoop as RangeLoop)
                     val rangeFrom = rangeLoop.range.from
                     val rangeTo = rangeLoop.range.to
@@ -118,6 +114,7 @@ object ThreadKernelGenerator {
 
                         // replace locals with new boundaries
                         // replace init with start
+                        // TODO: there are n loops that may have stack allocated ranges
                         // TODO: Comme: rangeLoop.init.replaceAssign(start) // what to replace with start
                         // replace condition.right with end
                         (rangeLoop.condition as BinaryOP).right = end// what to replace with end

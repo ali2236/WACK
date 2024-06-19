@@ -3,7 +3,6 @@ package optimization
 import ir.statement.Program
 import optimization.constant_propegation.ConstantPropagation
 import optimization.restructure.*
-import optimization.restructure.archive.AliasLoopLoadSymbol
 
 object OptimizationPasses {
     fun apply(program: Program){
@@ -15,6 +14,8 @@ object OptimizationPasses {
             IncrementRestructure(),
             RangeLoopRestructure(),
             ParallelForAnnotator(),
+            MarkLoopCountersAsPrivate(),
+            LocalizeRangeLoopCounter(),
         )
         for (pass in passes){
             pass.apply(program)

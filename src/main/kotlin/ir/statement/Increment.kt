@@ -23,7 +23,7 @@ class Increment(var increment: AssignmentStore) : BasicStatement(), AssignmentSt
     }
 
     override fun visit(v: Visitor) {
-        increment.visit(v)
+       v.visit(increment){this.increment = it as AssignmentStore}
     }
 
     override fun wat(wat: WatWriter) {

@@ -9,13 +9,14 @@ import java.io.File
 
 class WatWriter(private val buffer: Appendable) {
 
+    var watDebug: Boolean = true
     var indent = 0
     val debugIndent = 36
 
     fun writeLine(instruction: String, debug: Statement? = null) {
         startLine()
         write(instruction)
-        if (Mode.debug) {
+        if (Mode.debug && watDebug) {
             debug?.let {
                 for (i in 1..(debugIndent - (indent * Names.indent.length) - instruction.length)) {
                     buffer.append(' ')
