@@ -5,6 +5,7 @@ import ir.annotations.*
 import ir.expression.*
 import ir.finder.AnnotationFinder
 import ir.finder.Finders
+import ir.finder.SymbolReplacer
 import ir.statement.*
 import ir.statement.Function
 import ir.wasm.*
@@ -114,8 +115,26 @@ object ThreadKernelGenerator {
 
                         // replace locals with new boundaries
                         // replace init with start
-                        // TODO: there are n loops that may have stack allocated ranges
-                        // TODO: Comme: rangeLoop.init.replaceAssign(start) // what to replace with start
+                        // there are n loops that may have stack allocated ranges
+                        val toReplace = rangeLoop.annotations
+                            .filterIsInstance<Private>()
+                            .associate { private ->
+                                if (private.symbol == rangeLoop.symbol) {
+                                    return@associate Pair(private.symbol, start)
+                                } else {
+                                    val type = (private.symbol as Expression).exprType()
+                                    val newSymbol = Symbol(
+                                        WasmScope.local,
+                                        type,
+                                        Index(kernelFunction.type.params.size + kernelFunction.locals.size)
+                                    )
+                                    functionData.locals.add(type)
+                                    return@associate Pair(private.symbol, newSymbol)
+                                }
+                            }
+                        println()
+                        SymbolReplacer(toReplace).also { function.visit(it) }
+
                         // replace condition.right with end
                         (rangeLoop.condition as BinaryOP).right = end// what to replace with end
                         instructions.add(forLoop)
@@ -126,13 +145,6 @@ object ThreadKernelGenerator {
                     module.functions.add(kernelFunction)
                     program.statements.add(kernel)
 
-                    // TODO: replace locals with new locals
-                    /*ReplaceableFinder(Symbol::class.java).also { it.visit(kernel) {} }.result().forEach {
-                        val smbl = it.statement
-                        val newIndex = localsAccessed.indexOf(smbl)
-                        val newSmbl = Symbol(smbl.scope, smbl.type, Index(newIndex))
-                        it.replace(newSmbl)
-                    }*/
 
                     // call kernel function with thread-spawn
                     // check if error code -> trap
@@ -157,7 +169,7 @@ object ThreadKernelGenerator {
                             If(
                                 BinaryOP(
                                     WasmValueType.i32,
-                                    BinaryOP. Operator.lt.copy(signed = WasmBitSign.s),
+                                    BinaryOP.Operator.lt.copy(signed = WasmBitSign.s),
                                     FunctionResult(WasmValueType.i32),
                                     Value.zero
                                 ), mutableListOf(Unreachable())

@@ -1,16 +1,16 @@
 package optimization
 
-import ir.annotations.For
 import ir.annotations.Private
 import ir.annotations.Skip
 import ir.expression.Expression
 import ir.expression.Load
 import ir.expression.Symbol
 import ir.finder.ExpressionFinder
-import ir.finder.LoadReplacer
+import ir.finder.SymbolReplacer
 import ir.statement.Function
 import ir.statement.Program
 import ir.statement.RangeLoop
+import ir.statement.SymbolLoad
 import ir.wasm.Index
 import ir.wasm.WasmScope
 
@@ -45,9 +45,9 @@ class LocalizeRangeLoopCounter : Optimizer {
                     // replace old symbols with new ones
                     val replace = privateSymbol
                         .filter { it.symbol is Load && it.private is Symbol }
-                        .associate { Pair(it.symbol as Load, it.private as Symbol) }
+                        .associate { Pair(it.symbol as SymbolLoad, it.private as Symbol) }
 
-                    LoadReplacer(replace).also { function.visit(it) }
+                    SymbolReplacer(replace).also { function.visit(it) }
 
                     // TODO: commit back to memory after loop end somehow from last thread?
                 }

@@ -5,12 +5,13 @@ import ir.expression.Symbol
 import ir.statement.Assignment
 import ir.statement.Statement
 import ir.statement.Store
+import ir.statement.SymbolLoad
 
-class LoadReplacer(val replaceable : Map<Load, Symbol>) : Visitor() {
+class SymbolReplacer(val replaceable : Map<SymbolLoad, Symbol>) : Visitor() {
     override fun visit(v: Statement, replace: (Statement) -> Unit) {
         super.visit(v, replace)
         when(v){
-            is Load -> {
+            is SymbolLoad -> {
                 if(replaceable.containsKey(v)){
                     replace(replaceable[v]!!)
                 }

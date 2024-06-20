@@ -15,7 +15,7 @@ object OptimizationPasses {
             RangeLoopRestructure(),
             ParallelForAnnotator(),
             MarkLoopCountersAsPrivate(),
-            LocalizeRangeLoopCounter(),
+            //LocalizeRangeLoopCounter(),
         )
         for (pass in passes){
             pass.apply(program)
