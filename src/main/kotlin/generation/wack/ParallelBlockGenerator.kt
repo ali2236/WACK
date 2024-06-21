@@ -8,6 +8,13 @@ import ir.wasm.WasmBitSign
 import ir.wasm.WasmGlobal
 import ir.wasm.WasmValueType
 
+// for thread_id from 0 to num_threads:
+//    lockMutex(thread_id)
+//    @{oldBody}
+//
+// for thread_id from 0 to num_threads:
+//    join(thread_id)
+//
 object ParallelBlockGenerator {
     fun generate(blocks: List<Block>, threadCount: WasmGlobal, mutex: MutexLibrary) {
         blocks.forEach { block ->

@@ -8,6 +8,13 @@ import ir.statement.*
 import ir.statement.Function
 import ir.wasm.*
 
+/*
+export function thread_start(int tid, int args){
+    thread_id, kernel_index = decode_args(args)
+    table[kernel_id](thread_id)
+    unlockMutex(thread_id)
+}
+ */
 object WasiThreadStartGenerator {
     fun generate(program: Program, arg: ThreadArg, mutex: MutexLibrary) {
         val module = program.module

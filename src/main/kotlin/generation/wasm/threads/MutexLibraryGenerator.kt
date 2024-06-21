@@ -9,6 +9,10 @@ object MutexLibraryGenerator {
     fun generate(program: Program): MutexLibrary {
         val module = program.module
 
+        // TODO: Remove
+        val lockIndex = Index(8)
+        val unlockIndex = Index(9)
+
         // memory
         val mutexMemory = WasmMemory(Index.next(module.memories), 4, 4, true)
         module.memories.add(mutexMemory)
@@ -37,6 +41,7 @@ object MutexLibraryGenerator {
         // functions
         val tryLockMutex = Function(
             wasmTryLockMutex, mutableListOf(
+                FunctionCall(lockIndex, listOf(Symbol(WasmScope.local, WasmValueType.i32, Index(0))), listOf()),
                 Symbol(WasmScope.local, WasmValueType.i32, Index(0)),
                 Value.zero,
                 Value(WasmValueType.i32, "1"),
@@ -68,10 +73,10 @@ object MutexLibraryGenerator {
         program.statements.add(lockMutex)
         val unlockMutex = Function(
             wasmUnlockMutex, mutableListOf(
+                FunctionCall(unlockIndex, listOf(Symbol(WasmScope.local, WasmValueType.i32, Index(0))), listOf()),
                 Symbol(WasmScope.local, WasmValueType.i32, Index(0)),
                 Value.zero,
                 RawWat("i32.atomic.store"),
-
                 Symbol(WasmScope.local, WasmValueType.i32, Index(0)),
                 Value(WasmValueType.i32, "1"),
                 RawWat("memory.atomic.notify ${mutexMemory.index}"),

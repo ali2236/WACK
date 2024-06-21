@@ -144,7 +144,7 @@ object ThreadKernelGenerator {
                     kernel.annotations.add(kernelAnnotation)
                     module.functions.add(kernelFunction)
                     program.statements.add(kernel)
-
+                    rangeLoop.parent = kernel
 
                     // call kernel function with thread-spawn
                     // check if error code -> trap

@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
     insureDirectoryExists("./out/intermediate")
 
     // run
-    val samples = listOf(File("./samples/matrix_multiply.wasm"))// File("./samples").listFiles()
+    val samples = listOf(File("./samples/simple_loop.wasm"))// File("./samples").listFiles()
     for (sample in samples) {
         val watInput = Wasm2Wat.process(sample)
         val parseTree = Wat.parse(watInput.path)
