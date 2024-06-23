@@ -41,16 +41,16 @@ object MutexLibraryGenerator {
         // functions
         val tryLockMutex = Function(
             wasmTryLockMutex, mutableListOf(
-                FunctionCall(lockIndex, listOf(Symbol(WasmScope.local, WasmValueType.i32, Index(0))), listOf()),
                 Symbol(WasmScope.local, WasmValueType.i32, Index(0)),
                 Value.zero,
-                Value(WasmValueType.i32, "1"),
+                Value.one,
                 RawWat("i32.atomic.rmw.cmpxchg ${mutexMemory.index}"),
                 RawWat("i32.eqz"),
             )
         )
         program.statements.add(tryLockMutex)
         val lockMutex = Function(wasmLockMutex, mutableListOf(Block().also { block ->
+            block.instructions.add(FunctionCall(lockIndex, listOf(Symbol(WasmScope.local, WasmValueType.i32, Index(0))), listOf()),)
             block.instructions.add(
                 Loop(
                     mutableListOf(
@@ -76,7 +76,7 @@ object MutexLibraryGenerator {
                 FunctionCall(unlockIndex, listOf(Symbol(WasmScope.local, WasmValueType.i32, Index(0))), listOf()),
                 Symbol(WasmScope.local, WasmValueType.i32, Index(0)),
                 Value.zero,
-                RawWat("i32.atomic.store"),
+                RawWat("i32.atomic.store ${mutexMemory.index}"),
                 Symbol(WasmScope.local, WasmValueType.i32, Index(0)),
                 Value(WasmValueType.i32, "1"),
                 RawWat("memory.atomic.notify ${mutexMemory.index}"),

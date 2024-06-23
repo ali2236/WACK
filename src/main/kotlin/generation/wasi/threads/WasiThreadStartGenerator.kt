@@ -19,35 +19,13 @@ object WasiThreadStartGenerator {
     fun generate(program: Program, arg: ThreadArg, mutex: MutexLibrary) {
         val module = program.module
 
-        // kernels
-        val kernels =
-            program.statements
-                .filterIsInstance<Function>()
-                .filter { it.annotations.any { ann -> ann is Kernel } }
-                .sortedBy { it.annotations.filterIsInstance<Kernel>().first().kernelId }
-
         // types
         val kernelType = module.findOraddType(params = listOf(WasmValueType.i32), result = listOf())
         val threadStartType =
             module.findOraddType(params = listOf(WasmValueType.i32, WasmValueType.i32), result = listOf())
 
-        // table
-        val kernelTable = WasmTable(
-            Index.next(module.tables),
-            kernels.size,
-            kernels.size,
-            WasmRefType.funcref,
-        )
-        module.tables.add(kernelTable)
-
-        // elements
-        val kernelsElementSegment = WasmElementSegment(
-            Index.next(module.elementSegments),
-            kernelTable.index,
-            listOf(Value.zero),
-            kernels.map { it.functionData.index }
-        )
-        module.elementSegments.add(kernelsElementSegment)
+        // kernel table
+        val kernelTable = KernelTableGenerator.generate(program)
 
         // function headers
         val wasmWasiThreadStart = WasmFunction(

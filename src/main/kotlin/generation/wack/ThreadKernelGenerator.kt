@@ -1,6 +1,5 @@
 package generation.wack
 
-import generation.wasm.threads.MutexLibrary
 import ir.annotations.*
 import ir.expression.*
 import ir.finder.AnnotationFinder
@@ -12,7 +11,7 @@ import ir.wasm.*
 
 object ThreadKernelGenerator {
     fun generate(
-        program: Program, threadCount: WasmGlobal, threadSpawn: WasmFunction, arg: ThreadArg, mutex: MutexLibrary
+        program: Program, threadCount: WasmGlobal, generateCallKernel: (Function, Block) -> Unit,
     ): List<Block> {
         val module = program.module
         var kernels = 0
@@ -158,23 +157,8 @@ object ThreadKernelGenerator {
 
                     parallelAnnotation.threadId = threadId
                     parallelBlock.apply {
-                        // lock mutex
-                        instructions.add(
-                            mutex.lock.call(threadId),
-                        )
-                        // spawn thread
-                        instructions.add(arg.encode.call(threadId, Value(WasmValueType.i32, "$kernelId")))
-                        instructions.add(threadSpawn.call(FunctionResult(WasmValueType.i32)))
-                        instructions.add(
-                            If(
-                                BinaryOP(
-                                    WasmValueType.i32,
-                                    BinaryOP.Operator.lt.copy(signed = WasmBitSign.s),
-                                    FunctionResult(WasmValueType.i32),
-                                    Value.zero
-                                ), mutableListOf(Unreachable())
-                            ),
-                        )
+                        annotations.add(CallKernel(kernelId))
+                        generateCallKernel(function, this)
                     }
                     replace(parallelBlock)
                     parallelBlocks.add(parallelBlock)

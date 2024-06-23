@@ -28,5 +28,5 @@ else false
 
 ### How to Run
 ```
-wasmtime -S threads .\wack_matrix_multiply.wasm
+wasmtime -W all-proposals=y -S threads .\wack_matrix_multiply.wasm
 ```

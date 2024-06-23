@@ -1,8 +1,12 @@
 package ir.statement
 
+import external.Wasm2Wat
 import generation.WatWriter
+import ir.IRConstructor
 import ir.finder.Visitor
+import ir.parser.Wat
 import ir.wasm.WasmModule
+import java.io.File
 
 class Program(val module: WasmModule, val statements: MutableList<Statement>) : BasicStatement() {
     override fun write(out: Appendable) {
@@ -39,5 +43,16 @@ class Program(val module: WasmModule, val statements: MutableList<Statement>) : 
         // close module
         wat.indent--
         wat.writeLine(")")
+    }
+
+    companion object {
+        fun from(wasmFile: File): Program {
+            val watFile = Wasm2Wat.process(wasmFile)
+            val parseTree = Wat.parse(watFile.path)
+            val module = Wat.module(parseTree)
+            val ir = IRConstructor(module)
+            val program = ir.program()
+            return program
+        }
     }
 }

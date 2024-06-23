@@ -20,7 +20,7 @@ object Wasm2Wat : FileProcessor {
 
 
         // run process
-        val process = ProcessBuilder("wasm2wat", input.absolutePath).start()
+        val process = ProcessBuilder("wasm2wat", "--enable-all", input.absolutePath).start()
         val reader = process.inputStream.bufferedReader()
         val writer = output.bufferedWriter()
         var line = reader.readLine()

@@ -3,6 +3,7 @@ import analysis.cfg.CFG
 import analysis.dfa.Dfa
 import external.Wasm2Wat
 import external.Wat2Wasm
+import generation.PThreadsGenerator
 import generation.WasiThreadsGenerator
 import generation.WatWriter
 import ir.IRConstructor
@@ -20,23 +21,20 @@ fun main(args: Array<String>) {
     insureDirectoryExists("./out/intermediate")
 
     // run
-    val samples = listOf(File("./samples/simple_loop.wasm"))// File("./samples").listFiles()
+    val samples = listOf(File("./samples/matrix_multiply.wasm"))// File("./samples").listFiles()
     for (sample in samples) {
-        val watInput = Wasm2Wat.process(sample)
-        val parseTree = Wat.parse(watInput.path)
-        val module = Wat.module(parseTree)
-        val ir = IRConstructor(module)
-        val program = ir.program()
+        val program = Program.from(sample)
 
         OptimizationPasses.apply(program)
 
         // runtime injection / parallel loop transformer
-        WasiThreadsGenerator().apply(program)
+        //WasiThreadsGenerator().apply(program)
+        PThreadsGenerator().apply(program)
 
-        Analysis.writeDotFiles(program, watInput.nameWithoutExtension)
+        // Analysis.writeDotFiles(program, sample.nameWithoutExtension)
 
         // write out
-        val watOut = File("./out/intermediate/wack_${watInput.nameWithoutExtension}.wat")
+        val watOut = File("./out/intermediate/wack_${sample.nameWithoutExtension}.wat")
         WatWriter.writeToFile(program, watOut)
 
         // convert to wasm
