@@ -27,7 +27,7 @@ class WasiThreadsGenerator : Generator {
         val threadArg = ThreadArgEncoderGenerator.generate(program)
         val threadCount = ThreadCountGenerator.generate(program)
         val threadSpawn = WasiThreadSpawnGenerator.generate(program)
-        val parallelBlocks = ThreadKernelGenerator.generate(program, threadCount){ function, block ->
+        val parallelBlocks = ThreadKernelGenerator.generate(program, threadCount.symbol){ function, block ->
             val threadId = function.annotations.filterIsInstance<ThreadId>().first().symbol
             val kernelId = block.annotations.filterIsInstance<CallKernel>().first().kernelIndex
             // lock mutex

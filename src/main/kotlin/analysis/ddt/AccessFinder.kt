@@ -52,9 +52,6 @@ class AccessFinder(parentScope: RangeLoop, val dfa: Dfa) : Visitor() {
                 if (isLoopSymbol(v)) {
                     return
                 }
-                if(currentStatement == null){
-                    println()
-                }
                 val access = Access(
                     v,
                     AccessType.Read,

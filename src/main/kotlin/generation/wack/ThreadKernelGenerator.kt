@@ -11,7 +11,7 @@ import ir.wasm.*
 
 object ThreadKernelGenerator {
     fun generate(
-        program: Program, threadCount: WasmGlobal, generateCallKernel: (Function, Block) -> Unit,
+        program: Program, threadCount: Expression, generateCallKernel: (Function, Block) -> Unit,
     ): List<Block> {
         val module = program.module
         var kernels = 0
@@ -70,7 +70,7 @@ object ThreadKernelGenerator {
                                         WasmValueType.i32,
                                         BinaryOP.Operator.div.copy(signed = WasmBitSign.s),
                                         size,
-                                        threadCount.symbol,
+                                        threadCount,
                                     ),
                                     threadId,
                                 )
@@ -89,7 +89,7 @@ object ThreadKernelGenerator {
                                             WasmValueType.i32,
                                             BinaryOP.Operator.div.copy(signed = WasmBitSign.s),
                                             size,
-                                            threadCount.symbol,
+                                            threadCount,
                                         ),
                                         BinaryOP(
                                             WasmValueType.i32,
@@ -103,7 +103,7 @@ object ThreadKernelGenerator {
                                         WasmValueType.i32, BinaryOP.Operator.eq, threadId, BinaryOP(
                                             WasmValueType.i32,
                                             BinaryOP.Operator.sub,
-                                            threadCount.symbol,
+                                            threadCount,
                                             Value(WasmValueType.i32, "1")
                                         )
                                     ),
@@ -131,7 +131,6 @@ object ThreadKernelGenerator {
                                     return@associate Pair(private.symbol, newSymbol)
                                 }
                             }
-                        println()
                         SymbolReplacer(toReplace).also { function.visit(it) }
 
                         // replace condition.right with end

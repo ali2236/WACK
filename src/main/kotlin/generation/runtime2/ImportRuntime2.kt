@@ -1,52 +1,45 @@
 package generation.runtime2
 
-import ir.expression.Symbol
-import ir.finder.Replaceable
-import ir.finder.ReplaceableFinder
 import ir.statement.Function
 import ir.statement.Program
 import ir.wasm.Index
-import ir.wasm.WasmScope
-import java.io.File
+import ir.wasm.WasmFunction
+import ir.wasm.WasmImport
+import ir.wasm.WasmValueType
 
-//// things that will change when linking:
-// 1. function index + function call
-// 2. globals + global accesses
-// 3. module function types + function types + indirect_call type
-// 4. tabel index + element segment funcrefs
-// 5. data segment index + memory.init
-// 6. memory index + load/store
-// 7. export index
 object ImportRuntime2 {
-    fun into(program: Program): WackPthreads {
-        val runtimeWasm = File("./runtime/runtime2.wasm")
-        val runtime = Program.from(runtimeWasm)
 
-        // globals
-        val globalsIndexMap = mutableMapOf<Index, Index>()
-        program.module.globals.also { programGlobals ->
-            runtime.module.globals.forEach {
-                val newIndex = Index.next(runtime.module.globals)
-                programGlobals.add(it.copy(index = newIndex))
-                globalsIndexMap[it.index] = newIndex
-            }
-        }
+    fun into(program: Program) : WackPthreads{
+        val module = program.module
 
-        val symbolFinder = ReplaceableFinder(Symbol::class.java)
-        runtime.statements.filterIsInstance<Function>().forEach {function ->
-            function.visit(symbolFinder)
-        }
+        // wack_parallel
+        val wackParallelType = module.findOraddType(listOf(WasmValueType.i32), listOf())
 
-        symbolFinder.result().filter { it.statement.scope == WasmScope.global }.forEach {
-            val newIndex = globalsIndexMap.get(it.statement.index)
-            if(newIndex != null){
-                it.replace(Symbol(WasmScope.global, it.statement.type, newIndex))
-            }
-        }
+        val wackParallel = WasmFunction(
+            Index.next(module.functions),
+            "wack_parallel",
+            wackParallelType,
+            import = WasmImport("\"wack_runtime\"", "\"wack_parallel\"")
+        )
 
-        // memory
+        module.functions.add(wackParallel)
+        program.statements.add(0, Function(wackParallel))
 
+        // get_num_threads
+        val getterType = module.findOraddType(listOf(), listOf(WasmValueType.i32))
+        val getNumThreads = WasmFunction(
+            Index.next(module.functions),
+            "get_num_threads",
+            getterType,
+            import = WasmImport("\"wack_runtime\"", "\"get_num_threads\"")
+        )
+        module.functions.add(getNumThreads)
+        program.statements.add(0, Function(getNumThreads))
 
-        return TODO()
+        return WackPthreads(
+            threadCount = getNumThreads,
+            parallel = wackParallel,
+        )
     }
+
 }
