@@ -76,7 +76,12 @@ table_type
     ;
 
 memory_type
-    : NAT NAT?
+    : NAT NAT? share?
+    ;
+
+share
+    : SHARED
+    | UNSHARED
     ;
 
 type_use
@@ -126,10 +131,19 @@ plain_instr
     | GLOBAL_SET var_
     | LOAD var_? OFFSET_EQ_NAT? ALIGN_EQ_NAT?
     | STORE var_? OFFSET_EQ_NAT? ALIGN_EQ_NAT?
+    | MEMORY_INIT var_? var_?
     | MEMORY_SIZE var_?
     | MEMORY_GROW var_?
     | MEMORY_COPY var_? var_?
     | MEMORY_FILL var_?
+    | DATA_DROP var_?
+    | ATOMIC_FENCE
+    | ATOMIC_LOAD var_? OFFSET_EQ_NAT? ALIGN_EQ_NAT?
+    | ATOMIC_STORE var_? OFFSET_EQ_NAT? ALIGN_EQ_NAT?
+    | ATOMIC_WAIT var_? OFFSET_EQ_NAT? ALIGN_EQ_NAT?
+    | ATOMIC_NOTIFY var_? OFFSET_EQ_NAT? ALIGN_EQ_NAT?
+    | ATOMIC_CMPXCHG var_? OFFSET_EQ_NAT? ALIGN_EQ_NAT?
+    | ATOMIC_OPR var_? OFFSET_EQ_NAT? ALIGN_EQ_NAT?
     | CONST literal
     | TEST
     | COMPARE
@@ -262,7 +276,7 @@ table_fields
     ;
 
 data
-    : LPAR DATA var_? offset STRING_* RPAR
+    : LPAR DATA var_? offset? STRING_* RPAR
     ;
 
 memory

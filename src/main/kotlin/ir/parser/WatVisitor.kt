@@ -224,6 +224,8 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
                 "div_s" -> BinaryOP.Operator.div.copy(signed = WasmBitSign.s)
                 "rem_u" -> BinaryOP.Operator.rem.copy(signed = WasmBitSign.u)
                 "rem_s" -> BinaryOP.Operator.rem.copy(signed = WasmBitSign.s)
+                "rotl" -> BinaryOP.Operator.rotl
+                "rotr" -> BinaryOP.Operator.rotr
                 else -> throw Error("unkown binary operator $operatorName")
             }
             val second = stack.pop()
@@ -327,6 +329,117 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val value = stack.pop()
             val i = stack.pop()
             stack.push(MemoryFill(memoryIndex, i, value, n))
+        } else if (ctx.MEMORY_INIT() != null) {
+            val vars = ctx.var_()
+            val index1 = vars?.getOrNull(0)?.text?.toInt()
+            val index2 = vars?.getOrNull(1)?.text?.toInt()
+
+            val n = stack.pop()
+            val s = stack.pop()
+            val d = stack.pop()
+
+            if (vars.size == 0) {
+                stack.push(MemoryInit(Index(0), Index(0), n, s, d))
+            } else if (vars.size == 1) {
+                stack.push(MemoryInit(Index(0), Index(index1 ?: 0), n, s, d))
+            } else if (vars.size == 2) {
+                stack.push(MemoryInit(Index(index1 ?: 0), Index(index2 ?: 0), n, s, d))
+            } else {
+                throw Exception("Invalid Var Size for memory.init!")
+            }
+        } else if (ctx.DATA_DROP() != null) {
+            val dataIndex = Index(ctx.var_()?.firstOrNull()?.text?.toInt() ?: 0)
+            stack.push(DataDrop(dataIndex))
+        } else if (ctx.ATOMIC_FENCE() != null) {
+            stack.push(RawWat("atomic.fence"))
+        } else if (ctx.ATOMIC_LOAD() != null) {
+            val type = WasmValueType.parse(ctx.ATOMIC_LOAD()!!.text.substring(0, 3))
+            val offset = ctx.OFFSET_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
+            val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
+            val addr = stack.pop()
+            val memoryIndex = Index(ctx.var_().getOrNull(0)?.text?.toIntOrNull() ?: 0)
+            val _meta = ctx.ATOMIC_LOAD()!!.text.split("load").last()
+            var memSize: Int? = null
+            var memSign: WasmBitSign? = null
+            if (_meta.isNotEmpty()) {
+                val (_size, _sign) = _meta.split("_")
+                memSize = _size.toInt()
+                memSign = WasmBitSign.valueOf(_sign)
+            }
+            stack.push(Load(type, addr, memoryIndex, offset, align, memSize, memSign, true))
+        } else if (ctx.ATOMIC_STORE() != null) {
+            val type = WasmValueType.parse(ctx.ATOMIC_STORE()!!.text.substring(0, 3))
+            val offset = ctx.OFFSET_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
+            val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
+            val data = stack.pop()
+            val addr = stack.pop()
+            val memoryIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
+            val _meta = ctx.ATOMIC_STORE()!!.text.split("store").last()
+            var memSize: Int? = null
+            if (_meta.isNotEmpty()) {
+                memSize = _meta.toInt()
+            }
+            val store = Store(Load(type, addr, memoryIndex, offset, align, memSize, null, true), data)
+            stack.push(store)
+        } else if (ctx.ATOMIC_WAIT() != null) {
+            val type = WasmValueType.parse("i" + ctx.ATOMIC_WAIT()!!.text.substringAfter("wait").substring(0, 2))
+            val offset = ctx.OFFSET_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
+            val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
+            val k = stack.pop()
+            val n = stack.pop()
+            val i = stack.pop()
+            val memoryIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
+            val wait = AtomicWait(type, memoryIndex, offset, align, k, n, i)
+            stack.push(wait)
+        } else if (ctx.ATOMIC_NOTIFY() != null) {
+            val offset = ctx.OFFSET_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
+            val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
+            val k = stack.pop()
+            val i = stack.pop()
+            val memoryIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
+            val notify = AtomicNotify(memoryIndex, offset, align, k, i)
+            stack.push(notify)
+        } else if(ctx.ATOMIC_CMPXCHG() != null){
+            val type = WasmValueType.parse(ctx.ATOMIC_CMPXCHG()!!.text.substring(0, 3))
+            val memoryIndex = Index(ctx.var_().getOrNull(0)?.text?.toIntOrNull() ?: 0)
+            val offset = ctx.OFFSET_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
+            val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
+            val _afterRMW = ctx.ATOMIC_CMPXCHG()!!.text.substringAfter("rmw")
+            val _meta = _afterRMW.substringBefore(".")
+            var memSize: Int? = null
+            var memSign: WasmBitSign? = null
+            if (_meta.isNotEmpty()) {
+                val (_size, _sign) = _meta.split("_")
+                memSize = _size.toInt()
+                memSign = WasmBitSign.valueOf(_sign)
+            }
+            val load = Load(type, Value.zero, memoryIndex, offset, align, memSize, memSign)
+            val c3 = stack.pop()
+            val c2 = stack.pop()
+            val i = stack.pop()
+            val cmpxchg = CMPXCHG(load, c3, c2, i)
+            stack.push(cmpxchg)
+        } else if(ctx.ATOMIC_OPR() != null){
+            val type = WasmValueType.parse(ctx.ATOMIC_OPR()!!.text.substring(0, 3))
+            val memoryIndex = Index(ctx.var_().getOrNull(0)?.text?.toIntOrNull() ?: 0)
+            val offset = ctx.OFFSET_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
+            val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
+            val _afterRMW = ctx.ATOMIC_OPR()!!.text.substringAfter("rmw")
+            val _opr = _afterRMW.substringAfter(".")
+            val _meta = _afterRMW.substringBefore(".")
+            var memSize: Int? = null
+            var memSign: WasmBitSign? = null
+            if (_meta.isNotEmpty()) {
+                val (_size, _sign) = _meta.split("_")
+                memSize = _size.toInt()
+                memSign = WasmBitSign.valueOf(_sign)
+            }
+            val load = Load(type, Value.zero, memoryIndex, offset, align, memSize, memSign)
+            val c2 = stack.pop()
+            val i = stack.pop()
+            val operator = AtomicOp.Operator(_opr)
+            val opr = AtomicOp(load, operator, c2, i)
+            stack.push(opr)
         } else {
             throw Exception("No Case found for: " + ctx.text)
         }

@@ -115,7 +115,8 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
         val range = ctx.memory_fields().memory_type().NAT()
         val min = range.first().text.toInt()
         val max = if (range.size > 1) range.last().text.toInt() else null
-        val shared = false
+        val shared = ctx.memory_fields().memory_type()
+            ?.let { type -> return@let type.share()?.let { share -> return@let share.SHARED() != null } } ?: false
         val memory = WasmMemory(Index.next(module.memories), min, max, shared)
         module.memories.add(memory)
     }
@@ -153,7 +154,7 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
             tableIndex,
             instructions,
             functions
-            )
+        )
         module.elementSegments.add(element)
     }
 
@@ -173,6 +174,13 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
             string
         )
         module.dataSegments.add(data)
+    }
+
+    override fun enterStart_(ctx: WatParser.Start_Context) {
+        ctx.var_()?.let {
+            val functionIndex = Index(it.text.toInt())
+            module.start = WasmStartSection(functionIndex)
+        }
     }
 
 }

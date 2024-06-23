@@ -156,10 +156,28 @@ CONVERT:
     | 'i64.reinterpret_f64'
 ;
 
+MEMORY_INIT : 'memory.init';
 MEMORY_SIZE : 'memory.size';
 MEMORY_GROW : 'memory.grow';
 MEMORY_COPY : 'memory.copy';
 MEMORY_FILL : 'memory.fill';
+DATA_DROP : 'data.drop';
+
+SHARED : 'shared';
+UNSHARED: 'unshared';
+ATOMICOP: 'add' | 'sub' | 'and' | 'or' | 'xor' | 'xchg';
+ATOMIC_FENCE: 'atomic.fence';
+ATOMIC_STORE: IXX '.atomic.store' ('8' | '16' | '32')?;
+ATOMIC_LOAD:
+    IXX '.atomic.load'
+    | IXX '.atomic.load8_u'
+    | IXX '.atomic.load16_u'
+    | IXX '.atomic.load32_u'
+    ;
+ATOMIC_WAIT: 'memory.atomic.wait' ('32' | '64');
+ATOMIC_NOTIFY: 'memory.atomic.notify';
+ATOMIC_CMPXCHG: IXX '.atomic.rmw'('8' | '16' | '32')?'.cmpxchg';
+ATOMIC_OPR: IXX '.atomic.rmw'('8' | '16' | '32')?'.' ATOMICOP;
 
 TYPE   : 'type';
 FUNC   : 'func';

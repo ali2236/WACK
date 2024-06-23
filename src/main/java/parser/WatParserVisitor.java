@@ -65,6 +65,12 @@ public interface WatParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMemory_type(WatParser.Memory_typeContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link WatParser#share}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitShare(WatParser.ShareContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link WatParser#type_use}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

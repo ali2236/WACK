@@ -17,9 +17,13 @@ class Load(
     val align: Int = 0,
     val memorySize: Int? = null,
     val sign: WasmBitSign? = null,
+    val atomic: Boolean = false,
 ) : Expression(), SymbolLoad {
 
     override fun write(out: Appendable) {
+        if(atomic){
+            out.append("Atomic:")
+        }
         out.append(Names.memory + memoryIndex)
         out.append("[")
         address.write(out)
@@ -44,7 +48,8 @@ class Load(
         val algn = if (align != 0) " align=$align" else ""
         val sgn = if(sign != null && memorySize != null) "${memorySize}_${sign}" else ""
         val memIndex = if(Mode.multipleMemories) " $memoryIndex" else ""
-        wat.writeLine("${type}.load$sgn$memIndex${ofst}${algn}", this)
+        val atomic = if(atomic) ".atomic" else ""
+        wat.writeLine("${type}${atomic}.load$sgn$memIndex${ofst}${algn}", this)
     }
 
     override fun clone(): Load {

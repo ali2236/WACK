@@ -93,6 +93,8 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
             val or = Operator("|", "or")
             val xor = Operator("^", "xor")
             val rem = Operator("%", "rem")
+            val rotl = Operator("<<<", "rotl")
+            val rotr = Operator(">>>", "rotr")
         }
 
         fun invert(): Operator {

@@ -36,6 +36,8 @@ class Program(val module: WasmModule, val statements: MutableList<Statement>) : 
         module.globals.forEach { it.wat(wat) }
         // exports
         module.exports.forEach { it.wat(wat) }
+        // start
+        module.start?.wat(wat)
         // elements
         module.elementSegments.forEach { it.wat(wat) }
         // data segment

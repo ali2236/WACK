@@ -98,6 +98,16 @@ public interface WatParserListener extends ParseTreeListener {
 	 */
 	void exitMemory_type(WatParser.Memory_typeContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link WatParser#share}.
+	 * @param ctx the parse tree
+	 */
+	void enterShare(WatParser.ShareContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link WatParser#share}.
+	 * @param ctx the parse tree
+	 */
+	void exitShare(WatParser.ShareContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link WatParser#type_use}.
 	 * @param ctx the parse tree
 	 */

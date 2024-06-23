@@ -7,6 +7,7 @@ data class WasmModule(
     val memories: MutableList<WasmMemory> = mutableListOf(),
     val globals: MutableList<WasmGlobal> = mutableListOf(),
     val exports: MutableList<WasmExport> = mutableListOf(),
+    var start : WasmStartSection? = null,
     val elementSegments: MutableList<WasmElementSegment> = mutableListOf(),
     val dataSegments: MutableList<WasmDataSegment> = mutableListOf(),
 ) {
