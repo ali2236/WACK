@@ -1,5 +1,6 @@
 package generation
 
+import external.Wasm2Wat
 import external.WasmMerge
 import generation.runtime2.CallKernelGenerator
 import generation.runtime2.ImportRuntime2
@@ -14,7 +15,7 @@ import ir.statement.Program
 import ir.wasm.WasmValueType
 import java.io.File
 
-class PThreadsGenerator(val outputName: String) : Generator {
+class WasiCGenerator(val outputName: String) : Generator {
     override fun apply(program: Program) {
         Mode.insure(Mode::multipleMemories, true)
         Mode.insure(Mode::callByIndex, true)
@@ -32,15 +33,25 @@ class PThreadsGenerator(val outputName: String) : Generator {
         val kernelTabel = KernelTableGenerator.generate(program)
         CallKernelGenerator.generate(program, kernelTabel)
 
-        val wackRuntime = File("./runtime/runtime2.wasm")
+        // TODO: make effected program memories shared
+        program.module.memories.forEach {
+            it.shared = true
+            if(it.max == null){
+                it.max = it.min
+            }
+        }
+
+        val wackRuntime = File("./runtime/runtime3.wasm")
 
         // export program
         val wack = program.exportAsWasm(File("./out/intermediate/wack_program.wat"))
 
         // link with [wasm-merge]
-        WasmMerge.merge(listOf(
+        val output = WasmMerge.merge(listOf(
             Pair("wack", wack),
             Pair("wack_runtime", wackRuntime),
         ),outputName)
+
+        Wasm2Wat.process(output)
     }
 }

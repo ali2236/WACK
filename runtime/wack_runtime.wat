@@ -9,6 +9,9 @@
   (type $arg_encode_type (func (param i32 i32) (result i32)))
   (type $arg_decode_type (func (param i32) (result i32 i32)))
   (import "wasi" "thread-spawn" (func $thread_spawn (type $thread_spawn_type)))
+  (func $nothing (type $kernel_type) (param $thread_id i32)
+    nop
+  )
   (func $try_lock_mutex (type $thread_spawn_type) (param $mutex_address i32) (result i32)
     local.get $mutex_address
     i32.const 0 ;; expected
@@ -102,19 +105,28 @@
      local.get 2
      call $unlock_mutex
   )
+  (func $wasi_thread_start2 (type $thread_start_type) (param i32 i32)
+     i32.const 0
+     call $lock_mutex
+     loop
+        br 0
+     end
+  )
   (func $test (type $main_type)
-    (local i32 i32)
+    ;;i32.const 0
+    ;;call $lock_mutex
+    i32.const 0
+    call $thread_spawn
+    drop
     i32.const 0
     call $lock_mutex
-    i32.const 0
-    call $unlock_mutex
-    i32.const 0
-    call $wait_mutex_lock
+    ;;i32.const 0
+    ;;call $wait_mutex_lock
   )
   (memory (;$runtime_memory;) 4 4 shared) ;; 64kb for thread join lock
   (global $num_threads (mut i32) (i32.const 8)) ;; $num_threads
-  (export "wasi_thread_start" (func $wasi_thread_start)) ;; not for public use
+  (export "wasi_thread_start" (func $wasi_thread_start2)) ;; not for public use
   (export "_start" (func $test))
   (table $kernels 32 32 funcref) ;; must be generated
-  ;;(elem (table $k) (i32.const 0) func $kernel_function_ids) ;; must be generated
+  (elem (table $kernels) (i32.const 0) func $nothing) ;; must be generated
 )

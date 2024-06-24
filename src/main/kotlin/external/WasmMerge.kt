@@ -3,7 +3,7 @@ package external
 import java.io.File
 
 object WasmMerge {
-    fun merge(modules: List<Pair<String, File>>, outputName: String){
+    fun merge(modules: List<Pair<String, File>>, outputName: String): File{
         // validate input
         if (modules.map { it.second }.any { it.extension != "wasm" }) {
             throw Exception()
@@ -25,6 +25,11 @@ object WasmMerge {
         commands.add("-o")
         commands.add(output.absolutePath)
         val process = ProcessBuilder(commands).start()
+        process.errorStream.reader().forEachLine {
+            println(it)
+        }
         process.waitFor()
+
+        return output
     }
 }

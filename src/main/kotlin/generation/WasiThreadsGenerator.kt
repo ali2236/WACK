@@ -50,5 +50,11 @@ class WasiThreadsGenerator : Generator {
         }
         WasiThreadStartGenerator.generate(program, threadArg, mutex)
         ParallelBlockGenerator.generate(parallelBlocks, threadCount, mutex)
+        program.module.memories.forEach {
+            it.shared = true
+            if(it.max == null){
+                it.max = it.min
+            }
+        }
     }
 }

@@ -4,6 +4,7 @@ import analysis.dfa.Dfa
 import external.Wasm2Wat
 import external.Wat2Wasm
 import generation.PThreadsGenerator
+import generation.WasiCGenerator
 import generation.WasiThreadsGenerator
 import generation.WatWriter
 import ir.IRConstructor
@@ -21,15 +22,15 @@ fun main(args: Array<String>) {
     insureDirectoryExists("./out/intermediate")
 
     // run
-    val samples = listOf(File("./samples/matrix_multiply.wasm"))// File("./samples").listFiles()
+    val samples = listOf(File("./samples/simple_loop.wasm"))
     for (sample in samples) {
         val program = Program.from(sample)
 
         OptimizationPasses.apply(program)
 
         // runtime injection / parallel loop transformer
-        //WasiThreadsGenerator().apply(program)
-        PThreadsGenerator(sample.nameWithoutExtension).apply(program)
+        WasiThreadsGenerator().apply(program)
+        //WasiCGenerator(sample.nameWithoutExtension).apply(program)
 
         // Analysis.writeDotFiles(program, sample.nameWithoutExtension)
 
