@@ -1,10 +1,11 @@
 package ir.expression
 
 import generation.WatWriter
+import ir.finder.Visitor
 import ir.statement.Block
 import ir.wasm.WasmValueType
 
-class BlockResult(val type: WasmValueType, val block: Block) : Expression() {
+class ResultBlock(val type: WasmValueType, var block: Block) : Expression() {
     override fun clone(): Expression {
         return this
     }
@@ -14,10 +15,14 @@ class BlockResult(val type: WasmValueType, val block: Block) : Expression() {
     }
 
     override fun write(out: Appendable) {
-        out.append("BlockResult(${block.printHeader()})")
+        out.append("{${block.printHeader()}}")
     }
 
     override fun wat(wat: WatWriter) {
-        //wat.writeLine("nop", this)
+        block.wat(wat)
+    }
+
+    override fun visit(v: Visitor) {
+        v.visit(block){this.block = it as Block}
     }
 }

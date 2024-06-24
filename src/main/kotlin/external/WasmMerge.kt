@@ -17,13 +17,14 @@ object WasmMerge {
 
 
         // run process
-        val processBuilder = ProcessBuilder("wasm-merge", "-all", "--rename-export-conflicts")
+        val commands = mutableListOf("wasm-merge", "-all", "--rename-export-conflicts")
         modules.forEach {
-            processBuilder.command(it.second.absolutePath)
-            processBuilder.command(it.first)
+            commands.add(it.second.absolutePath)
+            commands.add(it.first)
         }
-        processBuilder.command("-o", output.absolutePath)
-        val process = processBuilder.start()
+        commands.add("-o")
+        commands.add(output.absolutePath)
+        val process = ProcessBuilder(commands).start()
         process.waitFor()
     }
 }

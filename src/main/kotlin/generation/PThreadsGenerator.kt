@@ -37,12 +37,12 @@ class PThreadsGenerator(val outputName: String) : Generator {
         val wackRuntime = runtime2.exportAsWasm(File("./out/intermediate/wack_runtime.wat"))
 
         // export program
-        //val wack = program.exportAsWasm(File("./out/intermediate/wack_program.wat"))
+        val wack = program.exportAsWasm(File("./out/intermediate/wack_program.wat"))
 
         // link with [wasm-merge]
-       /* WasmMerge.merge(listOf(
+        WasmMerge.merge(listOf(
             Pair("wack", wack),
             Pair("wack_runtime", wackRuntime),
-        ),outputName)*/
+        ),outputName)
     }
 }

@@ -1,7 +1,6 @@
 package ir.parser
 
 import ir.expression.*
-import ir.finder.Finders
 import ir.statement.*
 import ir.wasm.*
 import org.antlr.v4.runtime.tree.ParseTree
@@ -64,17 +63,19 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             newScope(Loop())
             super.visitBlock_instr(ctx)
             val loop = exitScope() as Loop
-            currentBlock.push(loop)
             if (type != null) {
-                currentBlock.push(BlockResult(type, loop))
+                currentBlock.push(ResultBlock(type, loop))
+            } else {
+                currentBlock.push(loop)
             }
         } else if (ctx.BLOCK() != null) {
             newScope(Block(type = type))
             super.visitBlock_instr(ctx)
             val block = exitScope()
-            currentBlock.push(block)
             if (type != null) {
-                currentBlock.push(BlockResult(type, block))
+                currentBlock.push(ResultBlock(type, block))
+            } else {
+                currentBlock.push(block)
             }
         } else if (ctx.IF() != null) {
             val condition = stack.pop()
@@ -87,9 +88,11 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
                 val falseBody = exitScope()
                 ifMain.elseBody = falseBody.instructions
             }
-            stack.push(ifMain)
+
             if (type != null) {
-                currentBlock.push(BlockResult(type, ifMain))
+                currentBlock.push(ResultBlock(type, ifMain))
+            } else {
+                currentBlock.push(ifMain)
             }
         }
     }
