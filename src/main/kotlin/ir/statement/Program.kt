@@ -1,6 +1,7 @@
 package ir.statement
 
 import external.Wasm2Wat
+import external.Wat2Wasm
 import generation.WatWriter
 import ir.IRConstructor
 import ir.finder.Visitor
@@ -45,6 +46,14 @@ class Program(val module: WasmModule, val statements: MutableList<Statement>) : 
         // close module
         wat.indent--
         wat.writeLine(")")
+    }
+
+    fun exportAsWat(file: File) : File{
+        return WatWriter.writeToFile(this, file)
+    }
+
+    fun exportAsWasm(watOut: File) : File{
+        return Wat2Wasm().process(exportAsWat(watOut))
     }
 
     companion object {

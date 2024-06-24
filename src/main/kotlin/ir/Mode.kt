@@ -9,7 +9,7 @@ object Mode {
         }
     }
 
-    val debug = true
+    val debug = false
     val multipleMemories = true
     val callByIndex = false
     val annotations = true

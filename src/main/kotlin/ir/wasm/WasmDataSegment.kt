@@ -13,13 +13,17 @@ data class WasmDataSegment(
     WebAssemblyInstruction {
     override fun wat(wat: WatWriter) {
         wat.startLine()
-        wat.write("(data (;$dataIndex;) (")
-        wat.endLine()
-        wat.indent++
-        wat.writeAll(constExpr)
-        wat.indent--
-        wat.startLine()
-        wat.write(") $bytes)")
+        wat.write("(data (;$dataIndex;)")
+        if(constExpr.isNotEmpty()) {
+            wat.write(" (")
+            wat.endLine()
+            wat.indent++
+            wat.writeAll(constExpr)
+            wat.indent--
+            wat.startLine()
+            wat.write(")")
+        }
+        wat.write(" $bytes)")
         wat.endLine()
 
     }

@@ -17,9 +17,8 @@ object ImportRuntime2 {
 
         val wackParallel = WasmFunction(
             Index.next(module.functions),
-            "wack_parallel",
             wackParallelType,
-            import = WasmImport("\"wack_runtime\"", "\"wack_parallel\"")
+            import = WasmImport("\"wack_runtime\"", "\"parallel\"")
         )
 
         module.functions.add(wackParallel)
@@ -29,7 +28,6 @@ object ImportRuntime2 {
         val getterType = module.findOraddType(listOf(), listOf(WasmValueType.i32))
         val getNumThreads = WasmFunction(
             Index.next(module.functions),
-            "get_num_threads",
             getterType,
             import = WasmImport("\"wack_runtime\"", "\"get_num_threads\"")
         )

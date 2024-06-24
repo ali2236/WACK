@@ -29,16 +29,12 @@ fun main(args: Array<String>) {
 
         // runtime injection / parallel loop transformer
         //WasiThreadsGenerator().apply(program)
-        PThreadsGenerator().apply(program)
+        PThreadsGenerator(sample.nameWithoutExtension).apply(program)
 
         // Analysis.writeDotFiles(program, sample.nameWithoutExtension)
 
-        // write out
-        val watOut = File("./out/intermediate/wack_${sample.nameWithoutExtension}.wat")
-        WatWriter.writeToFile(program, watOut)
-
-        // convert to wasm
-        Wat2Wasm().process(watOut)
+        // convert to wasm / wat
+        program.exportAsWasm(File("./out/intermediate/wack_${sample.nameWithoutExtension}.wat"))
     }
 }
 

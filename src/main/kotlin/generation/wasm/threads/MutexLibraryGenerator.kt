@@ -29,13 +29,13 @@ object MutexLibraryGenerator {
 
 
         // function headers
-        val wasmTryLockMutex = WasmFunction(Index.next(module.functions), "try_lock_mutex", threadSpawnType)
+        val wasmTryLockMutex = WasmFunction(Index.next(module.functions), threadSpawnType)
         module.functions.add(wasmTryLockMutex)
-        val wasmLockMutex = WasmFunction(Index.next(module.functions), "lock_mutex", kernelType)
+        val wasmLockMutex = WasmFunction(Index.next(module.functions), kernelType)
         module.functions.add(wasmLockMutex)
-        val wasmUnlockMutex = WasmFunction(Index.next(module.functions), "unlock_mutex", kernelType)
+        val wasmUnlockMutex = WasmFunction(Index.next(module.functions), kernelType)
         module.functions.add(wasmUnlockMutex)
-        val wasmWaitMutexLock = WasmFunction(Index.next(module.functions), "wait_mutex_lock", kernelType)
+        val wasmWaitMutexLock = WasmFunction(Index.next(module.functions), kernelType)
         module.functions.add(wasmWaitMutexLock)
 
         // functions

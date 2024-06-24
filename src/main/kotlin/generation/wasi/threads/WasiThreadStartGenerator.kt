@@ -30,7 +30,6 @@ object WasiThreadStartGenerator {
         // function headers
         val wasmWasiThreadStart = WasmFunction(
             Index.next(module.functions),
-            "wasi_thread_start",
             threadStartType,
             mutableListOf(WasmValueType.i32, WasmValueType.i32)
         )

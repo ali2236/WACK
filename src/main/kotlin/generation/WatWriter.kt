@@ -52,12 +52,13 @@ class WatWriter(private val buffer: Appendable) {
     }
 
     companion object {
-        fun writeToFile(program: Program, watOut: File) {
+        fun writeToFile(program: Program, watOut: File) : File {
             val outWriter = watOut.writer()
             val watWriter = WatWriter(outWriter)
             program.wat(watWriter)
             outWriter.flush()
             outWriter.close()
+            return watOut
         }
     }
 }

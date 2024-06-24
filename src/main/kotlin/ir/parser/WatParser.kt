@@ -61,7 +61,6 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
             val (params, results) = desc.func_type().paramsAndResults()
             val function = WasmFunction(
                 Index.next(module.functions),
-                name,
                 WasmFunctionType(
                     index = Index(desc.type_use().var_().NAT().text.toInt()),
                     params = params,
