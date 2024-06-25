@@ -1,5 +1,6 @@
 package generation
 
+import external.Wasm2Wat
 import external.WasmMerge
 import generation.runtime2.CallKernelGenerator
 import generation.runtime2.ImportRuntime2
@@ -38,9 +39,12 @@ class PThreadsGenerator(val outputName: String) : Generator {
         val wack = program.exportAsWasm(File("./out/intermediate/wack_program.wat"))
 
         // link with [wasm-merge]
-        WasmMerge.merge(listOf(
-            Pair("wack", wack),
+        val output = WasmMerge.merge(listOf(
+            Pair("env", File("./runtime/glue.wasm")),
             Pair("wack_runtime", wackRuntime),
+            Pair("wack", wack),
         ),outputName)
+
+        Wasm2Wat.process(output)
     }
 }

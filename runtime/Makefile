@@ -1,3 +1,6 @@
+build_glue:
+	wat2wasm glue.wat --enable-threads -o glue.wasm
+
 build: wack_runtime.wat
 	wat2wasm.exe wack_runtime.wat --enable-threads -o runtime.wasm
 
