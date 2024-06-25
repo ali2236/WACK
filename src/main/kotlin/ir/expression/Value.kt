@@ -75,6 +75,10 @@ open class Value(val type: WasmValueType, val value: String) : ImmutableExpressi
     }
 
     companion object {
+        fun i32(i: Int): Expression {
+            return Value(WasmValueType.i32, "$i")
+        }
+
         val zero: Value = Value(WasmValueType.i32, "0")
         val one: Value = Value(WasmValueType.i32, "1")
     }

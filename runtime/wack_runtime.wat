@@ -103,6 +103,8 @@
 
      ;; unlock mutex
      local.get 2
+     i32.const 4
+     i32.mul
      call $unlock_mutex
   )
   (func $wasi_thread_start2 (type $thread_start_type) (param i32 i32)

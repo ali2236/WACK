@@ -62,7 +62,7 @@ object WasiThreadStartGenerator {
 
             // unlock mutex
             it.instructions.add(
-                mutex.unlock.call(threadId),
+                mutex.unlock.call(BinaryOP(WasmValueType.i32, BinaryOP.Operator.mul, threadId, Value.i32(4))),
             )
 
         }

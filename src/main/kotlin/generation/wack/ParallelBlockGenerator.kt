@@ -21,7 +21,7 @@ object ParallelBlockGenerator {
             val threadId = block.annotations.filterIsInstance<Parallel>().first().threadId!!
             val oldBody = block.instructions.toTypedArray()
             val zero = Value.zero
-            val one = Value(WasmValueType.i32, "1")
+            val one = Value.one
             block.instructions.clear()
             block.instructions.apply {
                 // init: loop threadId from 0 until num_threads
@@ -45,7 +45,7 @@ object ParallelBlockGenerator {
                                     block,
                                     1,
                                 ),
-                                Br(loop,0),
+                                Br(loop, 0),
                             )
                         )
                     }
@@ -70,7 +70,7 @@ object ParallelBlockGenerator {
                                     block,
                                     1,
                                 ),
-                                Br(loop,0),
+                                Br(loop, 0),
                             )
                         )
                     }

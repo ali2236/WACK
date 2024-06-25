@@ -3,7 +3,7 @@
   (type $simple_type (func (param i32)))
   (type $thread_spawn_type (func (param i32) (result i32)))
   (type $thread_start_type (func (param i32 i32)))
-  (import "env" "memory" (memory (;0;) 4 4 shared))
+  (import "env" "my-memory" (memory (;0;) 4 4 shared))
   (import "wasi" "thread-spawn" (func $thread_spawn (type $thread_spawn_type)))
   (func $try_lock_mutex (type $thread_spawn_type) (param $mutex_address i32) (result i32)
     local.get $mutex_address
@@ -62,7 +62,7 @@
     i32.const 0
     call $wait_mutex_lock
   )
-  (export "memory" (memory 0))
+  (export "my-memory" (memory 0))
   (export "wasi_thread_start" (func $wasi_thread_start))
   (export "_start" (func $main))
 )

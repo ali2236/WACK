@@ -10,7 +10,12 @@ object MutexLibraryGenerator {
         val module = program.module
 
         // memory
-        val mutexMemory = WasmMemory(Index.next(module.memories), 4, 4, true)
+        val mutexMemory = WasmMemory(
+            Index.next(module.memories),
+            4,
+            4,
+            true,
+        )
         module.memories.add(mutexMemory)
 
         // types

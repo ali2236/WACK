@@ -27,12 +27,14 @@ class Program(val module: WasmModule, val statements: MutableList<Statement>) : 
         wat.indent++
         // types
         module.functionTypes.forEach { it.wat(wat) }
+        // memory imports
+        module.memories.filter { it.import != null }.forEach { it.wat(wat) }
         // imports & functions
         wat.writeAll(statements)
         // tables
         module.tables.forEach { it.wat(wat) }
         // memories
-        module.memories.forEach { it.wat(wat) }
+        module.memories.filter { it.import == null }.forEach { it.wat(wat) }
         // globals
         module.globals.forEach { it.wat(wat) }
         // exports
