@@ -29,8 +29,8 @@ fun main(args: Array<String>) {
         OptimizationPasses.apply(program)
 
         // runtime injection / parallel loop transformer
-        //WasiThreadsGenerator().apply(program)
-        PThreadsGenerator(sample.nameWithoutExtension).apply(program)
+        WasiThreadsGenerator().apply(program)
+        //PThreadsGenerator(sample.nameWithoutExtension).apply(program)
         //WasiCGenerator(sample.nameWithoutExtension).apply(program)
 
         // Analysis.writeDotFiles(program, sample.nameWithoutExtension)

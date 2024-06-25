@@ -16,8 +16,7 @@ import ir.expression.Value
 import ir.statement.If
 import ir.statement.Program
 import ir.statement.Unreachable
-import ir.wasm.WasmBitSign
-import ir.wasm.WasmValueType
+import ir.wasm.*
 
 class WasiThreadsGenerator : Generator {
     override fun apply(program: Program) {
@@ -56,5 +55,6 @@ class WasiThreadsGenerator : Generator {
                 it.max = it.min
             }
         }
+        program.module.exports.add(WasmExport("\"runtime_memory\"", WasmExportKind.memory, Index(1)))
     }
 }

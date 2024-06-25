@@ -40,7 +40,7 @@ class PThreadsGenerator(val outputName: String) : Generator {
 
         // link with [wasm-merge]
         val output = WasmMerge.merge(listOf(
-            Pair("env", File("./runtime/glue.wasm")),
+            //Pair("env", File("./runtime/glue.wasm")),
             Pair("wack_runtime", wackRuntime),
             Pair("wack", wack),
         ),outputName)

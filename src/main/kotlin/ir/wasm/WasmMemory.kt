@@ -2,6 +2,7 @@ package ir.wasm
 
 import generation.WatWriter
 import generation.WebAssemblyInstruction
+import ir.Mode
 
 data class WasmMemory(val index: Index, val min: Int, var max: Int?, var shared: Boolean?) : WebAssemblyInstruction {
     override fun wat(wat: WatWriter) {
