@@ -4,7 +4,6 @@ import ir.expression.Symbol
 import ir.expression.Value
 import ir.statement.Program
 import ir.wasm.*
-import wasm.*
 
 object ThreadCountGenerator {
     fun generate(program: Program) : WasmGlobal {

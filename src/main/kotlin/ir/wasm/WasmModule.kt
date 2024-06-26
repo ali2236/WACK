@@ -11,7 +11,7 @@ data class WasmModule(
     val elementSegments: MutableList<WasmElementSegment> = mutableListOf(),
     val dataSegments: MutableList<WasmDataSegment> = mutableListOf(),
 ) {
-    fun findOraddType(params: List<WasmValueType>, result: List<WasmValueType>): WasmFunctionType {
+    fun findOraddType(params: List<WasmValueType>, result: List<WasmValueType> = listOf()): WasmFunctionType {
         var type = functionTypes
             .firstOrNull { type ->
                 if (type.params.size != params.size || type.result.size != result.size) {

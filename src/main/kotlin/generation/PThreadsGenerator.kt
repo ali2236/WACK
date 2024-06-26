@@ -6,6 +6,7 @@ import generation.runtime2.CallKernelGenerator
 import generation.runtime2.ImportRuntime2
 import generation.wack.ThreadKernelGenerator
 import generation.wasi.threads.KernelTableGenerator
+import generation.wasi.threads.WasiThreadsMemory
 import ir.Mode
 import ir.annotations.CallKernel
 import ir.annotations.Parallel
@@ -32,6 +33,7 @@ class PThreadsGenerator(val outputName: String) : Generator {
         }
         val kernelTabel = KernelTableGenerator.generate(program)
         CallKernelGenerator.generate(program, kernelTabel)
+        WasiThreadsMemory(false).apply(program)
 
         val wackRuntime = File("./runtime/runtime2.wasm")
 
@@ -40,9 +42,8 @@ class PThreadsGenerator(val outputName: String) : Generator {
 
         // link with [wasm-merge]
         val output = WasmMerge.merge(listOf(
-            //Pair("env", File("./runtime/glue.wasm")),
-            Pair("wack_runtime", wackRuntime),
             Pair("wack", wack),
+            Pair("wack_runtime", wackRuntime),
         ),outputName)
 
         Wasm2Wat.process(output)

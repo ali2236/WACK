@@ -7,7 +7,7 @@
   (type $thread_spawn_type (func (param i32) (result i32)))
   (type $thread_start_type (func (param i32 i32)))
   (type $arg_encode_type (func (param i32 i32) (result i32)))
-  (type $arg_decode_type (func (param i32) (result i32 i32)))
+  (type $arg_decode_type (func (param i32) (result i32)))
   (import "wasi" "thread-spawn" (func $thread_spawn (type $thread_spawn_type)))
   (func $nothing (type $kernel_type) (param $thread_id i32)
     nop
@@ -64,35 +64,34 @@
     i32.shl
     i32.xor
   )
-  (func $decode_arg (type $arg_decode_type) (param i32) (result i32 i32)
+  (func $decode_thread_id (type $arg_decode_type) (param i32) (result i32)
     ;; unsigned int thread_id = args & 0x0000FFFF;
     local.get 0
     i32.const 0x0000FFFF
     i32.and
     ;; thread_num param
-    ;; unsigned int kernel_id = (args & 0xFFFF0000) >> 16;
-    local.get 0
-    i32.const 0xFFFF0000
-    i32.and
-    i32.const 16
-    i32.shr_u
-    ;; function index
   )
+
+    (func $decode_kernel_id (type $arg_decode_type) (param i32) (result i32)
+      ;; unsigned int kernel_id = (args & 0xFFFF0000) >> 16;
+      local.get 0
+      i32.const 0xFFFF0000
+      i32.and
+      i32.const 16
+      i32.shr_u
+      ;; function index
+    )
 
   (func $wasi_thread_start (type $thread_start_type) (param i32 i32)
     (local i32 i32)
      ;; unsigned int thread_id = args & 0x0000FFFF;
      local.get 1
-     i32.const 0x0000FFFF
-     i32.and
+     call $decode_thread_id
      local.set 2
      ;; thread_num param
      ;; unsigned int kernel_id = (args & 0xFFFF0000) >> 16;
      local.get 1
-     i32.const 0xFFFF0000
-     i32.and
-     i32.const 16
-     i32.shr_u
+     call $decode_kernel_id
      local.set 3
      ;; function index
 

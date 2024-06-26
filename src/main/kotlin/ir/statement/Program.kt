@@ -6,7 +6,10 @@ import generation.WatWriter
 import ir.IRConstructor
 import ir.finder.Visitor
 import ir.parser.Wat
+import ir.wasm.Index
+import ir.wasm.WasmFunction
 import ir.wasm.WasmModule
+import ir.wasm.WasmValueType
 import java.io.File
 
 class Program(val module: WasmModule, val statements: MutableList<Statement>) : BasicStatement() {
@@ -50,12 +53,30 @@ class Program(val module: WasmModule, val statements: MutableList<Statement>) : 
         wat.writeLine(")")
     }
 
-    fun exportAsWat(file: File) : File{
+    fun exportAsWat(file: File): File {
         return WatWriter.writeToFile(this, file)
     }
 
-    fun exportAsWasm(watOut: File) : File{
+    fun exportAsWasm(watOut: File): File {
         return Wat2Wasm().process(exportAsWat(watOut))
+    }
+
+    fun addFunction(
+        params: List<WasmValueType> = listOf(),
+        result: List<WasmValueType> = listOf(),
+        locals: List<WasmValueType> = listOf(),
+        instructions: MutableList<Statement> = mutableListOf()
+    ): Function {
+        val functionType = module.findOraddType(params, result)
+        val header = WasmFunction(
+            Index.next(module.functions),
+            functionType,
+            locals.toMutableList(),
+        )
+        module.functions.add(header)
+        val body = Function(header, instructions)
+        statements.add(body)
+        return body
     }
 
     companion object {

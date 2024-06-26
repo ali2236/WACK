@@ -10,92 +10,72 @@ object MutexLibraryGenerator {
         val module = program.module
 
         // memory
-        val mutexMemory = WasmMemory(
-            Index.next(module.memories),
-            4,
-            4,
-            true,
-        )
+        val m = Index.next(module.memories)
+        val mutexMemory = WasmMemory(m, 4, 4, true)
         module.memories.add(mutexMemory)
 
-        // types
-        val kernelType = module.findOraddType(params = listOf(WasmValueType.i32), result = listOf())
-        val threadSpawnType =
-            module.findOraddType(params = listOf(WasmValueType.i32), result = listOf(WasmValueType.i32))
-        val argEncodeType =
-            module.findOraddType(
-                params = listOf(WasmValueType.i32, WasmValueType.i32),
-                result = listOf(WasmValueType.i32)
-            )
-
-
-        // function headers
-        val wasmTryLockMutex = WasmFunction(Index.next(module.functions), threadSpawnType)
-        module.functions.add(wasmTryLockMutex)
-        val wasmLockMutex = WasmFunction(Index.next(module.functions), kernelType)
-        module.functions.add(wasmLockMutex)
-        val wasmUnlockMutex = WasmFunction(Index.next(module.functions), kernelType)
-        module.functions.add(wasmUnlockMutex)
-        val wasmWaitMutexLock = WasmFunction(Index.next(module.functions), kernelType)
-        module.functions.add(wasmWaitMutexLock)
-
         // functions
-        val tryLockMutex = Function(
-            wasmTryLockMutex, mutableListOf(
-                Symbol(WasmScope.local, WasmValueType.i32, Index(0)),
-                Value.zero,
-                Value.one,
-                RawWat("i32.atomic.rmw.cmpxchg ${mutexMemory.index}"),
+        val tryLockMutex = program.addFunction(
+            params = listOf(WasmValueType.i32), result = listOf(WasmValueType.i32), instructions = mutableListOf(
+                RawWat("local.get 0"),
+                RawWat("i32.const 0"),
+                RawWat("i32.const 1"),
+                RawWat("i32.atomic.rmw.cmpxchg $m"),
                 RawWat("i32.eqz"),
             )
         )
-        program.statements.add(tryLockMutex)
-        val lockMutex = Function(wasmLockMutex, mutableListOf(Block().also { block ->
-            block.instructions.add(
-                Loop(
-                    mutableListOf(
-                        FunctionCall(
-                            tryLockMutex.functionData.index,
-                            listOf(Symbol(WasmScope.local, WasmValueType.i32, Index(0))),
-                            tryLockMutex.functionData.type.result,
+
+        val lockMutex = program.addFunction(
+            params = listOf(WasmValueType.i32),
+            instructions = mutableListOf(
+                Block(
+                    instructions = mutableListOf(
+                        Loop(
+                            instructions = mutableListOf(
+                                RawWat("local.get 0"),
+                                tryLockMutex.functionData.call(),
+                                RawWat("br_if 1"),
+                                RawWat("local.get 0"),
+                                RawWat("i32.const 1"),
+                                RawWat("i64.const -1"),
+                                RawWat("memory.atomic.wait32 $m"),
+                                RawWat("drop"),
+                                RawWat("br 0"),
+                            )
                         ),
-                        BrIf(FunctionResult(WasmValueType.i32), block, 1),
-                        Symbol(WasmScope.local, WasmValueType.i32, Index(0)),
-                        Value(WasmValueType.i32, "1"),
-                        Value(WasmValueType.i64, "-1"),
-                        RawWat("memory.atomic.wait32 ${mutexMemory.index}"),
-                        RawWat("drop"),
-                        RawWat("br 0"),
-                    ),
+                    )
                 ),
-            )
-        }))
-        program.statements.add(lockMutex)
-        val unlockMutex = Function(
-            wasmUnlockMutex, mutableListOf(
-                Symbol(WasmScope.local, WasmValueType.i32, Index(0)),
-                Value.zero,
-                RawWat("i32.atomic.store ${mutexMemory.index}"),
-                Symbol(WasmScope.local, WasmValueType.i32, Index(0)),
-                Value(WasmValueType.i32, "1"),
-                RawWat("memory.atomic.notify ${mutexMemory.index}"),
+            ),
+        )
+
+        val unlockMutex = program.addFunction(
+            params = listOf(WasmValueType.i32),
+            instructions = mutableListOf(
+                RawWat("local.get 0"),
+                RawWat("i32.const 0"),
+                RawWat("i32.atomic.store $m"),
+                RawWat("local.get 0"),
+                RawWat("i32.const 1"),
+                RawWat("memory.atomic.notify $m"),
                 RawWat("drop"),
-            )
+            ),
         )
-        program.statements.add(unlockMutex)
-        val waitMutexLock = Function(
-            wasmWaitMutexLock, mutableListOf(
-                wasmLockMutex.call(Symbol(WasmScope.local, WasmValueType.i32, Index(0))),
-                wasmUnlockMutex.call(Symbol(WasmScope.local, WasmValueType.i32, Index(0))),
-            )
+
+        val waitMutexLock = program.addFunction(
+            params = listOf(WasmValueType.i32),
+            instructions = mutableListOf(
+                RawWat("local.get 0"),
+                lockMutex.functionData.call(),
+                RawWat("local.get 0"),
+                unlockMutex.functionData.call(),
+            ),
         )
-        program.statements.add(waitMutexLock)
 
         return MutexLibrary(
-            wasmLockMutex,
-            wasmUnlockMutex,
-            wasmWaitMutexLock,
-            mutexMemory,
+            lock = lockMutex.functionData,
+            unlock = unlockMutex.functionData,
+            join = waitMutexLock.functionData,
+            memory = mutexMemory,
         )
     }
 }

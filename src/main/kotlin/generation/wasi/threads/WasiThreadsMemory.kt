@@ -6,7 +6,7 @@ import ir.wasm.WasmExportKind
 import ir.wasm.WasmImport
 
 // Import & Export All memories - mark all memories as shared - declare memories in imports
-object WasiThreadsMemory {
+class WasiThreadsMemory(val specialFirst: Boolean = true) {
     fun apply(program: Program) {
         val module = program.module
 
@@ -24,7 +24,7 @@ object WasiThreadsMemory {
 
             // add it to import
             if (it.import == null) {
-                val name = if (it.index.number == 0) "\"memory\"" else "\"memory-${it.index}\""
+                val name = if (it.index.number == 0 && specialFirst) "\"memory\"" else "\"memory-${it.index}\""
                 it.import = WasmImport("\"env\"", name)
             }
 

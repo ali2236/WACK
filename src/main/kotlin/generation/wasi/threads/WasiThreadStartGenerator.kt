@@ -19,54 +19,29 @@ object WasiThreadStartGenerator {
     fun generate(program: Program, arg: ThreadArg, mutex: MutexLibrary) {
         val module = program.module
 
-        // types
-        val kernelType = module.findOraddType(params = listOf(WasmValueType.i32), result = listOf())
-        val threadStartType =
-            module.findOraddType(params = listOf(WasmValueType.i32, WasmValueType.i32), result = listOf())
-
         // kernel table
         val kernelTable = KernelTableGenerator.generate(program)
+        val kernelType = module.findOraddType(params = listOf(WasmValueType.i32)).index
 
-        // function headers
-        val wasmWasiThreadStart = WasmFunction(
-            Index.next(module.functions),
-            threadStartType,
-            mutableListOf(WasmValueType.i32, WasmValueType.i32)
+        val wasiThreadStart = program.addFunction(
+            params = listOf(WasmValueType.i32, WasmValueType.i32),
+            locals = listOf(WasmValueType.i32, WasmValueType.i32),
+            instructions = mutableListOf(
+                RawWat("local.get 1"),
+                arg.decodeThreadId.call(), // thread_id = decode_tid(arg)
+                RawWat("local.set 2"),
+                RawWat("local.get 1"),
+                arg.decodeKernelId.call(), // kernel_id = decode_kid(arg)
+                RawWat("local.set 3"),
+                RawWat("local.get 2"),
+                RawWat("local.get 3"),
+                RawWat("call_indirect ${kernelTable.index} (type $kernelType)"),
+                RawWat("local.get 2"),
+                RawWat("i32.const 4"),
+                RawWat("i32.mul"),
+                mutex.unlock.call(),
+            ),
         )
-        module.functions.add(wasmWasiThreadStart)
-
-        // functions
-        val wasiThreadStart = Function(wasmWasiThreadStart).also {
-            val args = Symbol(WasmScope.local, WasmValueType.i32, Index(1))
-            val threadId = Symbol(WasmScope.local, WasmValueType.i32, Index(2))
-            val kernelIndex = Symbol(WasmScope.local, WasmValueType.i32, Index(3))
-
-            // thread_id, kernel_index = decode_arg(args)
-            it.instructions.add(arg.decode.call(args))
-            it.instructions.add(
-                Assignment(kernelIndex, FunctionResult(WasmValueType.i32))
-            )
-            it.instructions.add(RawWat("local.set ${threadId.index}"))
-
-
-            // table[kernel_id](thread_id)
-            it.instructions.add(
-                IndirectFunctionCall(
-                    kernelTable.index,
-                    kernelType.index,
-                    kernelIndex,
-                    listOf(threadId),
-                    kernelType.result,
-                )
-            )
-
-            // unlock mutex
-            it.instructions.add(
-                mutex.unlock.call(BinaryOP(WasmValueType.i32, BinaryOP.Operator.mul, threadId, Value.i32(4))),
-            )
-
-        }
-        program.statements.add(wasiThreadStart)
 
         // exports
         val wasiThreadStartExport = WasmExport(

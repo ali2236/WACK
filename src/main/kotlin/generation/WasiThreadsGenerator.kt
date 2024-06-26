@@ -58,6 +58,6 @@ class WasiThreadsGenerator : Generator {
         }
         WasiThreadStartGenerator.generate(program, threadArg, mutex)
         ParallelBlockGenerator.generate(parallelBlocks, threadCount, mutex)
-        WasiThreadsMemory.apply(program)
+        WasiThreadsMemory().apply(program)
     }
 }

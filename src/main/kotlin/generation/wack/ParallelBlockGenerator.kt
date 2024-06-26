@@ -42,10 +42,9 @@ object ParallelBlockGenerator {
                                         threadId,
                                         threadCount.symbol
                                     ),
-                                    block,
-                                    1,
+                                    loop,
+                                    0,
                                 ),
-                                Br(loop, 0),
                             )
                         )
                     }
@@ -67,10 +66,9 @@ object ParallelBlockGenerator {
                                         threadId,
                                         threadCount.symbol
                                     ),
-                                    block,
-                                    1,
+                                    loop,
+                                    0,
                                 ),
-                                Br(loop, 0),
                             )
                         )
                     }
