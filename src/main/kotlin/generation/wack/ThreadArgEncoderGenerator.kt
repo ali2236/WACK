@@ -23,7 +23,7 @@ object ThreadArgEncoderGenerator {
             )
         )
 
-        val threadIdDecoder = program.addFunction(
+        val kernelIdDecoder = program.addFunction(
             params = listOf(WasmValueType.i32),
             result = listOf(WasmValueType.i32),
             instructions = mutableListOf(
@@ -33,7 +33,7 @@ object ThreadArgEncoderGenerator {
             )
         )
 
-        val kernelIdDecoder = program.addFunction(
+        val threadIdDecoder = program.addFunction(
             params = listOf(WasmValueType.i32),
             result = listOf(WasmValueType.i32),
             instructions = mutableListOf(

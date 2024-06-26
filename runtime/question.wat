@@ -57,7 +57,7 @@
   )
   (func $parallel
     (local i32)
-    i32.const 64
+    i32.const 1000
     local.set 0
     loop
         local.get 0
@@ -78,11 +78,6 @@
   )
   (func $main (type $main_type)
     call $parallel
-    i32.const 0
-    call $wait_mutex_lock
-    call $parallel
-    i32.const 4
-    call $wait_mutex_lock
   )
   (export "my-memory" (memory 0))
   (export "wasi_thread_start" (func $wasi_thread_start))

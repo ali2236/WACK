@@ -56,7 +56,7 @@
     local.get $mutex_address
     call $unlock_mutex
   )
-  ;; thread_id ^ (kernel_id << 16)
+  ;; r
   (func $encode_arg (type $arg_encode_type) (param i32 i32) (result i32)
     local.get 0
     local.get 1
@@ -64,22 +64,22 @@
     i32.shl
     i32.xor
   )
-  (func $decode_thread_id (type $arg_decode_type) (param i32) (result i32)
-    ;; unsigned int thread_id = args & 0x0000FFFF;
+  (func $decode_kernel_id (type $arg_decode_type) (param i32) (result i32)
+    ;; unsigned int kernel_id =r;
     local.get 0
     i32.const 0x0000FFFF
     i32.and
-    ;; thread_num param
+    ;; function index
   )
 
-    (func $decode_kernel_id (type $arg_decode_type) (param i32) (result i32)
-      ;; unsigned int kernel_id = (args & 0xFFFF0000) >> 16;
+    (func $decode_thread_id  (type $arg_decode_type) (param i32) (result i32)
+      ;; unsigned int thread_id  = (args & 0xFFFF0000) >> 16;
       local.get 0
       i32.const 0xFFFF0000
       i32.and
       i32.const 16
       i32.shr_u
-      ;; function index
+      ;; thread_num param
     )
 
   (func $wasi_thread_start (type $thread_start_type) (param i32 i32)

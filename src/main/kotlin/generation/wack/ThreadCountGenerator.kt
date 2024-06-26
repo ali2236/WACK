@@ -5,14 +5,14 @@ import ir.expression.Value
 import ir.statement.Program
 import ir.wasm.*
 
-object ThreadCountGenerator {
+class ThreadCountGenerator(val initialCount : Int) {
     fun generate(program: Program) : WasmGlobal {
         val module = program.module
 
         // globals
         val numThreads = WasmGlobal(
             Index.next(module.globals), WasmGlobalType(WasmValueType.i32, true), mutableListOf(
-                Value(WasmValueType.i32, "8")
+                Value.i32(initialCount),
             )
         )
         module.globals.add(numThreads)

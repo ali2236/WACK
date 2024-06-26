@@ -56,8 +56,8 @@ object ParallelBlockGenerator {
                         loop.indexInParent = 3
                         loop.instructions.addAll(
                             listOf(
-                                // barrier: loop threadId from 0 until num_threads -> join(threadId)
-                                mutex.join.call(threadId),
+                                // barrier: loop threadId from 0 until num_threads -> join(threadId*4)
+                                mutex.join.call(BinaryOP(WasmValueType.i32, BinaryOP.Operator.mul, threadId, Value.i32(4))),
                                 Assignment(threadId, BinaryOP(WasmValueType.i32, BinaryOP.Operator.add, threadId, one)),
                                 BrIf(
                                     BinaryOP(
