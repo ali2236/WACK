@@ -1,5 +1,5 @@
 ;; runtime template
-;; not used by compiler
+;; not used by tools
 ;; for demenstration purposes only
 (module
   (type $main_type (func))
@@ -71,17 +71,63 @@
     i32.and
     ;; function index
   )
-
-    (func $decode_thread_id  (type $arg_decode_type) (param i32) (result i32)
-      ;; unsigned int thread_id  = (args & 0xFFFF0000) >> 16;
-      local.get 0
-      i32.const 0xFFFF0000
-      i32.and
-      i32.const 16
-      i32.shr_u
-      ;; thread_num param
-    )
-
+  (func $decode_thread_id  (type $arg_decode_type) (param i32) (result i32)
+    ;; unsigned int thread_id  = (args & 0xFFFF0000) >> 16;
+    local.get 0
+    i32.const 0xFFFF0000
+    i32.and
+    i32.const 16
+    i32.shr_u
+    ;; thread_num param
+  )
+  (func $parallel (type $kernel_type) (param $kernel_id)
+    (local $i i32)
+    i32.const 0
+    local.set $i
+    loop
+        local.get $i
+        global.get $num_threads
+        i32.lt_u
+        if
+            local.get $i ;; thread_id
+            i32.const 4
+            i32.mul
+            call $lock_mutex
+            local.get $i ;; thread_id
+            local.get $kernel_id
+            call $encode_arg
+            call $thread_spawn
+            i32.const 0
+            i32.lt_u
+            if
+                unreachable
+            end
+            local.get $i
+            i32.const 1
+            i32.add
+            local.set $i
+            br 1
+        end
+    end
+    i32.const 0
+    local.set $i
+    loop ;; join all
+        local.get $i
+        global.get $num_threads
+        i32.lt_u
+        if
+            local.get $i ;; thread_id
+            i32.const 4
+            i32.mul
+            call $wait_mutex_lock
+            local.get $i
+            i32.const 1
+            i32.add
+            local.set $i
+            br 1
+        end
+    end
+  )
   (func $wasi_thread_start (type $thread_start_type) (param i32 i32)
     (local i32 i32)
      ;; unsigned int thread_id = args & 0x0000FFFF;

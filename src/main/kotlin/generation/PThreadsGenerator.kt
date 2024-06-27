@@ -9,11 +9,8 @@ import generation.wasi.threads.KernelTableGenerator
 import generation.wasi.threads.WasiThreadsMemory
 import ir.Mode
 import ir.annotations.CallKernel
-import ir.annotations.Parallel
-import ir.expression.SingleResultFunction
 import ir.expression.Value
 import ir.statement.Program
-import ir.wasm.WasmValueType
 import java.io.File
 
 class PThreadsGenerator(val outputName: String) : Generator {
@@ -21,18 +18,13 @@ class PThreadsGenerator(val outputName: String) : Generator {
         Mode.insure(Mode::multipleMemories, true)
         Mode.insure(Mode::callByIndex, true)
         val runtime = ImportRuntime2.into(program)
-        val threadCountCall = SingleResultFunction(runtime.threadCount.call(), WasmValueType.i32)
-        ThreadKernelGenerator.generate(program, threadCountCall){ _, block ->
+        val threadCountCall = runtime.threadCount.call().result
+        ThreadKernelGenerator.generate(program, threadCountCall, null){ _, block ->
             val kernelId = block.annotations.filterIsInstance<CallKernel>().first().kernelIndex
-            val isParallel = block.hasAnnotation(Parallel::class.java)
-            if(!isParallel) return@generate
-            block.annotations.removeIf { it is Parallel }
-            block.instructions.add(
-                runtime.parallel.call(Value(WasmValueType.i32, "$kernelId"))
-            )
+            block.instructions.add(runtime.parallel.call(Value.i32(kernelId)))
         }
-        val kernelTabel = KernelTableGenerator.generate(program)
-        CallKernelGenerator.generate(program, kernelTabel)
+        val kernelTable = KernelTableGenerator.generate(program)
+        CallKernelGenerator.generate(program, kernelTable)
         WasiThreadsMemory(false).apply(program)
 
         val wackRuntime = File("./runtime/runtime2.wasm")
@@ -42,8 +34,8 @@ class PThreadsGenerator(val outputName: String) : Generator {
 
         // link with [wasm-merge]
         val output = WasmMerge.merge(listOf(
-            Pair("wack", wack),
             Pair("wack_runtime", wackRuntime),
+            Pair("wack", wack),
         ),outputName)
 
         Wasm2Wat.process(output)

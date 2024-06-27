@@ -68,6 +68,10 @@ class Function(
     }
 
     override fun watHeader(wat: WatWriter) {
+        watBlockAnnotations(wat)
+        if(annotations.isNotEmpty()){
+            wat.endLine()
+        }
         val functionIndex = if(Mode.callByIndex) "(;${functionData.index};)" else "\$f${functionData.index}"
         val funcStart =
             "(func $functionIndex (type ${functionData.type.index})${functionData.type.paramsWat()}${functionData.type.resultWat()}"

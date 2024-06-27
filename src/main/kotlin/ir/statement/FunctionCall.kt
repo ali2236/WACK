@@ -3,6 +3,7 @@ package ir.statement
 import generation.WatWriter
 import ir.Mode
 import ir.expression.Expression
+import ir.expression.SingleResultFunction
 import ir.wasm.Index
 import ir.wasm.WasmValueType
 
@@ -33,8 +34,16 @@ class FunctionCall(
 
     override fun wat(wat: WatWriter) {
         wat.writeAll(params.asReversed())
-        val fi = if(Mode.callByIndex) "$functionIndex" else "\$f${functionIndex}"
+        val fi = if (Mode.callByIndex) "$functionIndex" else "\$f${functionIndex}"
         wat.writeLine("call $fi", this)
     }
+
+    val result: SingleResultFunction
+        get() {
+            if(returnType.size != 1){
+                throw Exception()
+            }
+            return SingleResultFunction(this, returnType.first())
+        }
 
 }

@@ -26,38 +26,15 @@ class WasiThreadsGenerator : Generator {
         Mode.insure(Mode::callByIndex, true)
         val mutex = MutexLibraryGenerator.generate(program)
         val threadArg = ThreadArgEncoderGenerator.generate(program)
-        val threadCount = ThreadCountGenerator(4).generate(program)
+        val threadCount = ThreadCountGenerator(8).generate(program)
         val threadSpawn = WasiThreadSpawnGenerator.generate(program)
-        val parallelBlocks = ThreadKernelGenerator.generate(program, threadCount.symbol) { function, block ->
-            val threadId = function.annotations.filterIsInstance<ThreadId>().first().symbol
+        val parallel = ParallelBlockGenerator.generate(program, threadCount.symbol, mutex, threadArg, threadSpawn)
+        ThreadKernelGenerator.generate(program, threadCount.symbol, mutex) { function, block ->
+            block.instructions.clear()
             val kernelId = block.annotations.filterIsInstance<CallKernel>().first().kernelIndex
-            // lock_mutex(thread_id * 4)
-            block.instructions.add(
-                mutex.lock.call(BinaryOP(WasmValueType.i32, BinaryOP.Operator.mul, threadId, Value.i32(4))),
-            )
-            // spawn thread
-            block.instructions.add(
-                If(
-                    BinaryOP(
-                        WasmValueType.i32,
-                        BinaryOP.Operator.lt.copy(signed = WasmBitSign.s),
-                        SingleResultFunction(
-                            threadSpawn.call(
-                                SingleResultFunction(
-                                    threadArg.encode.call(
-                                        threadId, Value(WasmValueType.i32, "$kernelId")
-                                    ), WasmValueType.i32
-                                )
-                            ),
-                            WasmValueType.i32,
-                        ),
-                        Value.zero
-                    ), mutableListOf(Unreachable())
-                ),
-            )
+            block.instructions.add(parallel.call(Value.i32(kernelId)))
         }
-        WasiThreadStartGenerator.generate(program, threadArg, mutex)
-        ParallelBlockGenerator.generate(parallelBlocks, threadCount, mutex)
+        WasiThreadStartGenerator.generate(program, threadArg, mutex, threadCount.symbol)
         WasiThreadsMemory().apply(program)
     }
 }

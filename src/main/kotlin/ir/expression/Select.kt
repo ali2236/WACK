@@ -4,6 +4,7 @@ import generation.WatWriter
 import ir.wasm.WasmValueType
 
 // return selector == 0 ? val2 : val1
+// TODO: implementation maybe incorrect
 class Select(val val1: Expression, val val2: Expression, val selector: Expression, val resultType: WasmValueType?) :
     Expression() {
     override fun clone(): Expression {
@@ -17,9 +18,9 @@ class Select(val val1: Expression, val val2: Expression, val selector: Expressio
     override fun write(out: Appendable) {
         selector.write(out)
         out.append(" ? ")
-        val2.write(out)
-        out.append(" : ")
         val1.write(out)
+        out.append(" : ")
+        val2.write(out)
     }
 
     override fun wat(wat: WatWriter) {

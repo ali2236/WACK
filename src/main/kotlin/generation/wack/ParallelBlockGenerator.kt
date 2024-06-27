@@ -4,8 +4,11 @@ import generation.wasm.threads.MutexLibrary
 import ir.annotations.Parallel
 import ir.expression.*
 import ir.statement.*
+import ir.wasm.Index
 import ir.wasm.WasmBitSign
+import ir.wasm.WasmFunction
 import ir.wasm.WasmGlobal
+import ir.wasm.WasmScope
 import ir.wasm.WasmValueType
 
 // for thread_id from 0 to num_threads:
@@ -16,64 +19,70 @@ import ir.wasm.WasmValueType
 //    join(thread_id)
 //
 object ParallelBlockGenerator {
-    fun generate(blocks: List<Block>, threadCount: WasmGlobal, mutex: MutexLibrary) {
-        blocks.forEach { block ->
-            val threadId = block.annotations.filterIsInstance<Parallel>().first().threadId!!
-            val oldBody = block.instructions.toTypedArray()
-            val zero = Value.zero
-            val one = Value.one
-            block.instructions.clear()
-            block.instructions.apply {
-                // init: loop threadId from 0 until num_threads
-                add(Assignment(threadId, zero))
-                add(
-                    Loop().also { loop ->
-                        loop.parent = block
-                        loop.indexInParent = 1
-                        loop.instructions.addAll(
-                            listOf(
-                                // body: run block body
-                                *oldBody,
-                                Assignment(threadId, BinaryOP(WasmValueType.i32, BinaryOP.Operator.add, threadId, one)),
-                                BrIf(
-                                    BinaryOP(
+    fun generate(
+        program: Program, threadCount: Expression, mutex: MutexLibrary, arg: ThreadArg, threadSpawn: WasmFunction
+    ): WasmFunction {
+        val module = program.module
+        val kernelId = Symbol(WasmScope.local, WasmValueType.i32, Index(0))
+        val threadId = Symbol(WasmScope.local, WasmValueType.i32, Index(1))
+        val mutexAddress = BinaryOP(
+            WasmValueType.i32,
+            BinaryOP.Operator.mul,
+            threadId,
+            Value.i32(4),
+        )
+        val parallel = program.addFunction(
+            params = listOf(WasmValueType.i32),
+            locals = listOf(WasmValueType.i32),
+            instructions = mutableListOf(
+                Assignment(threadId, Value.zero),
+                Loop(
+                    instructions = mutableListOf(
+                        If(
+                            condition = BinaryOP(
+                                WasmValueType.i32,
+                                BinaryOP.Operator.lt.copy(signed = WasmBitSign.s),
+                                threadId,
+                                threadCount,
+                            ),
+                            trueBody = mutableListOf(
+                                mutex.lock.call(mutexAddress),
+                                If(
+                                    condition = BinaryOP(
                                         WasmValueType.i32,
-                                        BinaryOP.Operator.lt.copy(signed = WasmBitSign.s),
-                                        threadId,
-                                        threadCount.symbol
+                                        BinaryOP.Operator.lt.copy(signed = WasmBitSign.u),
+                                        threadSpawn.call(arg.encode.call(threadId, kernelId).result).result,
+                                        Value.zero,
                                     ),
-                                    loop,
-                                    0,
+                                    trueBody = mutableListOf(Unreachable()),
                                 ),
-                            )
-                        )
-                    }
-                )
-                add(Assignment(threadId, zero))
-                add(
-                    Loop().also { loop ->
-                        loop.parent = block
-                        loop.indexInParent = 3
-                        loop.instructions.addAll(
-                            listOf(
-                                // barrier: loop threadId from 0 until num_threads -> join(threadId*4)
-                                mutex.join.call(BinaryOP(WasmValueType.i32, BinaryOP.Operator.mul, threadId, Value.i32(4))),
-                                Assignment(threadId, BinaryOP(WasmValueType.i32, BinaryOP.Operator.add, threadId, one)),
-                                BrIf(
-                                    BinaryOP(
-                                        WasmValueType.i32,
-                                        BinaryOP.Operator.lt.copy(signed = WasmBitSign.s),
-                                        threadId,
-                                        threadCount.symbol
-                                    ),
-                                    loop,
-                                    0,
-                                ),
-                            )
-                        )
-                    }
-                )
-            }
-        }
+                                Assignment(threadId, BinaryOP.increment(threadId)),
+                                RawWat("br 1"),
+                            ),
+                        ),
+                    )
+                ),
+                Assignment(threadId, Value.zero),
+                Loop(
+                    instructions = mutableListOf(
+                        If(
+                            condition = BinaryOP(
+                                WasmValueType.i32,
+                                BinaryOP.Operator.lt.copy(signed = WasmBitSign.s),
+                                threadId,
+                                threadCount,
+                            ),
+                            trueBody = mutableListOf(
+                                mutex.join.call(mutexAddress),
+                                Assignment(threadId, BinaryOP.increment(threadId)),
+                                RawWat("br 1"),
+                            ),
+                        ),
+                    )
+                ),
+            ),
+        )
+
+        return parallel.functionData
     }
 }

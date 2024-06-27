@@ -125,4 +125,16 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
             }
         }
     }
+
+    companion object {
+        fun increment(symbol: Symbol): BinaryOP {
+            return BinaryOP(
+                symbol.type,
+                Operator.add,
+                symbol,
+                Value(symbol.type, "1"),
+            )
+        }
+    }
+
 }

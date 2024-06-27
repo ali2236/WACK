@@ -16,12 +16,16 @@ export function thread_start(int tid, int args){
 }
  */
 object WasiThreadStartGenerator {
-    fun generate(program: Program, arg: ThreadArg, mutex: MutexLibrary) {
+    fun generate(program: Program, arg: ThreadArg, mutex: MutexLibrary, threadCount: Expression) {
         val module = program.module
 
         // kernel table
         val kernelTable = KernelTableGenerator.generate(program)
         val kernelType = module.findOraddType(params = listOf(WasmValueType.i32)).index
+
+        val threadId = Symbol(WasmScope.local, WasmValueType.i32, Index(2))
+        val kernelId = Symbol(WasmScope.local, WasmValueType.i32, Index(3))
+
 
         val wasiThreadStart = program.addFunction(
             params = listOf(WasmValueType.i32, WasmValueType.i32),

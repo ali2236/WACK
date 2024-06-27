@@ -4,14 +4,12 @@ import generation.WatWriter
 import ir.expression.Symbol
 import ir.finder.Visitor
 
-class Parallel(var threadId: Symbol? = null) : WackAnnotation {
+class Parallel : WackAnnotation {
     override fun wat(wat: WatWriter) {
-        wat.write("(@parallel $threadId)")
+        wat.write("(@parallel)")
     }
 
     override fun visit(v: Visitor) {
-        threadId?.let {
-            v.visit(it) {rep -> this.threadId = rep as Symbol}
-        }
+
     }
 }

@@ -1,5 +1,6 @@
 package generation.wack
 
+import generation.wasm.threads.MutexLibrary
 import ir.annotations.*
 import ir.expression.*
 import ir.finder.AnnotationFinder
@@ -11,7 +12,7 @@ import ir.wasm.*
 
 object ThreadKernelGenerator {
     fun generate(
-        program: Program, threadCount: Expression, generateCallKernel: (Function, Block) -> Unit,
+        program: Program, threadCount: Expression, mutex: MutexLibrary?, generateCallKernel: (Function, Block) -> Unit,
     ): List<Block> {
         val module = program.module
         var kernels = 0
@@ -21,11 +22,9 @@ object ThreadKernelGenerator {
             for ((forLoop, replace) in forBlocks) {
                 try {
                     val kernelType = module.findOraddType(listOf(WasmValueType.i32), listOf()).copy()
-                    val parallelBlock = Block(annotations = forLoop.annotations.apply { removeIf { it is For } })
+                    val parallelBlock = Block()
                     parallelBlock.parent = forLoop.parent
                     parallelBlock.indexInParent = forLoop.indexInParent
-                    val parallelAnnotation = parallelBlock.annotations.filterIsInstance<Parallel>().first()
-
 
                     // loop boundaries
                     val rangeLoop = (forLoop as RangeLoop)
@@ -82,6 +81,7 @@ object ThreadKernelGenerator {
                         instructions.add(
                             Assignment(
                                 end, Select(
+                                    size,
                                     BinaryOP(
                                         WasmValueType.i32,
                                         BinaryOP.Operator.mul,
@@ -98,7 +98,6 @@ object ThreadKernelGenerator {
                                             Value(WasmValueType.i32, "1"),
                                         ),
                                     ),
-                                    size,
                                     BinaryOP(
                                         WasmValueType.i32, BinaryOP.Operator.eq, threadId, BinaryOP(
                                             WasmValueType.i32,
@@ -111,6 +110,28 @@ object ThreadKernelGenerator {
                                 )
                             )
                         )
+
+                        val print = module.exports.first { it.name == "\"print_i32\"" }.index
+                        val debug = arrayOf(
+                            // lock mutex
+                            threadCount,
+                            RawWat("i32.const 4"),
+                            RawWat("i32.mul"),
+                            mutex!!.lock.call(),
+                            // debug
+                            RawWat("local.get 1"),
+                            RawWat("local.get 2"),
+                            RawWat("call \$f$print"),
+                            // debug end
+                            // unlock mutex
+                            threadCount,
+                            RawWat("i32.const 4"),
+                            RawWat("i32.mul"),
+                            mutex.unlock.call(),
+                        )
+                        instructions.addAll(debug)
+
+                        instructions.add(forLoop)
 
                         // replace locals with new boundaries
                         // replace init with start
@@ -131,11 +152,10 @@ object ThreadKernelGenerator {
                                     return@associate Pair(private.symbol, newSymbol)
                                 }
                             }
-                        SymbolReplacer(toReplace).also { function.visit(it) }
+                        SymbolReplacer(toReplace).also { this.visit(it) }
 
                         // replace condition.right with end
                         (rangeLoop.condition as BinaryOP).right = end// what to replace with end
-                        instructions.add(forLoop)
                     }
                     val kernelId = kernels++
                     val kernelAnnotation = Kernel(kernelId)
@@ -147,14 +167,6 @@ object ThreadKernelGenerator {
                     // call kernel function with thread-spawn
                     // check if error code -> trap
 
-                    var threadId = function.annotations.filterIsInstance<ThreadId>().firstOrNull()?.symbol
-                    if (threadId == null) {
-                        threadId = Symbol(WasmScope.local, WasmValueType.i32, Index.next(function.functionData.locals))
-                        function.functionData.locals.add(threadId.type)
-                        function.annotations.add(ThreadId(threadId))
-                    }
-
-                    parallelAnnotation.threadId = threadId
                     parallelBlock.apply {
                         annotations.add(CallKernel(kernelId))
                         generateCallKernel(function, this)

@@ -256,7 +256,7 @@ object DfaBuilder {
                 return explainExpression(expr.teeValue(), dfaFacts)
             }
 
-            is FunctionResult, is SingleResultFunction, is ResultBlock, is MemoryGrow, is MemorySize -> {
+            is FunctionResult, is SingleResultFunction, is ResultBlock, is MemoryGrow, is MemorySize, is CMPXCHG -> {
                 return DfaValue.Unknown()
             }
 

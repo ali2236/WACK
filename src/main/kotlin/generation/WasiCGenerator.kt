@@ -21,7 +21,7 @@ class WasiCGenerator(val outputName: String) : Generator {
         Mode.insure(Mode::callByIndex, true)
         val runtime = ImportRuntime2.into(program)
         val threadCountCall = SingleResultFunction(runtime.threadCount.call(), WasmValueType.i32)
-        ThreadKernelGenerator.generate(program, threadCountCall){ _, block ->
+        ThreadKernelGenerator.generate(program, threadCountCall, null){ _, block ->
             val kernelId = block.annotations.filterIsInstance<CallKernel>().first().kernelIndex
             val isParallel = block.hasAnnotation(Parallel::class.java)
             if(!isParallel) return@generate
