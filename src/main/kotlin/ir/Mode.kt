@@ -12,6 +12,6 @@ object Mode {
     val debug = true
     val multipleMemories = true
     val callByIndex = false
-    val annotations = true
+    val annotations = false
     val threadSpawnModule = "wasi" /*"wasi_snapshot_preview1"*/
 }

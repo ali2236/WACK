@@ -9,8 +9,10 @@ data class WasmGlobal(val index: Index, val type: WasmGlobalType, val constExpr:
 
     val symbol: Symbol
         get() = Symbol(WasmScope.global, type.type, index)
+
     override fun wat(wat: WatWriter) {
-        wat.writeLine("(global (;$index;) ($type) (")
+        val typ = if(type.mutable) "($type)" else "$type"
+        wat.writeLine("(global (;$index;) $typ (")
         wat.indent++
         constExpr.map { it.wat(wat) }
         wat.indent--

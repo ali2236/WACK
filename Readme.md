@@ -12,7 +12,7 @@
 - [x] Support Store 8/16/32 types
 - [x] Move Increment Restructure to Optimization Passes
 - [x] Privatize Loop Symbol if needed
-- [ ] Generate Deep-Loop Kernels correctly
+- [x] Generate Deep-Loop Kernels correctly
 - [ ] Dependence Analysis P54
 - [ ] GCD Test
 - [ ] Data Dependency Test
@@ -29,4 +29,8 @@ else false
 ### How to Run
 ```
 wasmtime -W all-proposals=y -S threads .\wack_matrix_multiply.wasm
+```
+
+```
+wasm-opt -O3 --enable-threads --enable-bulk-memory --enable-reference-types --enable-multimemory .\wack_matrix_multiply.wasm -o opt_mat.wasm
 ```

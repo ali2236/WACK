@@ -1,7 +1,13 @@
 import analysis.Analysis
 import generation.WasiThreadsGenerator
 import generation.insureDirectoryExists
+import ir.expression.Symbol
+import ir.expression.Value
+import ir.statement.Assignment
 import ir.statement.Program
+import ir.wasm.Index
+import ir.wasm.WasmScope
+import ir.wasm.WasmValueType
 import optimization.OptimizationPasses
 import java.io.File
 

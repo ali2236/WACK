@@ -12,7 +12,10 @@ import ir.wasm.*
 
 object ThreadKernelGenerator {
     fun generate(
-        program: Program, threadCount: Expression, mutex: MutexLibrary?, generateCallKernel: (Function, Block) -> Unit,
+        program: Program,
+        threadCount: Expression,
+        mutex: MutexLibrary?,
+        generateCallKernel: (Function, Block) -> Unit,
     ): List<Block> {
         val module = program.module
         var kernels = 0
@@ -111,7 +114,7 @@ object ThreadKernelGenerator {
                             )
                         )
 
-                        val print = module.exports.first { it.name == "\"print_i32\"" }.index
+                        /*val print = module.exports.first { it.name == "\"print_i32\"" }.index
                         val debug = arrayOf(
                             // lock mutex
                             threadCount,
@@ -129,7 +132,7 @@ object ThreadKernelGenerator {
                             RawWat("i32.mul"),
                             mutex.unlock.call(),
                         )
-                        instructions.addAll(debug)
+                        instructions.addAll(debug)*/
 
                         instructions.add(forLoop)
 
