@@ -1,10 +1,12 @@
 package ir.statement
 
 import generation.WatWriter
+import ir.Names
 import ir.expression.Expression
 import ir.expression.Symbol
 import ir.finder.Finders
 import ir.finder.Visitor
+import ir.wasm.WasmScope
 
 
 open class Assignment(
@@ -29,7 +31,11 @@ open class Assignment(
 
     override fun wat(wat: WatWriter) {
         value.wat(wat)
-        wat.writeLine("${symbol.scope}.set ${symbol.index}", this)
+        if (symbol.scope == WasmScope.global){
+            wat.writeLine("${symbol.scope}.set ${symbol.index.access(Names.global)}", this)
+        } else {
+            wat.writeLine("${symbol.scope}.set ${symbol.index}", this)
+        }
     }
 
     override fun visit(v: Visitor) {

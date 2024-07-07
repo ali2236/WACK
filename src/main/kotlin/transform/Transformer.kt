@@ -1,7 +1,7 @@
-package optimization
+package transform
 
 import ir.statement.Program
 
-interface Optimizer {
+interface Transformer {
     fun apply(program: Program)
 }

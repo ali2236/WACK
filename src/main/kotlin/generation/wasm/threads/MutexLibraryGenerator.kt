@@ -16,6 +16,7 @@ object MutexLibraryGenerator {
 
         // functions
         val tryLockMutex = program.addFunction(
+            name = "wack__try_lock_mutex",
             params = listOf(WasmValueType.i32), result = listOf(WasmValueType.i32), instructions = mutableListOf(
                 RawWat("local.get 0"),
                 RawWat("i32.const 0"),
@@ -26,6 +27,7 @@ object MutexLibraryGenerator {
         )
 
         val lockMutex = program.addFunction(
+            name = "wack__lock_mutex",
             params = listOf(WasmValueType.i32),
             instructions = mutableListOf(
                 Block(
@@ -49,6 +51,7 @@ object MutexLibraryGenerator {
         )
 
         val unlockMutex = program.addFunction(
+            name = "wack__unlock_mutex",
             params = listOf(WasmValueType.i32),
             instructions = mutableListOf(
                 RawWat("local.get 0"),
@@ -62,6 +65,7 @@ object MutexLibraryGenerator {
         )
 
         val waitMutexLock = program.addFunction(
+            name = "wack__wait_mutex_lock",
             params = listOf(WasmValueType.i32),
             instructions = mutableListOf(
                 RawWat("local.get 0"),

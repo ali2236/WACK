@@ -10,7 +10,7 @@ data class WasmFunction(
     val locals: MutableList<WasmValueType> = mutableListOf(), // only important when attached to a Function class
     val import: WasmImport? = null,
     val code: ParseTree? = null,
-) {
+) : IndexedSection {
     val allLocals: List<WasmValueType>
         get() = type.params + locals
 
@@ -18,12 +18,7 @@ data class WasmFunction(
         return FunctionCall(index, listOf(*params), type.result)
     }
 
-    val prettyName: String
-        get() {
-            if (import != null) {
-                return import.name.replace("\"", "")
-            } else {
-                return "f${index.number}"
-            }
-        }
+    override fun getSectionIndex(): Index {
+        return index
+    }
 }

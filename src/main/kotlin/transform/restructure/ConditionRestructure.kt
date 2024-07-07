@@ -1,11 +1,10 @@
-package optimization.restructure
+package transform.restructure
 
 import ir.expression.BinaryOP
 import ir.expression.Expression
 import ir.expression.Value
 import ir.statement.If
 import ir.statement.Statement
-import ir.wasm.WasmValueType
 import java.lang.Exception
 
 class ConditionRestructure : Restructure() {

@@ -1,4 +1,4 @@
-package optimization
+package transform
 
 import analysis.dfa.Dfa
 import ir.expression.Load
@@ -12,7 +12,7 @@ import ir.wasm.Index
 import ir.wasm.WasmScope
 
 @Deprecated("doesn't Alias Stack Allocated Variables")
-class AliasMemory : Optimizer {
+class AliasMemory : Transformer {
     override fun apply(program: Program) {
         program.statements
             .filterIsInstance<Function>()
@@ -23,7 +23,7 @@ class AliasMemory : Optimizer {
                 val aliases = mutableMapOf<Load, Symbol>()
                 val params = function.functionData.type.params.size
                 val makeAlias: (Load) -> Unit = { load ->
-                    aliases[load] = Symbol(WasmScope.local, load.type, Index(params + function.functionData.locals.size))
+                    aliases[load] = Symbol(WasmScope.local, load.type, Index.number(params + function.functionData.locals.size))
                     function.functionData.locals.add(load.type)
                 }
 

@@ -58,11 +58,12 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
 
         val desc = ctx.import_desc()
         if (desc.FUNC() != null) {
+            val index = if(desc.bind_var() != null) Index.parse(desc.bind_var().text) else Index.next(module.functions)
             val (params, results) = desc.func_type().paramsAndResults()
             val function = WasmFunction(
-                Index.next(module.functions),
+                index,
                 WasmFunctionType(
-                    index = Index(desc.type_use().var_().NAT().text.toInt()),
+                    index = Index.parse(desc.type_use().var_().text),
                     params = params,
                     result = results,
                 ),
@@ -74,6 +75,9 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
     }
 
     override fun enterFunc_(ctx: WatParser.Func_Context) {
+
+        // header
+        val index = if(ctx.bind_var() != null) Index.parse(ctx.bind_var().text) else Index.next(module.functions)
         val fields = ctx.func_fields()
         val typeIndex = fields.type_use().var_().NAT().text.toInt()
 
@@ -90,8 +94,8 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
 
         // Build Function
         val function = WasmFunction(
-            Index.next(module.functions),
-            type = WasmFunctionType(Index(typeIndex), params, results),
+            index = index,
+            type = WasmFunctionType(Index.number(typeIndex), params, results),
             locals = locals.toMutableList(),
             code = code
         )
@@ -100,13 +104,14 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
     }
 
     override fun enterSglobal(ctx: WatParser.SglobalContext) {
+        val index = if(ctx.bind_var() != null) Index.parse(ctx.bind_var().text) else Index.next(module.globals)
         val typeCtx = ctx.global_fields().global_type()
         val type = WasmValueType.parse(typeCtx.value_type().text)
         val mutable = typeCtx.MUT() != null
         val globalType = WasmGlobalType(type, mutable)
         val expr = ctx.global_fields().const_expr()
         val instructions = WatVisitor(module).visitArbitrary(expr).toMutableList()
-        val global = WasmGlobal(Index.next(module.globals), globalType, instructions)
+        val global = WasmGlobal(index, globalType, instructions)
         module.globals.add(global)
     }
 
@@ -128,7 +133,7 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
         else if (desc.MEMORY() != null) WasmExportKind.memory
         else if (desc.GLOBAL() != null) WasmExportKind.global
         else throw Error()
-        val index = Index(desc.var_().text.toInt())
+        val index = Index.parse(desc.var_().text)
         val export = WasmExport(name, kind, index)
         module.exports.add(export)
     }
@@ -142,12 +147,12 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
     }
 
     override fun enterElem(ctx: WatParser.ElemContext) {
-        val tableIndex = Index(ctx.table_bind()?.var_()?.text?.toIntOrNull() ?: 0)
+        val tableIndex = Index.parse(ctx.table_bind()?.var_()?.text)
         val expr = ctx.offset()
         val instructions =
             if (expr != null) WatVisitor(module).visitArbitrary(expr).toMutableList() else listOf<Statement>()
         val functionList = ctx.function_list()?.var_() ?: listOf()
-        val functions = functionList.map { Index(it.text?.toIntOrNull() ?: 0) }
+        val functions = functionList.map { Index.parse(it.text) }
         val element = WasmElementSegment(
             Index.next(module.elementSegments),
             tableIndex,
@@ -158,7 +163,7 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
     }
 
     override fun enterData(ctx: WatParser.DataContext) {
-        val memoryIndex = Index(ctx.var_()?.text?.toIntOrNull() ?: 0)
+        val memoryIndex = Index.parse(ctx.var_()?.text)
         val expr = ctx.offset()
         val instructions =
             if (expr != null) WatVisitor(module).visitArbitrary(expr).toMutableList() else listOf<Statement>()
@@ -177,7 +182,7 @@ class WasmModuleRecorder(val module: WasmModule) : WatParserBaseListener() {
 
     override fun enterStart_(ctx: WatParser.Start_Context) {
         ctx.var_()?.let {
-            val functionIndex = Index(it.text.toInt())
+            val functionIndex = Index.parse(it.text)
             module.start = WasmStartSection(functionIndex)
         }
     }

@@ -16,10 +16,9 @@ import java.io.File
 class PThreadsGenerator(val outputName: String) : Generator {
     override fun apply(program: Program) {
         Mode.insure(Mode::multipleMemories, true)
-        Mode.insure(Mode::callByIndex, true)
         val runtime = ImportRuntime2.into(program)
         val threadCountCall = runtime.threadCount.call().result
-        ThreadKernelGenerator.generate(program, threadCountCall, null){ _, block ->
+        ThreadKernelGenerator.generate(program, threadCountCall){ _, block ->
             val kernelId = block.annotations.filterIsInstance<CallKernel>().first().kernelIndex
             block.instructions.add(runtime.parallel.call(Value.i32(kernelId)))
         }

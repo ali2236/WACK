@@ -1,12 +1,12 @@
-package optimization.constant_propegation
+package transform.constant_propegation
 
 import analysis.dfa.Dfa
 import ir.statement.*
 import ir.statement.Function
-import optimization.Optimizer
+import transform.Transformer
 
 // Replace Assignable with const equivalent
-class ConstantPropagation : Optimizer {
+class ConstantPropagation : Transformer {
     override fun apply(program: Program) {
         program.statements.filterIsInstance<Function>().filter { it.instructions.isNotEmpty() }.forEach { function ->
                 val srcMap = SourceMapBuilder().also { it.visit(function) {} }.result()

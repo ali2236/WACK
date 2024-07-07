@@ -22,9 +22,8 @@ object ParallelBlockGenerator {
     fun generate(
         program: Program, threadCount: Expression, mutex: MutexLibrary, arg: ThreadArg, threadSpawn: WasmFunction
     ): WasmFunction {
-        val module = program.module
-        val kernelId = Symbol(WasmScope.local, WasmValueType.i32, Index(0))
-        val threadId = Symbol(WasmScope.local, WasmValueType.i32, Index(1))
+        val kernelId = Symbol(WasmScope.local, WasmValueType.i32, Index.number(0))
+        val threadId = Symbol(WasmScope.local, WasmValueType.i32, Index.number(1))
         val mutexAddress = BinaryOP(
             WasmValueType.i32,
             BinaryOP.Operator.mul,
@@ -32,6 +31,7 @@ object ParallelBlockGenerator {
             Value.i32(4),
         )
         val parallel = program.addFunction(
+            name = "wack__parallel",
             params = listOf(WasmValueType.i32),
             locals = listOf(WasmValueType.i32),
             instructions = mutableListOf(

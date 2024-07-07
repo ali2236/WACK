@@ -2,6 +2,7 @@ package ir.statement
 
 import generation.WatWriter
 import ir.Mode
+import ir.Names
 import ir.expression.Expression
 import ir.expression.SingleResultFunction
 import ir.wasm.Index
@@ -14,7 +15,7 @@ class FunctionCall(
 ) : BasicStatement() {
 
     override fun write(out: Appendable) {
-        out.append("f${functionIndex}")
+        out.append(functionIndex.name)
         out.append("(")
 
         val paramCount = params.size
@@ -34,7 +35,7 @@ class FunctionCall(
 
     override fun wat(wat: WatWriter) {
         wat.writeAll(params.asReversed())
-        val fi = if (Mode.callByIndex) "$functionIndex" else "\$f${functionIndex}"
+        val fi = functionIndex.section(Names.function)
         wat.writeLine("call $fi", this)
     }
 

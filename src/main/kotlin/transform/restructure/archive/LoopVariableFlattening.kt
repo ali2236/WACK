@@ -1,11 +1,4 @@
-package optimization.restructure.archive
-
-import ir.finder.Replaceable
-import ir.expression.Expression
-import ir.expression.Symbol
-import ir.finder.Finders
-import ir.statement.*
-import java.util.Stack
+package transform.restructure.archive
 
 /*
 class LoopVariableFlattening : Restructure(){

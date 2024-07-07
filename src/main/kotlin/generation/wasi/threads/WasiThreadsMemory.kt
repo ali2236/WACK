@@ -24,7 +24,7 @@ class WasiThreadsMemory(val specialFirst: Boolean = true) {
 
             // add it to import
             if (it.import == null) {
-                val name = if (it.index.number == 0 && specialFirst) "\"memory\"" else "\"memory-${it.index}\""
+                val name = if (it.index.name == "0" && specialFirst) "\"memory\"" else "\"memory-${it.index}\""
                 it.import = WasmImport("\"env\"", name)
             }
 

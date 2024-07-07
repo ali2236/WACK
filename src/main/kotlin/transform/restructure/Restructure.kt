@@ -1,14 +1,14 @@
-package optimization.restructure
+package transform.restructure
 
 import ir.annotations.Skip
 import ir.statement.Block
 import ir.statement.Function
 import ir.statement.Program
 import ir.statement.Statement
-import optimization.Optimizer
+import transform.Transformer
 import java.util.*
 
-abstract class Restructure : Optimizer {
+abstract class Restructure : Transformer {
     lateinit var currentProgram: Program
     lateinit var currentFunction: Function
     protected var blocks = Stack<Block>()

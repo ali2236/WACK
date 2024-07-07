@@ -1,4 +1,4 @@
-package optimization.restructure.archive
+package transform.restructure.archive
 
 import ir.annotations.Skip
 import ir.expression.Load
@@ -7,10 +7,10 @@ import ir.statement.Block
 import ir.statement.ConditionLoop
 import ir.statement.Function
 import ir.statement.Program
-import optimization.Optimizer
+import transform.Transformer
 
 @Deprecated("doesn't work")
-class AliasLoopLoadSymbol : Optimizer {
+class AliasLoopLoadSymbol : Transformer {
     override fun apply(program: Program) {
         program.statements
             .filter { it is Function && !it.hasAnnotation(Skip::class.java) }

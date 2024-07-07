@@ -1,4 +1,4 @@
-package optimization.constant_propegation
+package transform.constant_propegation
 
 import ir.finder.Replaceable
 import ir.finder.Visitor

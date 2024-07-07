@@ -1,4 +1,4 @@
-package optimization.restructure.archive
+package transform.restructure.archive
 
 import ir.finder.Replaceable
 import ir.expression.*
@@ -6,7 +6,7 @@ import ir.finder.Finders
 import ir.statement.*
 import ir.wasm.Index
 import ir.wasm.WasmScope
-import optimization.restructure.Restructure
+import transform.restructure.Restructure
 import kotlin.math.max
 
 // replaces load with constload/symbol around loops
@@ -19,7 +19,7 @@ class LoopMemoryCounterAlias : Restructure() {
             // make symbol
             val params = currentFunction.functionData.type.params
             val functionLocals = currentFunction.functionData.locals
-            val index = Index(functionLocals.size + params.size)
+            val index = Index.number(functionLocals.size + params.size)
             val symbol = Symbol(WasmScope.local, load.type, index)
             functionLocals.add(load.type)
             memRef[load] = symbol

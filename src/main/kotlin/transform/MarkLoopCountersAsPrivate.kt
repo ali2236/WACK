@@ -1,4 +1,4 @@
-package optimization
+package transform
 
 import ir.annotations.For
 import ir.annotations.Private
@@ -9,7 +9,7 @@ import ir.statement.Function
 import ir.statement.Program
 import ir.statement.RangeLoop
 
-class MarkLoopCountersAsPrivate : Optimizer {
+class MarkLoopCountersAsPrivate : Transformer {
     override fun apply(program: Program) {
         program.statements.filterIsInstance<Function>()
             .filter { !it.hasAnnotation(Skip::class.java) }

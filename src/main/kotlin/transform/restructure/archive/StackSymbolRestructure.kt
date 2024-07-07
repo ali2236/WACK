@@ -1,4 +1,4 @@
-package optimization.restructure.archive
+package transform.restructure.archive
 
 import ir.expression.*
 import ir.finder.ExpressionFinder
@@ -8,7 +8,7 @@ import ir.statement.Function
 import ir.statement.SymbolLoad
 import ir.wasm.Index
 import ir.wasm.WasmScope
-import optimization.restructure.Restructure
+import transform.restructure.Restructure
 
 // for each function:
 // find all loads
@@ -56,7 +56,7 @@ class StackSymbolRestructure : Restructure() {
                 val type = load.type
                 val index = function.functionData.type.params.size + function.functionData.locals.size
                 function.functionData.locals.add(type)
-                addressSymbol[offset] = Symbol(WasmScope.local, type, Index(index))
+                addressSymbol[offset] = Symbol(WasmScope.local, type, Index.number(index))
             }
             val offsetSymbol =  addressSymbol[offset]!!
             replace(offsetSymbol)

@@ -1,6 +1,7 @@
 package ir.expression
 
 import generation.WatWriter
+import ir.Names
 import ir.statement.SymbolLoad
 import ir.wasm.Index
 import ir.wasm.WasmScope
@@ -9,11 +10,15 @@ import ir.wasm.WasmValueType
 open class Symbol(val scope: WasmScope, val type: WasmValueType, val index : Index) : ImmutableExpression(), SymbolLoad {
 
     override fun write(out: Appendable) {
-        out.append("${scope.prefix()}$index")
+        out.append(index.access(scope.prefix()))
     }
 
     override fun wat(wat: WatWriter) {
-        wat.writeLine("${scope.name}.get $index", this)
+        if(scope == WasmScope.global){
+            wat.writeLine("${scope.name}.get ${index.access(Names.global)}", this)
+        } else {
+            wat.writeLine("${scope.name}.get $index", this)
+        }
     }
 
     override fun exprType(): WasmValueType {

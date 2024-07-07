@@ -13,11 +13,12 @@ object WasiThreadSpawnGenerator {
         val module = program.module
 
         // function type
-        val threadSpawnType = module.findOraddType(params = listOf(WasmValueType.i32), result = listOf(WasmValueType.i32))
+        val threadSpawnType = module.findOrAddType(params = listOf(WasmValueType.i32), result = listOf(WasmValueType.i32))
 
         // imports
         val wasiThreadSpawnImport = WasmFunction(
-            Index.next(module.functions), type = threadSpawnType, import = WasmImport("\"${Mode.threadSpawnModule}\"", "\"thread-spawn\"")
+            Index("wasi_thread_spawn"),
+            type = threadSpawnType, import = WasmImport("\"${Mode.threadSpawnModule}\"", "\"thread-spawn\"")
         )
         module.functions.add(wasiThreadSpawnImport)
 

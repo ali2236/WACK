@@ -1,12 +1,13 @@
-package optimization
+package transform
 
 import ir.statement.Program
-import optimization.constant_propegation.ConstantPropagation
-import optimization.restructure.*
+import transform.constant_propegation.ConstantPropagation
+import transform.restructure.*
 
 object OptimizationPasses {
     fun apply(program: Program){
-        val passes = listOf<Optimizer>(
+        val passes = listOf<Transformer>(
+            SkipMarker(),
             ShiftToMultiply(),
             ConstantPropagation(),
             ConditionRestructure(),

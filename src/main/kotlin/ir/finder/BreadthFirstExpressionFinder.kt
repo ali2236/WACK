@@ -8,7 +8,7 @@ class BreadthFirstExpressionFinder<T : Visitable>(
 ) :
     Visitor() {
 
-    private val expr = mutableListOf<T>()
+    private val expr = mutableSetOf<T>()
 
     private val q = mutableListOf<Iterable<Statement>>()
 
@@ -36,7 +36,7 @@ class BreadthFirstExpressionFinder<T : Visitable>(
         while (q.isNotEmpty()){
             _visit(q.removeFirst())
         }
-        return expr
+        return expr.toList()
     }
 
 }

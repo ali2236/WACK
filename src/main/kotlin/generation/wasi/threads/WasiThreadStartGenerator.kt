@@ -2,10 +2,8 @@ package generation.wasi.threads
 
 import generation.wack.ThreadArg
 import generation.wasm.threads.MutexLibrary
-import ir.annotations.Kernel
 import ir.expression.*
 import ir.statement.*
-import ir.statement.Function
 import ir.wasm.*
 
 /*
@@ -21,13 +19,14 @@ object WasiThreadStartGenerator {
 
         // kernel table
         val kernelTable = KernelTableGenerator.generate(program)
-        val kernelType = module.findOraddType(params = listOf(WasmValueType.i32)).index
+        val kernelType = module.findOrAddType(params = listOf(WasmValueType.i32)).index
 
-        val threadId = Symbol(WasmScope.local, WasmValueType.i32, Index(2))
-        val kernelId = Symbol(WasmScope.local, WasmValueType.i32, Index(3))
+        val threadId = Symbol(WasmScope.local, WasmValueType.i32, Index.number(2))
+        val kernelId = Symbol(WasmScope.local, WasmValueType.i32, Index.number(3))
 
 
         val wasiThreadStart = program.addFunction(
+            name = "wack__wasi_thread_start",
             params = listOf(WasmValueType.i32, WasmValueType.i32),
             locals = listOf(WasmValueType.i32, WasmValueType.i32),
             instructions = mutableListOf(

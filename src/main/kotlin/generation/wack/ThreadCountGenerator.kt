@@ -1,6 +1,5 @@
 package generation.wack
 
-import ir.expression.Symbol
 import ir.expression.Value
 import ir.statement.Program
 import ir.wasm.*

@@ -23,13 +23,12 @@ import ir.wasm.*
 class WasiThreadsGenerator : Generator {
     override fun apply(program: Program) {
         Mode.insure(Mode::multipleMemories, true)
-        Mode.insure(Mode::callByIndex, true)
         val mutex = MutexLibraryGenerator.generate(program)
         val threadArg = ThreadArgEncoderGenerator.generate(program)
         val threadCount = ThreadCountGenerator(8).generate(program)
         val threadSpawn = WasiThreadSpawnGenerator.generate(program)
         val parallel = ParallelBlockGenerator.generate(program, threadCount.symbol, mutex, threadArg, threadSpawn)
-        ThreadKernelGenerator.generate(program, threadCount.symbol, mutex) { function, block ->
+        ThreadKernelGenerator.generate(program, threadCount.symbol) { function, block ->
             block.instructions.clear()
             val kernelId = block.annotations.filterIsInstance<CallKernel>().first().kernelIndex
             block.instructions.add(parallel.call(Value.i32(kernelId)))

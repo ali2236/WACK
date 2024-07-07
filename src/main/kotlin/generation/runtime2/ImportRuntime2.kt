@@ -13,7 +13,7 @@ object ImportRuntime2 {
         val module = program.module
 
         // wack_parallel
-        val wackParallelType = module.findOraddType(listOf(WasmValueType.i32), listOf())
+        val wackParallelType = module.findOrAddType(listOf(WasmValueType.i32), listOf())
 
         val wackParallel = WasmFunction(
             Index.next(module.functions),
@@ -25,7 +25,7 @@ object ImportRuntime2 {
         program.statements.add(0, Function(wackParallel))
 
         // get_num_threads
-        val getterType = module.findOraddType(listOf(), listOf(WasmValueType.i32))
+        val getterType = module.findOrAddType(listOf(), listOf(WasmValueType.i32))
         val getNumThreads = WasmFunction(
             Index.next(module.functions),
             getterType,

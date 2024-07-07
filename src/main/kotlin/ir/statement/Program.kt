@@ -62,14 +62,15 @@ class Program(val module: WasmModule, val statements: MutableList<Statement>) : 
     }
 
     fun addFunction(
+        name: String?,
         params: List<WasmValueType> = listOf(),
         result: List<WasmValueType> = listOf(),
         locals: List<WasmValueType> = listOf(),
         instructions: MutableList<Statement> = mutableListOf()
     ): Function {
-        val functionType = module.findOraddType(params, result)
+        val functionType = module.findOrAddType(params, result)
         val header = WasmFunction(
-            Index.next(module.functions),
+            if(name != null) Index(name) else Index.next(module.functions),
             functionType,
             locals.toMutableList(),
         )

@@ -150,7 +150,7 @@ object DfaBuilder {
         for (i in 0 until params.size){
             start.IN.put(
                 DfaFact(
-                    Symbol(WasmScope.local, params[i], Index(i)),
+                    Symbol(WasmScope.local, params[i], Index.number(i)),
                     DfaValue.Unknown(),
                 )
             )
@@ -161,7 +161,7 @@ object DfaBuilder {
             val localType = locals[i]
             start.IN.put(
                 DfaFact(
-                    Symbol(WasmScope.local, localType, Index(i+params.size)),
+                    Symbol(WasmScope.local, localType, Index.number(i+params.size)),
                     DfaValue.Expr(Value(localType, localType.defaultValue()))
                 )
             )
@@ -169,7 +169,7 @@ object DfaBuilder {
         (function.functionData.type.params + function.functionData.locals).forEachIndexed { index, localType ->
             start.IN.put(
                 DfaFact(
-                    Symbol(WasmScope.local, localType, Index(index)),
+                    Symbol(WasmScope.local, localType, Index.number(index)),
                     DfaValue.Expr(Value(localType, localType.defaultValue()))
                 )
             )
@@ -304,8 +304,8 @@ object DfaBuilder {
             when (type) {
                 WasmValueType.i32, WasmValueType.i64 -> {
                     // calculate
-                    val l = (leftL.value as Value).value.toLong()
-                    val r = (rightL.value as Value).value.toLong()
+                    val l = leftL.value.value.toLong()
+                    val r = rightL.value.value.toLong()
                     val value: Number = when (op.operator.sign) {
                         "+" -> l + r
                         "-" -> l - r
@@ -329,8 +329,8 @@ object DfaBuilder {
 
                 WasmValueType.f32, WasmValueType.f64 -> {
                     // calculate
-                    val l = (leftL.value as Value).value.toDouble()
-                    val r = (rightL.value as Value).value.toDouble()
+                    val l = leftL.value.value.toDouble()
+                    val r = rightL.value.value.toDouble()
                     val value: Number = when (op.operator.sign) {
                         "+" -> l + r
                         "-" -> l - r

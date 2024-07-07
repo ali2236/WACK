@@ -72,7 +72,7 @@ class Function(
         if(annotations.isNotEmpty()){
             wat.endLine()
         }
-        val functionIndex = if(Mode.callByIndex) "(;${functionData.index};)" else "\$f${functionData.index}"
+        val functionIndex = functionData.index.section(Names.function)
         val funcStart =
             "(func $functionIndex (type ${functionData.type.index})${functionData.type.paramsWat()}${functionData.type.resultWat()}"
         if (functionData.import == null) {

@@ -1,4 +1,4 @@
-package optimization.restructure
+package transform.restructure
 
 import analysis.dfa.Dfa
 import analysis.dfa.DfaValue
@@ -6,7 +6,6 @@ import analysis.dfa.StatementFactsFinder
 import analysis.dfa.whatIs
 import ir.expression.BinaryOP
 import ir.expression.Value
-import ir.finder.*
 import ir.statement.*
 import ir.statement.Function
 import kotlin.Exception
@@ -19,7 +18,8 @@ class RangeLoopRestructure : Restructure() {
     override fun restructureFunction(function: Function) {
         // dfa
         functionDfa = Dfa.from(function)
-        functionFacts = StatementFactsFinder(functionDfa)
+        functionFacts = functionDfa.finder()
+        functionFacts.addFact(function, functionDfa.nodes.first().OUT.facts)
         super.restructureFunction(function)
     }
 
@@ -62,6 +62,9 @@ class RangeLoopRestructure : Restructure() {
         if (block == null || startIndex == null){
             return null
         }
+        if(block is Function && startIndex == 0){
+            return functionFacts.at(block).whatIs(symbol)?.asValue()
+        }
         for (i in (startIndex - 1) downTo 0){
             val value = functionFacts.at(block.instructions[i]).whatIs(symbol)?.asValue()
             if(value != null){
@@ -81,6 +84,7 @@ class RangeLoopRestructure : Restructure() {
                 "<=" -> (right as Value).add(1)
                 ">" -> (right as Value).add(1)
                 ">=" -> (right as Value)
+                "!=" -> (right as Value)
                 else -> throw Exception()
             }
         }

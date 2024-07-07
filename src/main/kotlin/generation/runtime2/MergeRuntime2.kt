@@ -22,12 +22,12 @@ object MergeRuntime2 {
         val runtime = Program.from(runtimeWasm)
 
         // globals
-        val globalsIndexMap = mutableMapOf<Index, Index>()
+        /*val globalsIndexMap = mutableMapOf<Index, Index>()
         program.module.globals.also { programGlobals ->
             runtime.module.globals.forEach {
                 val newIndex = Index.next(runtime.module.globals)
-                programGlobals.add(it.copy(index = newIndex))
-                globalsIndexMap[it.index] = newIndex
+                programGlobals.add(it.copy(getSectionIndex = newIndex))
+                globalsIndexMap[it.getSectionIndex] = newIndex
             }
         }
 
@@ -42,7 +42,7 @@ object MergeRuntime2 {
                 it.replace(Symbol(WasmScope.global, it.statement.type, newIndex))
             }
         }
-
+*/
         // memory
 
 

@@ -200,6 +200,8 @@ internal class CfgBuilder(val function: Function) {
         // instructions ended with no next
         if(current.next == null){
             current.addSuccessor(currentScope.next)
+        } else {
+            current.addSuccessor(current.next)
         }
     }
 

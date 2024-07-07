@@ -118,8 +118,8 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val type = WasmValueType.parse(ctx.CONST()!!.text.substring(0, 3))
             stack.push(Value(type, ctx.literal().text))
         } else if (ctx.CALL() != null) {
-            val functionIndex = Index(ctx.var_().first().text.toInt())
-            val calledFunction = module.functions.first { it.index == functionIndex }
+            val functionIndex = Index.parse(ctx.var_().first().text)
+            val calledFunction = module.functions.find(functionIndex)
             val (paramsTypes, resultTypes) = calledFunction.type.getParamsAndResults(module)
             val params = paramsTypes.map { stack.pop() }
             val call = FunctionCall(functionIndex, params, resultTypes)
@@ -135,8 +135,8 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
                 }
             }
         } else if (ctx.CALL_INDIRECT() != null) {
-            val tableIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
-            val typeIndex = Index(ctx.type_use().var_().text?.toIntOrNull() ?: 0)
+            val tableIndex = Index.parse(ctx.var_().firstOrNull()?.text)
+            val typeIndex = Index.parse(ctx.type_use().var_().text)
             val type = module.functionTypes.first { it.index == typeIndex }
             val functionIndex = stack.pop()
             val params = mutableListOf<Expression>()
@@ -159,31 +159,31 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
                 }
             }
         } else if (ctx.LOCAL_GET() != null) {
-            val index = ctx.var_().first().text.toInt()
-            val type = function!!.allLocals[index]
-            val symbol = Symbol(WasmScope.local, type, Index(index))
+            val index = Index.parse(ctx.var_().first().text)
+            val type = function!!.allLocals[index.asInt()]
+            val symbol = Symbol(WasmScope.local, type, index)
             stack.push(symbol)
         } else if (ctx.LOCAL_SET() != null) {
-            val index = ctx.var_().first().text.toInt()
-            val type = function!!.allLocals[index]
-            val symbol = Symbol(WasmScope.local, type, Index(index))
+            val index = Index.parse(ctx.var_().first().text)
+            val type = function!!.allLocals[index.asInt()]
+            val symbol = Symbol(WasmScope.local, type, index)
             val value = stack.pop()
             stack.push(Assignment(symbol, value))
         } else if (ctx.LOCAL_TEE() != null) {
-            val index = ctx.var_().first().text.toInt()
-            val type = function!!.allLocals[index]
-            val symbol = Symbol(WasmScope.local, type, Index(index))
+            val index = Index.parse(ctx.var_().first().text)
+            val type = function!!.allLocals[index.asInt()]
+            val symbol = Symbol(WasmScope.local, type, index)
             val value = stack.pop()
             stack.push(Tee(symbol, value))
         } else if (ctx.GLOBAL_GET() != null) {
-            val index = ctx.var_().first().text.toInt()
-            val type = module.globals[index].type.type
-            val symbol = Symbol(WasmScope.global, type, Index(index))
+            val index = Index.parse(ctx.var_().first().text)
+            val type = module.globals.find(index)!!.type.type
+            val symbol = Symbol(WasmScope.global, type, index)
             stack.push(symbol)
         } else if (ctx.GLOBAL_SET() != null) {
-            val index = ctx.var_().first().text.toInt()
-            val type = module.globals[index].type.type
-            val symbol = Symbol(WasmScope.global, type, Index(index))
+            val index = Index.parse(ctx.var_().first().text)
+            val type = module.globals.find(index)!!.type.type
+            val symbol = Symbol(WasmScope.global, type, index)
             stack.push(Assignment(symbol, stack.pop()))
         } else if (ctx.TEST() != null) {
             val (typeString, operatorName) = ctx.TEST()!!.text.split(".")
@@ -229,6 +229,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
                 "rem_s" -> BinaryOP.Operator.rem.copy(signed = WasmBitSign.s)
                 "rotl" -> BinaryOP.Operator.rotl
                 "rotr" -> BinaryOP.Operator.rotr
+                "div" -> BinaryOP.Operator.div
                 else -> throw Error("unkown binary operator $operatorName")
             }
             val second = stack.pop()
@@ -255,7 +256,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val offset = ctx.OFFSET_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val addr = stack.pop()
-            val memoryIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
+            val memoryIndex = Index.parse(ctx.var_().firstOrNull()?.text)
             val _meta = ctx.LOAD()!!.text.split("load").last()
             var memSize: Int? = null
             var memSign: WasmBitSign? = null
@@ -272,7 +273,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val data = stack.pop()
             val addr = stack.pop()
-            val memoryIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
+            val memoryIndex = Index.parse(ctx.var_().firstOrNull()?.text)
             val _meta = ctx.STORE()!!.text.split("store").last()
             var memSize: Int? = null
             if (_meta.isNotEmpty()) {
@@ -308,16 +309,16 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val jumps = ctx.var_().map { it.text.toInt() }
             stack.push(BrTable(stack.pop(), jumps))
         } else if (ctx.MEMORY_SIZE() != null) {
-            val memoryIndex = Index(ctx.var_()?.firstOrNull()?.text?.toInt() ?: 0)
+            val memoryIndex = Index.parse(ctx.var_()?.firstOrNull()?.text)
             stack.push(MemorySize(memoryIndex))
         } else if (ctx.MEMORY_GROW() != null) {
-            val memoryIndex = Index(ctx.var_()?.firstOrNull()?.text?.toInt() ?: 0)
+            val memoryIndex = Index.parse(ctx.var_()?.firstOrNull()?.text)
             stack.push(MemoryGrow(memoryIndex, stack.pop()))
         } else if (ctx.MEMORY_COPY() != null) {
-            val z = Index(0)
+            val z = Index.number(0)
             var (from, to) = Pair(z, z)
             if (ctx.var_()?.size == 2) {
-                ctx.var_()!!.map { Index(it.text.toInt()) }.also {
+                ctx.var_()!!.map { Index.parse(it.text) }.also {
                     from = it.first()
                     to = it.last()
                 }
@@ -327,31 +328,31 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val i1 = stack.pop()
             stack.push(MemoryCopy(from, to, n, i1, i2))
         } else if (ctx.MEMORY_FILL() != null) {
-            val memoryIndex = Index(ctx.var_()?.firstOrNull()?.text?.toInt() ?: 0)
+            val memoryIndex = Index.parse(ctx.var_()?.firstOrNull()?.text)
             val n = stack.pop()
             val value = stack.pop()
             val i = stack.pop()
             stack.push(MemoryFill(memoryIndex, i, value, n))
         } else if (ctx.MEMORY_INIT() != null) {
             val vars = ctx.var_()
-            val index1 = vars?.getOrNull(0)?.text?.toInt()
-            val index2 = vars?.getOrNull(1)?.text?.toInt()
+            val index1 = vars?.getOrNull(0)?.text
+            val index2 = vars?.getOrNull(1)?.text
 
             val n = stack.pop()
             val s = stack.pop()
             val d = stack.pop()
 
             if (vars.size == 0) {
-                stack.push(MemoryInit(Index(0), Index(0), n, s, d))
+                stack.push(MemoryInit(Index.number(0), Index.number(0), n, s, d))
             } else if (vars.size == 1) {
-                stack.push(MemoryInit(Index(0), Index(index1 ?: 0), n, s, d))
+                stack.push(MemoryInit(Index.number(0), Index.parse(index1), n, s, d))
             } else if (vars.size == 2) {
-                stack.push(MemoryInit(Index(index1 ?: 0), Index(index2 ?: 0), n, s, d))
+                stack.push(MemoryInit(Index.parse(index1), Index.parse(index2), n, s, d))
             } else {
                 throw Exception("Invalid Var Size for memory.init!")
             }
         } else if (ctx.DATA_DROP() != null) {
-            val dataIndex = Index(ctx.var_()?.firstOrNull()?.text?.toInt() ?: 0)
+            val dataIndex = Index.parse(ctx.var_()?.firstOrNull()?.text)
             stack.push(DataDrop(dataIndex))
         } else if (ctx.ATOMIC_FENCE() != null) {
             stack.push(RawWat("atomic.fence"))
@@ -360,7 +361,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val offset = ctx.OFFSET_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val addr = stack.pop()
-            val memoryIndex = Index(ctx.var_().getOrNull(0)?.text?.toIntOrNull() ?: 0)
+            val memoryIndex = Index.parse(ctx.var_().getOrNull(0)?.text)
             val _meta = ctx.ATOMIC_LOAD()!!.text.split("load").last()
             var memSize: Int? = null
             var memSign: WasmBitSign? = null
@@ -376,7 +377,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val data = stack.pop()
             val addr = stack.pop()
-            val memoryIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
+            val memoryIndex = Index.parse(ctx.var_().firstOrNull()?.text)
             val _meta = ctx.ATOMIC_STORE()!!.text.split("store").last()
             var memSize: Int? = null
             if (_meta.isNotEmpty()) {
@@ -391,7 +392,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val k = stack.pop()
             val n = stack.pop()
             val i = stack.pop()
-            val memoryIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
+            val memoryIndex = Index.parse(ctx.var_().firstOrNull()?.text)
             val wait = AtomicWait(type, memoryIndex, offset, align, k, n, i)
             stack.push(wait)
         } else if (ctx.ATOMIC_NOTIFY() != null) {
@@ -399,12 +400,12 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val k = stack.pop()
             val i = stack.pop()
-            val memoryIndex = Index(ctx.var_().firstOrNull()?.text?.toIntOrNull() ?: 0)
+            val memoryIndex = Index.parse(ctx.var_().firstOrNull()?.text)
             val notify = AtomicNotify(memoryIndex, offset, align, k, i)
             stack.push(notify)
         } else if(ctx.ATOMIC_CMPXCHG() != null){
             val type = WasmValueType.parse(ctx.ATOMIC_CMPXCHG()!!.text.substring(0, 3))
-            val memoryIndex = Index(ctx.var_().getOrNull(0)?.text?.toIntOrNull() ?: 0)
+            val memoryIndex = Index.parse(ctx.var_().getOrNull(0)?.text)
             val offset = ctx.OFFSET_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val _afterRMW = ctx.ATOMIC_CMPXCHG()!!.text.substringAfter("rmw")
@@ -424,7 +425,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             stack.push(cmpxchg)
         } else if(ctx.ATOMIC_OPR() != null){
             val type = WasmValueType.parse(ctx.ATOMIC_OPR()!!.text.substring(0, 3))
-            val memoryIndex = Index(ctx.var_().getOrNull(0)?.text?.toIntOrNull() ?: 0)
+            val memoryIndex = Index.parse(ctx.var_().getOrNull(0)?.text)
             val offset = ctx.OFFSET_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val align = ctx.ALIGN_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
             val _afterRMW = ctx.ATOMIC_OPR()!!.text.substringAfter("rmw")
@@ -449,4 +450,13 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
         return super.visitPlain_instr(ctx)
     }
 
+}
+
+private fun <E : IndexedSection> List<E>.find(predicate: Index): E {
+    val r = firstOrNull { it.getSectionIndex() == predicate }
+    if(r == null){
+        throw Exception("Index $predicate not found!")
+    } else {
+        return r
+    }
 }

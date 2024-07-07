@@ -12,6 +12,7 @@ object ThreadArgEncoderGenerator {
         val module = program.module
 
         val encoder = program.addFunction(
+            name = "wack__encode_arg",
             params = listOf(WasmValueType.i32, WasmValueType.i32),
             result = listOf(WasmValueType.i32),
             instructions = mutableListOf(
@@ -24,6 +25,7 @@ object ThreadArgEncoderGenerator {
         )
 
         val kernelIdDecoder = program.addFunction(
+            name = "wack__decode_kernel_idx_from_arg",
             params = listOf(WasmValueType.i32),
             result = listOf(WasmValueType.i32),
             instructions = mutableListOf(
@@ -34,6 +36,7 @@ object ThreadArgEncoderGenerator {
         )
 
         val threadIdDecoder = program.addFunction(
+            name = "wack__decode_thread_id_from_arg",
             params = listOf(WasmValueType.i32),
             result = listOf(WasmValueType.i32),
             instructions = mutableListOf(

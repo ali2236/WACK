@@ -1,4 +1,4 @@
-package optimization.constant_propegation
+package transform.constant_propegation
 
 import analysis.dfa.DfaFact
 import analysis.dfa.DfaValue

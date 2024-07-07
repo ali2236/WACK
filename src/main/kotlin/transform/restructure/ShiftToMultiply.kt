@@ -1,4 +1,4 @@
-package optimization.restructure
+package transform.restructure
 
 import ir.finder.Replaceable
 import ir.expression.*

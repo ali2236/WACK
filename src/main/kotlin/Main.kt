@@ -1,14 +1,8 @@
 import analysis.Analysis
 import generation.WasiThreadsGenerator
 import generation.insureDirectoryExists
-import ir.expression.Symbol
-import ir.expression.Value
-import ir.statement.Assignment
 import ir.statement.Program
-import ir.wasm.Index
-import ir.wasm.WasmScope
-import ir.wasm.WasmValueType
-import optimization.OptimizationPasses
+import transform.OptimizationPasses
 import java.io.File
 
 fun main(args: Array<String>) {
@@ -18,7 +12,10 @@ fun main(args: Array<String>) {
     insureDirectoryExists("./out/intermediate")
 
     // run
-    val samples = listOf(File("./samples/matrix_multiply.wasm"))
+    val samples = listOf(
+        //File("./samples/matrix_multiply.wasm"),
+        File("./samples/polybench/2mm.wasm"),
+    )
     for (sample in samples) {
         val program = Program.from(sample)
         OptimizationPasses.apply(program)

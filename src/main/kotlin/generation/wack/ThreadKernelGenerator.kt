@@ -1,6 +1,5 @@
 package generation.wack
 
-import generation.wasm.threads.MutexLibrary
 import ir.annotations.*
 import ir.expression.*
 import ir.finder.AnnotationFinder
@@ -14,7 +13,6 @@ object ThreadKernelGenerator {
     fun generate(
         program: Program,
         threadCount: Expression,
-        mutex: MutexLibrary?,
         generateCallKernel: (Function, Block) -> Unit,
     ): List<Block> {
         val module = program.module
@@ -24,7 +22,7 @@ object ThreadKernelGenerator {
             val forBlocks = AnnotationFinder(For::class.java).apply { visit(function) { } }.result()
             for ((forLoop, replace) in forBlocks) {
                 try {
-                    val kernelType = module.findOraddType(listOf(WasmValueType.i32), listOf()).copy()
+                    val kernelType = module.findOrAddType(listOf(WasmValueType.i32), listOf()).copy()
                     val parallelBlock = Block()
                     parallelBlock.parent = forLoop.parent
                     parallelBlock.indexInParent = forLoop.indexInParent
@@ -43,16 +41,16 @@ object ThreadKernelGenerator {
 
                     // make function definition
                     val kernelFunction = WasmFunction(
-                        Index.next(module.functions),
+                        Index("__kernel_$kernels"),
                         type = kernelType,
                         locals = mutableListOf(WasmValueType.i32, WasmValueType.i32),
                     )
 
                     // put loop as function body
                     val kernel = Function(kernelFunction).apply {
-                        val threadId = Symbol(WasmScope.local, WasmValueType.i32, Index(0))
-                        val start = Symbol(WasmScope.local, WasmValueType.i32, Index(1))
-                        val end = Symbol(WasmScope.local, WasmValueType.i32, Index(2))
+                        val threadId = Symbol(WasmScope.local, WasmValueType.i32, Index.number(0))
+                        val start = Symbol(WasmScope.local, WasmValueType.i32, Index.number(1))
+                        val end = Symbol(WasmScope.local, WasmValueType.i32, Index.number(2))
                         // size = to - from
                         val size = BinaryOP(
                             WasmValueType.i32,
@@ -149,7 +147,7 @@ object ThreadKernelGenerator {
                                     val newSymbol = Symbol(
                                         WasmScope.local,
                                         type,
-                                        Index(kernelFunction.type.params.size + kernelFunction.locals.size)
+                                        Index.number(kernelFunction.type.params.size + kernelFunction.locals.size)
                                     )
                                     functionData.locals.add(type)
                                     return@associate Pair(private.symbol, newSymbol)

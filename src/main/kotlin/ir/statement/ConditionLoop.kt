@@ -11,7 +11,7 @@ open class ConditionLoop(var condition: Statement, instructions: MutableList<Sta
 
     override fun writeHeader(out: Appendable) {
         val symbols = findSymbols()
-        out.append("condition-loop(${symbols.first()}/${symbols.size})")
+        out.append("condition-loop(${symbols.joinToString(", ")})")
     }
 
     fun findSymbols(): List<SymbolLoad> {

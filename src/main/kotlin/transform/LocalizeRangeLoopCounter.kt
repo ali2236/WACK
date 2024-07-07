@@ -1,4 +1,4 @@
-package optimization
+package transform
 
 import ir.annotations.Private
 import ir.annotations.Skip
@@ -14,7 +14,7 @@ import ir.statement.SymbolLoad
 import ir.wasm.Index
 import ir.wasm.WasmScope
 
-class LocalizeRangeLoopCounter : Optimizer {
+class LocalizeRangeLoopCounter : Transformer {
     override fun apply(program: Program) {
         program.statements
             .filterIsInstance<Function>()
@@ -35,7 +35,7 @@ class LocalizeRangeLoopCounter : Optimizer {
                             val newSymbol = Symbol(
                                 WasmScope.local,
                                 oldSymbol.exprType(),
-                                Index(paramCount + function.functionData.locals.size),
+                                Index.number(paramCount + function.functionData.locals.size),
                             )
                             function.functionData.locals.add(newSymbol.type)
                             private.private = newSymbol
