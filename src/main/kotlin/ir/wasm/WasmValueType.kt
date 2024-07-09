@@ -1,5 +1,7 @@
 package ir.wasm
 
+import ir.expression.Value
+
 enum class WasmValueType {
     i32,
     i64,
@@ -73,6 +75,10 @@ enum class WasmValueType {
             f64 -> number.toDouble()
             Unknown -> Double.NaN
         }.toString()
+    }
+
+    fun value(number: Number): Value {
+        return Value(this, fromNumber(number))
     }
 
     companion object {

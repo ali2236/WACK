@@ -95,7 +95,7 @@ interface DfaValue {
     }
 
     // to: exclusive in loop - inclusive outside
-    class Range(val from: Value,val to: Value) : Unknown(){
+    class Range(val from: Expression,val to: Expression) : Unknown(){
         override fun toString(): String {
             return "[$from, $to]"
         }
@@ -108,6 +108,13 @@ interface DfaValue {
             } else {
                 return super.equals(other)
             }
+        }
+
+        override fun hashCode(): Int {
+            var result = super.hashCode()
+            result = 31 * result + from.hashCode()
+            result = 31 * result + to.hashCode()
+            return result
         }
 
 

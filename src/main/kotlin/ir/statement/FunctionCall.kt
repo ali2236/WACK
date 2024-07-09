@@ -15,7 +15,7 @@ class FunctionCall(
 ) : BasicStatement() {
 
     override fun write(out: Appendable) {
-        out.append(functionIndex.name)
+        out.append(functionIndex.access(Names.function, ""))
         out.append("(")
 
         val paramCount = params.size

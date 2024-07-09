@@ -10,7 +10,7 @@ import ir.wasm.WasmValueType
 open class Symbol(val scope: WasmScope, val type: WasmValueType, val index : Index) : ImmutableExpression(), SymbolLoad {
 
     override fun write(out: Appendable) {
-        out.append(index.access(scope.prefix()))
+        out.append(index.access(scope.prefix(), ""))
     }
 
     override fun wat(wat: WatWriter) {

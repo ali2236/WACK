@@ -5,6 +5,7 @@ import analysis.dfa.DfaValue
 import analysis.dfa.StatementFactsFinder
 import analysis.dfa.whatIs
 import ir.expression.BinaryOP
+import ir.expression.Expression
 import ir.expression.Value
 import ir.statement.*
 import ir.statement.Function
@@ -37,7 +38,7 @@ class RangeLoopRestructure : Restructure() {
     private fun transformIntoRangeLoop(loop: ConditionLoop) {
         val condition = loop.condition
         val conditionSymbols = loop.findSymbols()
-        if (condition is BinaryOP && conditionSymbols.size == 1) {
+        if (condition is BinaryOP) {
             val symbol = conditionSymbols.first()
 
             // symbol initial value
@@ -74,18 +75,26 @@ class RangeLoopRestructure : Restructure() {
         return initialValueOf(block.parent, block.indexInParent, symbol)
     }
 
-    private val BinaryOP.endExclusive: Value
+    private val BinaryOP.endExclusive: Expression
         get() {
-            if (right !is Value) {
-                throw Exception()
-            }
-            return when (operator.sign) {
-                "<" -> right as Value
-                "<=" -> (right as Value).add(1)
-                ">" -> (right as Value).add(1)
-                ">=" -> (right as Value)
-                "!=" -> (right as Value)
-                else -> throw Exception()
+            if (right is Value) {
+                return when (operator.sign) {
+                    "<" -> right as Value
+                    "<=" -> (right as Value).add(1)
+                    ">" -> (right as Value).add(1)
+                    ">=" -> (right as Value)
+                    "!=" -> (right as Value)
+                    else -> throw Exception()
+                }
+            } else {
+                return when (operator.sign) {
+                    "<" -> right
+                    "<=" -> BinaryOP.plus(right, 1)
+                    ">" -> BinaryOP.plus(right, 1)
+                    ">=" -> right
+                    "!=" -> right
+                    else -> throw Exception()
+                }
             }
         }
 

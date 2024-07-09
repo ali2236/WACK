@@ -31,11 +31,11 @@ data class Index(val name: String) {
         }
     }
 
-    fun access(type: String): String {
+    fun access(type: String, prefix: String = "$"): String {
         try {
-            return "\$${type}${name.toInt()}"
+            return "${prefix}${type}${name.toInt()}"
         } catch (e: Exception){
-            return "\$${name}"
+            return "${prefix}${name}"
         }
     }
 

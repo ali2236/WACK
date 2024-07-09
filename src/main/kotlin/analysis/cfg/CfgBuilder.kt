@@ -180,11 +180,11 @@ internal class CfgBuilder(val function: Function) {
                     val next = makeNext(i, instructions)
 
                     // current
-                    val block = makeBlock("Block")
+                    val block = makeBlock(if(stmt.instructions.isEmpty()) "Block" else null)
                     pushScope(block, next, next)
                     runOnBlock(block, stmt.instructions)
                     current.addSuccessor(block)
-                    block.statements.add(stmt)
+                    //block.statements.add(stmt)
 
                     // end
                     popScope()

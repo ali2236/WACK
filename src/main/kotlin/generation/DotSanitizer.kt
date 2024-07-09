@@ -4,14 +4,16 @@ class DotSanitizer(private val appendable: java.lang.Appendable) : java.lang.App
 
     override fun append(csq: CharSequence): java.lang.Appendable {
         return appendable.append(
-            csq.replace(Regex("<"), "&lt;")
+            csq.replace(Regex("&"), "&amp;")
+                .replace(Regex("<"), "&lt;")
                 .replace(Regex(">"), "&gt;")
         )
     }
 
     override fun append(csq: CharSequence, start: Int, end: Int): java.lang.Appendable {
         return appendable.append(
-            csq.replace(Regex("<"), "&lt;")
+            csq.replace(Regex("&"),"&amp;")
+                .replace(Regex("<"), "&lt;")
                 .replace(Regex(">"), "&gt;"), start, end
         )
     }
@@ -20,6 +22,7 @@ class DotSanitizer(private val appendable: java.lang.Appendable) : java.lang.App
         return when (c) {
             '<' -> appendable.append("&lt;")
             '>' -> appendable.append("&gt;")
+            '&' -> appendable.append("&amp;")
             else -> appendable.append(c)
         }
     }

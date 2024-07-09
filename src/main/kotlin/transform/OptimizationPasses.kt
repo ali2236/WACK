@@ -8,6 +8,7 @@ object OptimizationPasses {
     fun apply(program: Program){
         val passes = listOf<Transformer>(
             SkipMarker(),
+            //UnTeeRestructure(),
             ShiftToMultiply(),
             ConstantPropagation(),
             ConditionRestructure(),

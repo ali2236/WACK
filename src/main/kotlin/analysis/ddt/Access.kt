@@ -2,10 +2,7 @@ package analysis.ddt
 
 import analysis.dfa.DfaFact
 import analysis.dfa.DfaValue
-import ir.expression.Expression
-import ir.expression.Load
-import ir.expression.Symbol
-import ir.expression.Value
+import ir.expression.*
 import ir.finder.BreadthFirstExpressionFinder
 import ir.finder.Finders
 import ir.statement.SymbolLoad
@@ -31,10 +28,15 @@ data class Access(
             val p2 = a2.polynomial()
 
             // check bounds
+            try {
+
             val b1 = this.bounds(p1)
             val b2 = a2.bounds(p2)
             if (!b1.intersect(b2)) {
                 return null
+            }
+            } catch (e: Exception){
+                // TODO: check bounds at runtime
             }
 
             // TODO: check gcd
@@ -80,12 +82,14 @@ data class Access(
         }
 
 
-        val maxFacts = symbolsRange.mapValues { it.value.to.add(-1) }
+        val maxFacts = symbolsRange.mapValues { BinaryOP(it.value.to.exprType(), BinaryOP.Operator.sub, it.value.to, it.value.to.exprType().value(1)) }
         val minFacts = symbolsRange.mapValues { it.value.from }
 
-        val max = poly.calculate(maxFacts).value.toLong()
+        throw Exception()
+
+        /*val max = poly.calculate(maxFacts).value.toLong()
         val min = poly.calculate(minFacts).value.toLong()
 
-        return ArrayBounds(min, max)
+        return ArrayBounds(min, max)*/
     }
 }
