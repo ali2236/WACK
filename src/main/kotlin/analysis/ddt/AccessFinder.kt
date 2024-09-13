@@ -2,6 +2,8 @@ package analysis.ddt
 
 import analysis.dfa.Dfa
 import ir.expression.Expression
+import ir.expression.Load
+import ir.expression.Symbol
 import ir.finder.Visitor
 import ir.statement.AssignmentStore
 import ir.statement.RangeLoop
@@ -51,14 +53,24 @@ class AccessFinder(parentScope: RangeLoop, val dfa: Dfa) : Visitor() {
             is SymbolLoad -> {
                 if (isLoopSymbol(v)) {
                     return
+                } else if(isStackVariable(v)){
+                    val access = Access(
+                        v,
+                        AccessType.Read,
+                        AccessScope(scope),
+                        finder.at(currentStatement!!) ?: setOf(),
+                    )
+                    accesses.add(access)
+                    return // dont break it down further
+                } else {
+                    val access = Access(
+                        v,
+                        AccessType.Read,
+                        AccessScope(scope),
+                        finder.at(currentStatement!!) ?: setOf(),
+                    )
+                    accesses.add(access)
                 }
-                val access = Access(
-                    v,
-                    AccessType.Read,
-                    AccessScope(scope),
-                    finder.at(currentStatement!!) ?: setOf(),
-                )
-                accesses.add(access)
             }
         }
         if (v !is Expression){
@@ -67,9 +79,18 @@ class AccessFinder(parentScope: RangeLoop, val dfa: Dfa) : Visitor() {
         super.visit(v, replace)
     }
 
+    private fun isStackVariable(symbol: SymbolLoad): Boolean {
+        if(symbol is Load && symbol.address is Symbol){
+            return true
+        } else {
+            return false
+        }
+    }
+
     private fun isLoopSymbol(symbol: SymbolLoad): Boolean {
         for (loop in scope) {
-            if (loop.symbol == symbol) {
+            val symbols = loop.findSymbols()
+            if (symbols.any { it == symbol }) {
                 return true
             }
         }

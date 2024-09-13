@@ -39,6 +39,14 @@ data class Access(
                 // TODO: check bounds at runtime
             }
 
+            // TODO: check base
+            // 1. find the base
+            // val base1 = p1.base()
+            // val base2 = p2.base()
+            // 2. calculate bounds at runtime
+            // 3. check if access do not cross each other's bounds
+            // TODO: check base at runtime
+
             // TODO: check gcd
 
             // distance

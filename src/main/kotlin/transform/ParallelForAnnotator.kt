@@ -3,6 +3,7 @@ package transform
 import analysis.ddt.DependenceTester
 import ir.annotations.For
 import ir.annotations.Parallel
+import ir.annotations.Skip
 import ir.statement.Function
 import ir.statement.Program
 
@@ -10,6 +11,7 @@ class ParallelForAnnotator : Transformer {
     override fun apply(program: Program) {
         program.statements
             .filterIsInstance<Function>()
+            .filter { !it.hasAnnotation(Skip::class.java) }
             .forEach { applyToFunction(it) }
     }
 
