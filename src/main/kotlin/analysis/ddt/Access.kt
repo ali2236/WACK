@@ -48,8 +48,8 @@ data class Access(
             // 2. calculate bounds at runtime
             // check_bounds(A, C)
             // 3. check if access do not cross each other's bounds
-            // A. A != B != C
-
+            // A. A != C
+            conditions.add(BinaryOP(WasmValueType.i32, BinaryOP.Operator.neq, base1, base2))
             // B. if A.max < C.min or A.min > C.min
             // TODO: check base at runtime
 
@@ -60,7 +60,7 @@ data class Access(
             val sink = p2
             val distance = sink - source
 
-            return DistanceResult(distance.calculate(distance.symbols().associateWith { Value.zero }).value.toInt())
+            return DistanceResult(distance.calculate(distance.symbols().associateWith { Value.zero }).value.toInt(), conditions)
         }
         return DistanceResult.noCollision
     }
