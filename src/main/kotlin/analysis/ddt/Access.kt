@@ -5,6 +5,7 @@ import analysis.dfa.DfaValue
 import ir.expression.*
 import ir.finder.BreadthFirstExpressionFinder
 import ir.finder.Finders
+import ir.statement.Statement
 import ir.statement.SymbolLoad
 import ir.wasm.WasmValueType
 
@@ -14,13 +15,14 @@ data class Access(
     val scope: AccessScope,
     val facts: Set<DfaFact>,
 ) {
-    fun distance(a2: Access): Int? {
+    fun distance(a2: Access): DistanceResult {
+        val conditions = mutableListOf<Statement>()
         if (symbol is Load || a2.symbol is Load) {
             val s1 = symbol as Load
             val s2 = a2.symbol as Load
             // check if same memory
             if (s1.memoryIndex != s2.memoryIndex) {
-                return null
+                return DistanceResult.noCollision
             }
 
             // polynomials
@@ -33,7 +35,7 @@ data class Access(
             val b1 = this.bounds(p1)
             val b2 = a2.bounds(p2)
             if (!b1.intersect(b2)) {
-                return null
+                return DistanceResult.noCollision
             }
             } catch (e: Exception){
                 // TODO: check bounds at runtime
@@ -41,10 +43,14 @@ data class Access(
 
             // TODO: check base
             // 1. find the base
-            // val base1 = p1.base()
-            // val base2 = p2.base()
+            val base1 = p1.base()
+            val base2 = p2.base()
             // 2. calculate bounds at runtime
+            // check_bounds(A, C)
             // 3. check if access do not cross each other's bounds
+            // A. A != B != C
+
+            // B. if A.max < C.min or A.min > C.min
             // TODO: check base at runtime
 
             // TODO: check gcd
@@ -54,12 +60,12 @@ data class Access(
             val sink = p2
             val distance = sink - source
 
-            return distance.calculate(distance.symbols().associateWith { Value.zero }).value.toInt()
+            return DistanceResult(distance.calculate(distance.symbols().associateWith { Value.zero }).value.toInt())
         }
-        return null
+        return DistanceResult.noCollision
     }
 
-    fun polynomial(): Polynomial {
+    private fun polynomial(): Polynomial {
         if (symbol !is Load) {
             throw Exception("Polynomial Only usable on Load Symbols!")
         }

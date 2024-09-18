@@ -1,5 +1,6 @@
 package analysis.ddt
 
+import ir.expression.Expression
 import ir.expression.Symbol
 import ir.expression.Value
 import ir.statement.SymbolLoad
@@ -17,11 +18,17 @@ open class Polynomial {
     }
 
     fun addMultiplier(symbol: SymbolLoad, value: Value = Value.one) {
-        symbolMultiplier[symbol] = symbolMultiplier.getOrDefault(symbol, value).add(value)
+        symbolMultiplier[symbol] = symbolMultiplier.getOrDefault(symbol, Value.zero).add(value)
     }
 
     fun symbols(): Set<SymbolLoad> {
         return symbolMultiplier.keys
+    }
+
+    fun base() : Expression {
+        // symbol or constant address
+        val symbol = symbolMultiplier.entries.firstOrNull { it.value == Value.one }?.key ?: offset
+        return symbol as Expression
     }
 
     fun calculate(symbolValue: Map<SymbolLoad, Value>): Value {
