@@ -4,6 +4,7 @@ import ir.annotations.*
 import ir.expression.*
 import ir.finder.AnnotationFinder
 import ir.finder.Finders
+import ir.finder.ReplaceableFinder
 import ir.finder.SymbolReplacer
 import ir.statement.*
 import ir.statement.Function
@@ -13,6 +14,7 @@ object ThreadKernelGenerator {
     fun generate(
         program: Program,
         threadCount: Expression,
+        globalStackBase: Symbol,
         generateCallKernel: (Function, Block) -> Unit,
     ): List<Block> {
         val module = program.module
@@ -27,6 +29,15 @@ object ThreadKernelGenerator {
                     parallelBlock.parent = forLoop.parent
                     parallelBlock.indexInParent = forLoop.indexInParent
 
+                    // TODO: replace stack_base
+                    val localStackBase = forLoop.annotations.filterIsInstance<StackBase>().firstOrNull()
+                    if(localStackBase != null){
+                        val replaces = mapOf<SymbolLoad, Symbol>(
+                            localStackBase.symbol to globalStackBase
+                        )
+                        SymbolReplacer(replaces).also { forLoop.visit(it) }
+                    }
+
                     // loop boundaries
                     val rangeLoop = (forLoop as RangeLoop)
                     val rangeFrom = rangeLoop.range.from
@@ -38,7 +49,7 @@ object ThreadKernelGenerator {
                         // RangeTo is not constant
                         // check condition
 
-
+                        //throw Exception("Can't Deduce Loop To Range: $rangeTo")
                     }
                     // from & to are constants!
 
@@ -114,26 +125,6 @@ object ThreadKernelGenerator {
                                 )
                             )
                         )
-
-                        /*val print = module.exports.first { it.name == "\"print_i32\"" }.index
-                        val debug = arrayOf(
-                            // lock mutex
-                            threadCount,
-                            RawWat("i32.const 4"),
-                            RawWat("i32.mul"),
-                            mutex!!.lock.call(),
-                            // debug
-                            RawWat("local.get 1"),
-                            RawWat("local.get 2"),
-                            RawWat("call \$f$print"),
-                            // debug end
-                            // unlock mutex
-                            threadCount,
-                            RawWat("i32.const 4"),
-                            RawWat("i32.mul"),
-                            mutex.unlock.call(),
-                        )
-                        instructions.addAll(debug)*/
 
                         instructions.add(forLoop)
 

@@ -13,6 +13,7 @@ import ir.expression.Value
 import ir.statement.Program
 import java.io.File
 
+/*
 class PThreadsGenerator(val outputName: String) : Generator {
     override fun apply(program: Program) {
         Mode.insure(Mode::multipleMemories, true)
@@ -39,4 +40,4 @@ class PThreadsGenerator(val outputName: String) : Generator {
 
         Wasm2Wat.process(output)
     }
-}
+}*/

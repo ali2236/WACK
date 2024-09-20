@@ -1,13 +1,11 @@
 package generation.wack
 
 import generation.wasm.threads.MutexLibrary
-import ir.annotations.Parallel
 import ir.expression.*
 import ir.statement.*
 import ir.wasm.Index
 import ir.wasm.WasmBitSign
 import ir.wasm.WasmFunction
-import ir.wasm.WasmGlobal
 import ir.wasm.WasmScope
 import ir.wasm.WasmValueType
 
@@ -18,7 +16,10 @@ import ir.wasm.WasmValueType
 // for thread_id from 0 to num_threads:
 //    join(thread_id)
 //
-object ParallelBlockGenerator {
+///
+/// Generates the [parallel] function
+///
+object RunParallelFunctionGenerator {
     fun generate(
         program: Program, threadCount: Expression, mutex: MutexLibrary, arg: ThreadArg, threadSpawn: WasmFunction
     ): WasmFunction {

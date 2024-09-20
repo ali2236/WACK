@@ -15,6 +15,7 @@ import ir.statement.Program
 import ir.wasm.WasmValueType
 import java.io.File
 
+/*
 class WasiCGenerator(val outputName: String) : Generator {
     override fun apply(program: Program) {
         Mode.insure(Mode::multipleMemories, true)
@@ -53,4 +54,4 @@ class WasiCGenerator(val outputName: String) : Generator {
 
         Wasm2Wat.process(output)
     }
-}
+}*/
