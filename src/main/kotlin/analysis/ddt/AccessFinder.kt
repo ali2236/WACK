@@ -70,6 +70,7 @@ class AccessFinder(parentScope: RangeLoop, val dfa: Dfa) : Visitor() {
                         finder.at(currentStatement!!) ?: setOf(),
                     )
                     accesses.add(access)
+                    return // maybe dont go deeper
                 }
             }
         }

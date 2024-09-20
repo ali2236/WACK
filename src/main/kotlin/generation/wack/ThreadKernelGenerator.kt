@@ -35,7 +35,10 @@ object ThreadKernelGenerator {
                         throw Exception("Can't Deduce Loop From Range: $rangeFrom")
                     }
                     if (Finders.symbols(rangeTo).isNotEmpty()) {
-                        throw Exception("Can't Deduce Loop To Range: $rangeTo")
+                        // RangeTo is not constant
+                        // check condition
+
+
                     }
                     // from & to are constants!
 

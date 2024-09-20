@@ -51,7 +51,6 @@ data class Access(
             // A. A != C
             conditions.add(BinaryOP(WasmValueType.i32, BinaryOP.Operator.neq, base1, base2))
             // B. if A.max < C.min or A.min > C.min
-            // TODO: check base at runtime
 
             // TODO: check gcd
 

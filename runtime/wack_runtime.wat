@@ -170,8 +170,9 @@
     ;;i32.const 0
     ;;call $wait_mutex_lock
   )
-  (memory (;$runtime_memory;) 4 4 shared) ;; 64kb for thread join lock
+  (memory (;$runtime_memory;) 4 4 shared) ;; 64kb * 4 for thread join lock
   (global $num_threads (mut i32) (i32.const 8)) ;; $num_threads
+  (global $stack_base (mut i32) (i32.const 0)) ;; $serial_function_stack_base
   (export "wasi_thread_start" (func $wasi_thread_start2)) ;; not for public use
   (export "_start" (func $test))
   (table $kernels 32 32 funcref) ;; must be generated
