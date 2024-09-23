@@ -1,3 +1,5 @@
+import external.Wasmtime
+import external.runTimed
 import java.io.File
 import java.nio.file.Files
 import kotlin.io.path.Path
@@ -12,12 +14,11 @@ class MatrixMultiplyTest {
             .filter { Files.isRegularFile(it) }
             .filter { it.extension == "wasm" }
 
-            println("test file\tinput run time\toutput run time")
         for (path in allWasmFilePaths){
-            val inputRunTime = TODO()
+            val inputRunTime = runTimed { Wasmtime.run(path) }
             val output = WAPC.compile(path)
-            val outputRunTime = TODO()
-            println("${path.fileName}\t${inputRunTime}\t${outputRunTime}")
+            val outputRunTime = runTimed { Wasmtime.runWithThreadsEnabled(output) }
+            println("${path.fileName}: before=${inputRunTime}; after=${outputRunTime}")
         }
     }
 
