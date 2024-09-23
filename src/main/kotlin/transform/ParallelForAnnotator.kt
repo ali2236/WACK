@@ -29,6 +29,7 @@ class ParallelForAnnotator : Transformer {
                 }
                 //println("Added Conditions To Parallel For Loop")
             }
+            // generally alias stack access
             if(parallelLoop.conditions.isNotEmpty()){
                 // find stack_base
                 val symbols = Finders.symbols(parallelLoop.conditions.first())

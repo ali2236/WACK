@@ -4,7 +4,7 @@ import ir.statement.Program
 import transform.constant_propegation.ConstantPropagation
 import transform.restructure.*
 
-object OptimizationPasses {
+object TransformationPasses {
     fun apply(program: Program){
         val passes = listOf<Transformer>(
             SkipMarker(),
@@ -16,6 +16,7 @@ object OptimizationPasses {
             IncrementRestructure(),
             RangeLoopRestructure(),
             ParallelForAnnotator(),
+            StackBaseAliasAnnotator(),
             MarkLoopCountersAsPrivate(),
             //LocalizeRangeLoopCounter(),
         )

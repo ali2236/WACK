@@ -2,7 +2,7 @@ import analysis.Analysis
 import generation.WasiThreadsGenerator
 import generation.insureDirectoryExists
 import ir.statement.Program
-import transform.OptimizationPasses
+import transform.TransformationPasses
 import java.io.File
 import java.nio.file.Path
 
@@ -17,7 +17,7 @@ object WAPC {
     fun compile(input: Path, output: Path? = null, generateDotFiles:Boolean = false): Path {
         val inputFile = input.toFile()
         val program = Program.from(inputFile)
-        OptimizationPasses.apply(program)
+        TransformationPasses.apply(program)
         WasiThreadsGenerator().apply(program)
         if(generateDotFiles){
             Analysis.writeDotFiles(program, inputFile.nameWithoutExtension)

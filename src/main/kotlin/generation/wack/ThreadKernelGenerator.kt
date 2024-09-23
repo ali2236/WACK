@@ -29,7 +29,7 @@ object ThreadKernelGenerator {
                     parallelBlock.parent = forLoop.parent
                     parallelBlock.indexInParent = forLoop.indexInParent
 
-                    // TODO: replace stack_base
+                    // replace stack_base
                     val localStackBase = forLoop.annotations.filterIsInstance<StackBase>().firstOrNull()
                     if (localStackBase != null) {
                         val replaces = mapOf<SymbolLoad, Symbol>(
