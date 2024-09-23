@@ -18,17 +18,17 @@ class WasiThreadsGenerator : Generator {
         val mutex = MutexLibraryGenerator.generate(program)
         val threadArg = ThreadArgEncoderGenerator.generate(program)
         val threadCount = ThreadCountGenerator(8).generate(program)
-        val globalStackBase = StackBaseGenerator.generate(program)
+        val metaLib = MetaLibrary.generate(program)
         val threadSpawn = WasiThreadSpawnGenerator.generate(program)
         val runParallel =
             RunParallelFunctionGenerator.generate(program, threadCount.symbol, mutex, threadArg, threadSpawn)
-        ThreadKernelGenerator.generate(program, threadCount.symbol, globalStackBase.symbol) { function, block ->
+        ThreadKernelGenerator.generate(program, threadCount.symbol, metaLib) { function, block ->
             block.instructions.clear()
             val kernelId = block.annotations.filterIsInstance<CallKernel>().first().kernelIndex
             val localStackBase = block.annotations.filterIsInstance<StackBase>().first().symbol
             block.instructions.addAll(
                 listOf(
-                    Assignment(globalStackBase.symbol, localStackBase),
+                    metaLib.setStackBase.call(localStackBase),
                     runParallel.call(Value.i32(kernelId)),
                 ),
             )

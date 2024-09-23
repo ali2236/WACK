@@ -8,6 +8,8 @@
   (type $thread_start_type (func (param i32 i32)))
   (type $arg_encode_type (func (param i32 i32) (result i32)))
   (type $arg_decode_type (func (param i32) (result i32)))
+  (type $set_i32_type (func (param i32)))
+  (type $get_i32_type (func (result i32)))
   (import "wasi" "thread-spawn" (func $thread_spawn (type $thread_spawn_type)))
   (func $nothing (type $kernel_type) (param $thread_id i32)
     nop
@@ -16,7 +18,7 @@
     local.get $mutex_address
     i32.const 0 ;; expected
     i32.const 1 ;; locked
-    i32.atomic.rmw.cmpxchg (;$runtime_memory;)
+    i32.atomic.rmw.cmpxchg (;$runtime_mutex_memory;)
     i32.eqz
   )
    (func $lock_mutex (type $kernel_type) (param $mutex_address i32)
@@ -31,7 +33,7 @@
           local.get $mutex_address ;; mutex address
           i32.const 1              ;; expected value (1 => locked)
           i64.const -1             ;; infinite timeout
-          memory.atomic.wait32 (;$runtime_memory;)
+          memory.atomic.wait32 (;$runtime_mutex_memory;)
           drop
           br $retry
         end
@@ -42,12 +44,12 @@
       ;; Unlock the mutex.
       local.get $mutex_address     ;; mutex address
       i32.const 0              ;; 0 => unlocked
-      i32.atomic.store (;$runtime_memory;)
+      i32.atomic.store (;$runtime_mutex_memory;)
 
       ;; Notify one agent that is waiting on this lock.
       local.get $mutex_address   ;; mutex address
       i32.const 1            ;; notify 1 waiter
-      memory.atomic.notify (;$runtime_memory;)
+      memory.atomic.notify (;$runtime_mutex_memory;)
       drop
    )
   (func $wait_mutex_lock (type $kernel_type) (param $mutex_address i32)
@@ -80,7 +82,16 @@
     i32.shr_u
     ;; thread_num param
   )
-  (func $parallel (type $kernel_type) (param $kernel_id)
+  (func $set_stack_base (type $set_i32_type) (param $stack_base i32)
+    i32.const 0
+    local.get $stack_base
+    i32.store ;;$runtime_memory
+  )
+  (func $get_stack_base (type $get_i32_type)
+    i32.const 0
+    i32.load ;;$runtime_memory
+  )
+  (func $parallel (type $kernel_type) (param $kernel_id i32)
     (local $i i32)
     i32.const 0
     local.set $i
@@ -170,9 +181,9 @@
     ;;i32.const 0
     ;;call $wait_mutex_lock
   )
-  (memory (;$runtime_memory;) 4 4 shared) ;; 64kb * 4 for thread join lock
+  (memory $runtime_mutex_memory 4 4 shared) ;; 64kb * 4 for thread join lock
+  (memory $runtime_memory 1 1 shared) ;; 64kb for {int stack_base}
   (global $num_threads (mut i32) (i32.const 8)) ;; $num_threads
-  (global $stack_base (mut i32) (i32.const 0)) ;; $serial_function_stack_base
   (export "wasi_thread_start" (func $wasi_thread_start2)) ;; not for public use
   (export "_start" (func $test))
   (table $kernels 32 32 funcref) ;; must be generated

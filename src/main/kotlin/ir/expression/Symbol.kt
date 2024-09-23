@@ -43,4 +43,10 @@ open class Symbol(val scope: WasmScope, val type: WasmValueType, val index : Ind
         return result
     }
 
+    companion object {
+        fun localI32(idx: Index): Symbol {
+            return Symbol(WasmScope.local, WasmValueType.i32, idx)
+        }
+    }
+
 }

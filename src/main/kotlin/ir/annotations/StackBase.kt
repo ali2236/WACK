@@ -9,9 +9,11 @@ class StackBase(val symbol: Symbol) : WackAnnotation {
     override fun wat(wat: WatWriter) {
         wat.write("(@stack (")
         wat.endLine()
+        wat.indent++
         symbol.wat(wat)
+        wat.indent--
+        wat.startLine()
         wat.write("))")
-        wat.endLine()
     }
 
     override fun visit(v: Visitor) {

@@ -14,7 +14,7 @@ object ThreadKernelGenerator {
     fun generate(
         program: Program,
         threadCount: Expression,
-        globalStackBase: Symbol,
+        metaLib: MetaLibrary,
         generateCallKernel: (Function, Block) -> Unit,
     ): List<Block> {
         val module = program.module
@@ -31,9 +31,9 @@ object ThreadKernelGenerator {
 
                     // TODO: replace stack_base
                     val localStackBase = forLoop.annotations.filterIsInstance<StackBase>().firstOrNull()
-                    if(localStackBase != null){
+                    if (localStackBase != null) {
                         val replaces = mapOf<SymbolLoad, Symbol>(
-                            localStackBase.symbol to globalStackBase
+                            localStackBase.symbol to Symbol.localI32(Index.number(1))
                         )
                         SymbolReplacer(replaces).also { forLoop.visit(it) }
                     }
@@ -56,15 +56,30 @@ object ThreadKernelGenerator {
                     // make function definition
                     val kernelFunction = WasmFunction(
                         Index("__kernel_$kernels"),
-                        type = kernelType,
-                        locals = mutableListOf(WasmValueType.i32, WasmValueType.i32),
+                        type = kernelType, /* thread_id */
+                        locals = mutableListOf(
+                            WasmValueType.i32/* stack_base */,
+                            WasmValueType.i32/* start */,
+                            WasmValueType.i32/* end */
+                        ),
                     )
 
                     // put loop as function body
                     val kernel = Function(kernelFunction).apply {
                         val threadId = Symbol(WasmScope.local, WasmValueType.i32, Index.number(0))
-                        val start = Symbol(WasmScope.local, WasmValueType.i32, Index.number(1))
-                        val end = Symbol(WasmScope.local, WasmValueType.i32, Index.number(2))
+                        val stackBase = Symbol(WasmScope.local, WasmValueType.i32, Index.number(1))
+                        val start = Symbol(WasmScope.local, WasmValueType.i32, Index.number(2))
+                        val end = Symbol(WasmScope.local, WasmValueType.i32, Index.number(3))
+
+                        // TODO: Only if has stack_base
+                        // new stack_base
+                        instructions.add(
+                            Assignment(
+                                stackBase,
+                                metaLib.getStackBase.call().result,
+                            )
+                        )
+
                         // size = to - from
                         val size = BinaryOP(
                             WasmValueType.i32,
@@ -164,12 +179,15 @@ object ThreadKernelGenerator {
 
                     parallelBlock.apply {
                         annotations.add(CallKernel(kernelId))
+                        forLoop.annotations.filterIsInstance<StackBase>().firstOrNull()?.let {
+                            parallelBlock.annotations.add(it)
+                        }
                         generateCallKernel(function, this)
                     }
                     replace(parallelBlock)
                     parallelBlocks.add(parallelBlock)
                 } catch (e: Exception) {
-
+                    error(e)
                 }
             }
         }
