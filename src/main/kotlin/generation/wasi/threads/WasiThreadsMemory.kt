@@ -19,7 +19,8 @@ class WasiThreadsMemory(val specialFirst: Boolean = true) {
             // make shared
             it.shared = true
             if (it.max == null) {
-                it.max = it.min
+                // TODO: currently its set to a high number of pages
+                it.max = 64000
             }
 
             // add it to import

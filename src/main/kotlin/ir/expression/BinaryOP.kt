@@ -136,8 +136,8 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
             )
         }
 
-        fun plus(left: Expression, i: Int): BinaryOP {
-            return BinaryOP(left.exprType(), Operator.add, left, Value(left.exprType(), left.exprType().fromNumber(i)))
+        fun plus(left: Expression, i: Value): BinaryOP {
+            return BinaryOP(left.exprType(), Operator.add, left, i)
         }
     }
 

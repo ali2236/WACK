@@ -89,8 +89,8 @@ class RangeLoopRestructure : Restructure() {
             } else {
                 return when (operator.sign) {
                     "<" -> right
-                    "<=" -> BinaryOP.plus(right, 1)
-                    ">" -> BinaryOP.plus(right, 1)
+                    "<=" -> BinaryOP.plus(right, Value.one)
+                    ">" -> BinaryOP.plus(right, Value.one)
                     ">=" -> right
                     "!=" -> right
                     else -> throw Exception()

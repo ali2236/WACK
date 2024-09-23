@@ -35,7 +35,6 @@ class AddressPolynomialFinder(address: Expression) : Visitor() {
                     }
                 }
             }
-
             is Value -> {
                 p.addOffset(v)
                 return

@@ -10,7 +10,7 @@ open class Polynomial {
     private var offset: Value = Value.zero
 
     fun addOffset(v: Value) {
-        offset.add(v)
+        offset = offset.add(v)
     }
 
     fun getOffset(): Value {
@@ -64,6 +64,11 @@ open class Polynomial {
                 p.symbolMultiplier
                     .getOrDefault(symbol, Value.zero)
                     .add(other.symbolMultiplier[symbol]!!.multiply(-1))
+        }
+        for(symbol in p.symbolMultiplier.keys){
+            if(p.symbolMultiplier[symbol] == Value.zero){
+                p.symbolMultiplier.remove(symbol)
+            }
         }
         return p
     }

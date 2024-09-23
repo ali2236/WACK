@@ -4,6 +4,7 @@ import analysis.dfa.Dfa
 import ir.finder.BreadthFirstExpressionFinder
 import ir.statement.Function
 import ir.statement.RangeLoop
+import ir.statement.Statement
 import java.lang.Exception
 
 object DependenceTester {
@@ -38,7 +39,7 @@ object DependenceTester {
                     try {
                         val result = a1.distance(a2)
 
-                        if (result.distance != null) {
+                        if (result.distance != null || result.conditions.isNotEmpty()) {
                             val pair = AccessPair(a1, a2, result)
                             pairs.add(pair)
                         }
@@ -49,8 +50,13 @@ object DependenceTester {
                     }
                 }
             }
-            if (pairs.map { it.distanceInfo.distance }.reduce { acc, i -> acc!! or i!! } == 0) {
-                val conditions = pairs.map { it.distanceInfo.conditions }.reduce { acc, cond -> acc + cond }
+            var distance = 0
+            var conditions = listOf<Statement>()
+            for(pair in pairs){
+                distance = distance or (pair.distanceInfo.distance ?: 0)
+                conditions = conditions + pair.distanceInfo.conditions
+            }
+            if (distance == 0) {
                 loops.add(ParallelizableLoop(topLevelRangeLoop, conditions))
             }
         }

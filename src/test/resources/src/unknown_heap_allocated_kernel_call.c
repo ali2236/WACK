@@ -13,9 +13,9 @@ void matrix_multiply(int A[_N][_N], int B[_N][_N], int C[_N][_N], int n){
 
 int main() {
     int N = _N;
-    int** a = (int**) malloc(sizeof(int) * N * N);
-    int** b = (int**) malloc(sizeof(int) * N * N);
-    int** c = (int**) malloc(sizeof(int) * N * N);
+    int (*a)[N] = (void*) malloc(sizeof(int) * N * N);
+    int (*b)[N] = (void*) malloc(sizeof(int) * N * N);
+    int (*c)[N] = (void*) malloc(sizeof(int) * N * N);
     // matrix fill
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {

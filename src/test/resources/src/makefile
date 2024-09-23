@@ -6,6 +6,7 @@ all: $(patsubst %.c, %.wasm, $(wildcard *.c))
 
 %.wasm: %.c
 	$(CC) --sysroot=$(SYSROOT) --target=wasm32-wasi -o $@ $<
+	wasm-opt -O1 $@ -o $@
 
 clean:
 	rm *.wasm

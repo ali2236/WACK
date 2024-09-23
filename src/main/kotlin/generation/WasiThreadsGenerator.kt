@@ -25,13 +25,10 @@ class WasiThreadsGenerator : Generator {
         ThreadKernelGenerator.generate(program, threadCount.symbol, metaLib) { function, block ->
             block.instructions.clear()
             val kernelId = block.annotations.filterIsInstance<CallKernel>().first().kernelIndex
-            val localStackBase = block.annotations.filterIsInstance<StackBase>().first().symbol
-            block.instructions.addAll(
-                listOf(
-                    metaLib.setStackBase.call(localStackBase),
-                    runParallel.call(Value.i32(kernelId)),
-                ),
-            )
+            block.annotations.filterIsInstance<StackBase>().firstOrNull()?.symbol?.let { localStackBase ->
+                block.instructions.add(metaLib.setStackBase.call(localStackBase))
+            }
+            block.instructions.add(runParallel.call(Value.i32(kernelId)))
         }
         WasiThreadStartGenerator.generate(program, threadArg, mutex, threadCount.symbol)
         WasiThreadsMemory().apply(program)

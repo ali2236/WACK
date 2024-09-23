@@ -32,34 +32,42 @@ data class Access(
             // check bounds
             try {
 
-            val b1 = this.bounds(p1)
-            val b2 = a2.bounds(p2)
-            if (!b1.intersect(b2)) {
-                return DistanceResult.noCollision
-            }
-            } catch (e: Exception){
+                val b1 = this.bounds(p1)
+                val b2 = a2.bounds(p2)
+                if (!b1.intersect(b2)) {
+                    return DistanceResult.noCollision
+                } else {
+                    return DistanceResult.collision
+                }
+            } catch (e: Exception) {
                 // TODO: check bounds at runtime
+                // 1. find the base
+                val base1 = p1.base()
+                val base2 = p2.base()
+                // 2. add it to the offset to get linear memory array base
+                val linearBase1 = BinaryOP.plus(base1, p1.getOffset())
+                val linearBase2 = BinaryOP.plus(base2, p2.getOffset())
+                // check_bounds(A, C)
+                // 3. check if access do not cross each other's bounds
+                // A. A != C
+                conditions.add(BinaryOP(WasmValueType.i32, BinaryOP.Operator.neq, linearBase1, linearBase2))
+                // B. if A.max < C.min or A.min > C.min
+                return DistanceResult(null, conditions)
             }
 
-            // TODO: check base
-            // 1. find the base
-            val base1 = p1.base()
-            val base2 = p2.base()
-            // 2. calculate bounds at runtime
-            // check_bounds(A, C)
-            // 3. check if access do not cross each other's bounds
-            // A. A != C
-            conditions.add(BinaryOP(WasmValueType.i32, BinaryOP.Operator.neq, base1, base2))
-            // B. if A.max < C.min or A.min > C.min
 
             // TODO: check gcd
 
             // distance
+            // TODO: distance is only relevant if they are in the same address
             val source = p1
             val sink = p2
             val distance = sink - source
 
-            return DistanceResult(distance.calculate(distance.symbols().associateWith { Value.zero }).value.toInt(), conditions)
+            return DistanceResult(
+                distance.calculate(distance.symbols().associateWith { Value.zero }).value.toInt(),
+                conditions
+            )
         }
         return DistanceResult.noCollision
     }
@@ -89,20 +97,21 @@ data class Access(
             var value = fact.value
             if (value !is DfaValue.Range) {
                 val ss = s as Expression
-                value = DfaValue.Range(Value(ss.exprType(), ss.exprType().lb()), Value(ss.exprType(), ss.exprType().ub()))
+                value =
+                    DfaValue.Range(Value(ss.exprType(), ss.exprType().lb()), Value(ss.exprType(), ss.exprType().ub()))
             }
             symbolsRange[s] = value
         }
 
 
-        val maxFacts = symbolsRange.mapValues { BinaryOP(it.value.to.exprType(), BinaryOP.Operator.sub, it.value.to, it.value.to.exprType().value(1)) }
-        val minFacts = symbolsRange.mapValues { it.value.from }
+        // val maxFacts = symbolsRange.mapValues { BinaryOP(it.value.to.exprType(), BinaryOP.Operator.sub, it.value.to as Value, it.value.to.exprType().value(1)) }
+        val maxFacts = symbolsRange.mapValues { (it.value.to as Value).add(-1) }
+        val minFacts = symbolsRange.mapValues { it.value.from as Value }
 
-        throw Exception()
 
-        /*val max = poly.calculate(maxFacts).value.toLong()
+        val max = poly.calculate(maxFacts).value.toLong()
         val min = poly.calculate(minFacts).value.toLong()
 
-        return ArrayBounds(min, max)*/
+        return ArrayBounds(min, max)
     }
 }
