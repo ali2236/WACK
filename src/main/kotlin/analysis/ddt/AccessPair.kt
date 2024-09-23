@@ -5,9 +5,6 @@ data class AccessPair(
     val sink : Access,
     val distanceInfo: DistanceResult,
 ){
-    init {
-        assert(distanceInfo.distance != null)
-    }
 
     val direction : Int
         get() = if (distanceInfo.distance!! > 0) 1 else if(distanceInfo.distance < 0) -1 else 0

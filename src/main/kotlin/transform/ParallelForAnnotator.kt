@@ -22,12 +22,12 @@ class ParallelForAnnotator : Transformer {
             val loop = parallelLoop.loop
             loop.annotations.add(Parallel())
             loop.annotations.add(For())
-            println("Loop Marked as Parallel For")
+            //println("Loop Marked as Parallel For")
             if(parallelLoop.conditions.isNotEmpty()){
                 for (condition in parallelLoop.conditions){
                     loop.annotations.add(OnlyIf(condition))
                 }
-                println("Added Conditions To Parallel For Loop")
+                //println("Added Conditions To Parallel For Loop")
             }
             if(parallelLoop.conditions.isNotEmpty()){
                 // find stack_base
@@ -37,7 +37,7 @@ class ParallelForAnnotator : Transformer {
                 loop.annotations.add(StackBase(stackBase))
                 // 2. replace all stack_base symbols with global_stack_base
                 // 3. set global_stack_base to local_stack_base before
-                println("Added Stack Base To Parallel For Loop")
+                //println("Added Stack Base To Parallel For Loop")
             }
         }
     }

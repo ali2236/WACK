@@ -1,5 +1,5 @@
 #include <stdio.h>
-#define N 1500
+#define N 3
 
 int main() {
     int a[N][N];
