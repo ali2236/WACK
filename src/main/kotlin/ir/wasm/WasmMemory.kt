@@ -7,7 +7,7 @@ import ir.Names
 
 data class WasmMemory(
     val index: Index,
-    val min: Int,
+    var min: Int,
     var max: Int?,
     var shared: Boolean?,
     var import: WasmImport? = null

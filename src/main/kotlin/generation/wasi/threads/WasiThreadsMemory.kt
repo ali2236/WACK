@@ -14,7 +14,12 @@ class WasiThreadsMemory(val specialFirst: Boolean = true) {
         module.exports.removeIf { it.kind == WasmExportKind.memory }
 
         // make all memories shared + imported + exported
-        program.module.memories.forEach {
+        program.module.memories.forEachIndexed { i, it ->
+
+            // TODO: make min memory also max
+            if(i==0){
+                it.min = 2048
+            }
 
             // make shared
             it.shared = true

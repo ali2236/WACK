@@ -21,6 +21,10 @@
 - [ ] Profitability Analysis
 - [ ] Thread Local Storage (TLS)
 
+Currently not supported:
+- O3
+- `+=` operator
+
 Loop Analysis Steps:
 if Pass GCD Test -> parallel
 else test dependence
