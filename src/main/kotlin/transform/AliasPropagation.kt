@@ -14,6 +14,7 @@ import ir.statement.RangeLoop
 // And make it like this:
 // M0[M0[L11+28]+(M0[L11+8]*7200))+(M0[L11+4]*8)+0] = ((M0[L11+40]*M0[(M0[L11+24]+(M0[L11+8]*8800))+(M0[L11+0]*8)+0])*M0[(M0[L11+20]+(M0[L11+0]*7200))+(M0[L11+4]*8)+0])+M0[M0[L11+28]+(M0[L11+8]*7200))+(M0[L11+4]*8)+0];
 //
+@Deprecated("Not Implemented")
 class AliasPropagation : Transformer {
     override fun apply(program: Program) {
         program.statements
@@ -25,7 +26,7 @@ class AliasPropagation : Transformer {
     private fun applyToFunction(function: Function){
         val topLevelRangeLoops = BreadthFirstExpressionFinder(RangeLoop::class.java, true).also { it.visit(function) {} }.result()
        for(topLevelLoop in topLevelRangeLoops){
-            TODO()
+           throw Error()
        }
     }
 }

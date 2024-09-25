@@ -1,6 +1,5 @@
 import external.Wasmtime
 import external.runTimed
-import java.io.File
 import java.nio.file.Files
 import java.util.Date
 import kotlin.io.path.Path

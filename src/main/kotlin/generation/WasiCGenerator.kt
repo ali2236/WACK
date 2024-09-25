@@ -33,7 +33,6 @@ class WasiCGenerator(val outputName: String) : Generator {
         val kernelTabel = KernelTableGenerator.generate(program)
         CallKernelGenerator.generate(program, kernelTabel)
 
-        // TODO: make effected program memories shared
         program.module.memories.forEach {
             it.shared = true
             if(it.max == null){

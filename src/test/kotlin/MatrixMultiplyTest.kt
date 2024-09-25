@@ -2,8 +2,6 @@ import external.Make
 import external.Wasmtime
 import external.runTimed
 import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
 import kotlin.io.path.Path
 import kotlin.io.path.extension
 import kotlin.io.path.name
@@ -35,10 +33,8 @@ class MatrixMultiplyTest {
             println("Serial Version - ${path.name}")
             println(inputRunTime)
             print(inputOutput)
-            // TODO: assert output unchanged
+            // assert output unchanged
             assertEquals(inputOutput, outputOutput, "Different output is produced for ${path.fileName}")
-            //println("${path.fileName}: before=${inputRunTime}; after=${outputRunTime}")
-            // TODO: assert better performance
         }
     }
 

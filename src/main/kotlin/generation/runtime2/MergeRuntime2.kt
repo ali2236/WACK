@@ -16,6 +16,7 @@ import java.io.File
 // 5. data segment index + memory.init
 // 6. memory index + load/store
 // 7. export index
+@Deprecated("not implemented")
 object MergeRuntime2 {
     fun into(program: Program): WackPthreads {
         val runtimeWasm = File("./runtime/runtime2.wasm")
@@ -46,6 +47,6 @@ object MergeRuntime2 {
         // memory
 
 
-        return TODO()
+        throw Error()
     }
 }

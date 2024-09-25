@@ -1,5 +1,3 @@
-import external.Wasmtime
-import external.runTimed
 import java.io.File
 
 fun main(args: Array<String>) {
