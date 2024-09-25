@@ -248,6 +248,12 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
                 "abs" -> UnaryOP.Operator.abs
                 "ctz" -> UnaryOP.Operator.ctz
                 "clz" -> UnaryOP.Operator.clz
+                "sqrt" -> UnaryOP.Operator.sqrt
+                "popcnt" -> UnaryOP.Operator.popcnt
+                "ceil" -> UnaryOP.Operator.ceil
+                "floor" -> UnaryOP.Operator.floor
+                "trunc" -> UnaryOP.Operator.trunc
+                "nearest" -> UnaryOP.Operator.nearest
                 else -> throw Error("unknown unary operator $operatorName")
             }
             stack.push(UnaryOP(type, operatorSign, stack.pop()))
