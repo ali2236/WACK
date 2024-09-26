@@ -9,12 +9,12 @@ object Wasmtime {
     }
 
     fun run(path: Path, flags: List<String> = listOf()) : String{
-        val process = ProcessBuilder(
-            listOf("wasmtime") + flags + listOf(path.toString())
-        ).start()
-        process.errorStream.reader().forEachLine {
+        val command = listOf("wasmtime") + flags + listOf(path.toString())
+        //println(command)
+        val process = ProcessBuilder(command).start()
+        /*process.errorStream.reader().forEachLine {
           throw Exception(it)
-        }
+        }*/
         val reader = process.inputStream.bufferedReader()
         val output = StringBuilder()
         var line = reader.readLine()

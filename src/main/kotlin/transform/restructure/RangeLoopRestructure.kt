@@ -31,7 +31,7 @@ class RangeLoopRestructure : Restructure() {
             try {
                 transformIntoRangeLoop(block)
             } catch (e: Exception) {
-                println(e)
+                //println("range loop exception: $e")
             }
         }
     }
@@ -107,7 +107,7 @@ class RangeLoopRestructure : Restructure() {
                     ">" -> (right as Value).add(1)
                     ">=" -> (right as Value)
                     "!=" -> (right as Value)
-                    else -> throw Exception()
+                    else -> throw Exception("operator ${operator.sign} is not supported")
                 }
             } else {
                 return when (operator.sign) {
@@ -116,7 +116,7 @@ class RangeLoopRestructure : Restructure() {
                     ">" -> BinaryOP.plus(right, Value.one)
                     ">=" -> right
                     "!=" -> right
-                    else -> throw Exception()
+                    else -> throw Exception("operator ${operator.sign} is not supported")
                 }
             }
         }
