@@ -5,29 +5,44 @@ import ir.expression.Expression
 import ir.finder.Visitor
 
 // symbol++
-class Increment(var increment: AssignmentStore) : BasicStatement(), AssignmentStore {
+class Increment(var stmt: AssignmentStore, var direction: Direction) : BasicStatement(), AssignmentStore {
     override fun assignedWith(): Expression {
-        return increment.assignedWith()
+        return stmt.assignedWith()
     }
 
     override fun assignedTo(): SymbolLoad {
-        return increment.assignedTo()
+        return stmt.assignedTo()
     }
 
     override fun replaceAssign(newValue: Expression) {
-        return increment.replaceAssign(newValue)
+        return stmt.replaceAssign(newValue)
     }
 
     override fun write(out: Appendable) {
-        increment.write(out)
+        stmt.write(out)
     }
 
     override fun visit(v: Visitor) {
-       v.visit(increment){this.increment = it as AssignmentStore}
+       v.visit(stmt){this.stmt = it as AssignmentStore}
     }
 
     override fun wat(wat: WatWriter) {
-        increment.wat(wat)
+        stmt.wat(wat)
+    }
+
+    enum class Direction {
+        plus,
+        minus,
+    }
+
+    companion object {
+        fun plus(stmt: AssignmentStore): Statement {
+            return Increment(stmt, Direction.plus)
+        }
+
+        fun minus(stmt: AssignmentStore): Statement {
+            return Increment(stmt, Direction.minus)
+        }
     }
 }
 

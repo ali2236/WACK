@@ -18,10 +18,16 @@ class IncrementRestructure : Restructure() {
     private fun checkAssignmentStyleIncrement(stmt: AssignmentStore) {
         if (stmt.assignedWith() is BinaryOP) {
             val opr = stmt.assignedWith() as BinaryOP
-            if ((opr.right is Value && opr.operator == BinaryOP.Operator.add && (opr.right as Value).value == "1" && opr.left == stmt.assignedTo())) {
-                replaceCurrentInstruction(Increment(stmt))
-            } else if ((opr.left is Value && opr.operator == BinaryOP.Operator.add && (opr.left as Value).value == "1" && opr.right == stmt.assignedTo())) {
-                replaceCurrentInstruction(Increment(stmt))
+            val operatorIsAdd = opr.operator == BinaryOP.Operator.add
+            val operatorIsSub = opr.operator == BinaryOP.Operator.sub
+            if ((opr.right is Value && operatorIsAdd && (opr.right as Value).value == "1" && opr.left == stmt.assignedTo())) {
+                replaceCurrentInstruction(Increment.plus(stmt))
+            } else if ((opr.left is Value && operatorIsAdd && (opr.left as Value).value == "1" && opr.right == stmt.assignedTo())) {
+                replaceCurrentInstruction(Increment.plus(stmt))
+            } else  if ((opr.right is Value && operatorIsSub && (opr.right as Value).value == "1" && opr.left == stmt.assignedTo())) {
+                replaceCurrentInstruction(Increment.minus(stmt))
+            } else if ((opr.left is Value && operatorIsSub && (opr.left as Value).value == "1" && opr.right == stmt.assignedTo())) {
+                replaceCurrentInstruction(Increment.minus(stmt))
             }
         }
     }

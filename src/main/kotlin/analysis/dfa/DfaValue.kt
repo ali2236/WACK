@@ -5,7 +5,7 @@ import ir.expression.Value
 
 interface DfaValue {
     fun join(other: DfaValue): DfaValue
-    fun asValue(): Value
+    fun asValue(): Value?
 
     class Expr(val value: Expression) : DfaValue {
         override fun join(other: DfaValue): DfaValue {
@@ -71,7 +71,7 @@ interface DfaValue {
         }
     }*/
 
-    open class Unknown() : DfaValue {
+    open class Unknown(val expr: Expression? = null) : DfaValue {
         override fun join(other: DfaValue): DfaValue {
             return Unknown()
         }
@@ -89,8 +89,8 @@ interface DfaValue {
             return javaClass.hashCode()
         }
 
-        override fun asValue(): Value {
-            throw Exception()
+        override fun asValue(): Value? {
+            return null
         }
     }
 

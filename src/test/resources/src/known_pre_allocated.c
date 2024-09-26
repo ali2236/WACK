@@ -1,5 +1,5 @@
 #include <stdio.h>
-#define N 1500
+#define N 100
 
 int a[N][N];
 int b[N][N];

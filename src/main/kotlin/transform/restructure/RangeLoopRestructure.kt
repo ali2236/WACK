@@ -7,6 +7,7 @@ import analysis.dfa.whatIs
 import ir.expression.BinaryOP
 import ir.expression.Expression
 import ir.expression.Value
+import ir.finder.BreadthFirstExpressionFinder
 import ir.statement.*
 import ir.statement.Function
 import kotlin.Exception
@@ -30,7 +31,7 @@ class RangeLoopRestructure : Restructure() {
             try {
                 transformIntoRangeLoop(block)
             } catch (e: Exception) {
-
+                println(e)
             }
         }
     }
@@ -42,17 +43,19 @@ class RangeLoopRestructure : Restructure() {
             val symbol = conditionSymbols.first()
 
             // symbol initial value
-            val initial = initialValueOf(loop.parent, loop.indexInParent, symbol) ?: return
+            val initialConstValue = initialValueOf(loop.parent, loop.indexInParent, symbol)
+            val initialRuntimeValue = initialExpressionOf(loop.parent, loop.indexInParent, symbol)
+            val initial = initialRuntimeValue ?: initialConstValue ?: return
 
             // symbol end value
             val endExclusive = condition.endExclusive
 
-            // TODO: validate has Increment
             // TODO: Normalize Increments
-            /*val hasIncrement = loop.instructions.any { it is Increment }
+            // validate has Increment
+            val hasIncrement = BreadthFirstExpressionFinder(Increment::class.java).also { loop.visit(it) }.result().any { inc -> inc.stmt.assignedTo() == symbol }
             if (!hasIncrement) {
                 return
-            }*/
+            }
 
             val rangeLoop = RangeLoop(symbol, DfaValue.Range(initial, endExclusive), condition, loop.instructions)
             replaceCurrentBlock(rangeLoop)
@@ -67,12 +70,32 @@ class RangeLoopRestructure : Restructure() {
             return functionFacts.at(block).whatIs(symbol)?.asValue()
         }
         for (i in (startIndex - 1) downTo 0){
-            val value = functionFacts.at(block.instructions[i]).whatIs(symbol)?.asValue()
-            if(value != null){
-                return value
+            val fact = functionFacts.at(block.instructions[i]).whatIs(symbol)
+            if(fact != null){
+                return fact.asValue()
             }
         }
         return initialValueOf(block.parent, block.indexInParent, symbol)
+    }
+
+    private fun initialExpressionOf(block: Block?, startIndex: Int?, symbol: SymbolLoad) : Expression?{
+        if (block == null || startIndex == null){
+            return null
+        }
+        if(block is Function && startIndex == 0){
+            return null
+        }
+        for (i in (startIndex - 1) downTo 0){
+            val instruction = block.instructions[i]
+            when(instruction){
+                is AssignmentStore -> {
+                    if(instruction.assignedTo() == symbol){
+                        return instruction.assignedWith()
+                    }
+                }
+            }
+        }
+        return initialExpressionOf(block.parent, block.indexInParent, symbol)
     }
 
     private val BinaryOP.endExclusive: Expression

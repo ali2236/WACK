@@ -227,10 +227,10 @@ object DfaBuilder {
                         }
                         return DfaValue.Expr(expr)
                     } else {
-                        return DfaValue.Unknown()
+                        return DfaValue.Unknown(expr)
                     }
                 } else {
-                    return DfaValue.Unknown()
+                    return DfaValue.Unknown(expr)
                 }
             }
 
@@ -248,7 +248,7 @@ object DfaBuilder {
                     val result = evalUnaryOp(expr, dfaFacts)
                     return DfaValue.Expr(result)
                 } catch (e: java.lang.Exception) {
-                    return DfaValue.Unknown()
+                    return DfaValue.Unknown(expr)
                 }
             }
 
@@ -257,7 +257,7 @@ object DfaBuilder {
             }
 
             is FunctionResult, is SingleResultFunction, is ResultBlock, is MemoryGrow, is MemorySize, is CMPXCHG -> {
-                return DfaValue.Unknown()
+                return DfaValue.Unknown(expr)
             }
 
             is Select -> {
@@ -267,7 +267,7 @@ object DfaBuilder {
                     val res = if (value == 0) expr.val1 else expr.val2
                     return explainExpression(res, dfaFacts)
                 } else {
-                    return DfaValue.Unknown()
+                    return DfaValue.Unknown(expr)
                 }
             }
 
@@ -276,7 +276,7 @@ object DfaBuilder {
                 if (v is DfaValue.Expr) {
                     return DfaValue.Expr(Value(expr.toType, v.value.toString()))
                 } else {
-                    return DfaValue.Unknown()
+                    return DfaValue.Unknown(expr)
                 }
             }
 
@@ -396,7 +396,7 @@ object DfaBuilder {
 }
 
 private fun Boolean.toInt(): Int {
-    if (true) {
+    if (this) {
         return 1
     } else {
         return 0

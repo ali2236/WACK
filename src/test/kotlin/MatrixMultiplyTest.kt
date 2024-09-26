@@ -10,20 +10,21 @@ import kotlin.test.assertEquals
 
 class MatrixMultiplyTest {
     private val _dir = Path("./src/test/resources/src")
+
     init {
         Make(_dir).run()
     }
 
     @Test
-    fun runAll(){
+    fun runAll() {
         val allWasmFilePaths = Files.list(_dir)
             .filter { Files.isRegularFile(it) }
             .filter { it.extension == "wasm" }
 
-        for (path in allWasmFilePaths){
+        for (path in allWasmFilePaths) {
             println("Testing ${path.fileName}")
-            var inputOutput : String = ""
-            var outputOutput : String = ""
+            var inputOutput: String = ""
+            var outputOutput: String = ""
             val output = WAPC.compile(path)
             val outputRunTime = runTimed { outputOutput = Wasmtime.runWithThreadsEnabled(output) }
             println("Auto-Parallel Version - ${path.name}")
