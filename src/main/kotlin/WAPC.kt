@@ -1,17 +1,18 @@
 import analysis.Analysis
 import generation.WasiThreadsGenerator
-import generation.insureDirectoryExists
 import ir.statement.Program
 import transform.TransformationPasses
 import java.io.File
+import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.Path
 
 // WebAssembly Parallel Compiler
 object WAPC {
 
     init {
-        insureDirectoryExists("./out")
-        insureDirectoryExists("./out/intermediate")
+        //Files.deleteIfExists(Path("./out"))
+        Files.createDirectories(Path("./out/intermediate"))
     }
 
     fun compile(input: Path, output: Path? = null, generateDotFiles:Boolean = false): Path {

@@ -25,6 +25,11 @@ open class Polynomial {
         return symbolMultiplier.keys
     }
 
+
+    fun multipliers(): List<Value> {
+        return symbolMultiplier.values.toList()
+    }
+
     fun base() : Expression {
         // symbol or constant address
         val symbol = symbolMultiplier.entries.firstOrNull { it.value == Value.one }?.key ?: offset

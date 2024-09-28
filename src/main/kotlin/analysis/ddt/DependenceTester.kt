@@ -1,10 +1,10 @@
 package analysis.ddt
 
+import analysis.ddt.tests.DependenceTests
 import analysis.dfa.Dfa
 import ir.finder.BreadthFirstExpressionFinder
 import ir.statement.Function
 import ir.statement.RangeLoop
-import ir.statement.Statement
 import java.util.Stack
 
 class DependenceTester(val function: Function) {
@@ -59,12 +59,13 @@ class DependenceTester(val function: Function) {
                 if (i == j) continue
                 val a1 = accesses[i]
                 val a2 = accesses[j]
+                if(a1.accessType == a2.accessType && a2.accessType == AccessType.Read) continue
 
                 // TODO: non loop symbols can cause dependencies
 
                 // determine dependency type between them
                 try {
-                    val result = a1.distance(a2)
+                    val result = DependenceTests.test(a1, a2) ?: continue
 
                     if (result.distance != null || result.conditions.isNotEmpty()) {
                         val pair = AccessPair(a1, a2, result)
@@ -72,12 +73,13 @@ class DependenceTester(val function: Function) {
                     }
                 } catch (e: Exception) {
                     // TODO: this is only here to make the test fail
-                    pairs.add(AccessPair(a1, a2, DistanceResult(-1)))
+                    //pairs.add(AccessPair(a1, a2, DependenceResult(-1)))
                     //println("Dependency probably exists")
                 }
             }
         }
-        var distance = 0
+        // TODO: rewrite
+       /* var distance = 0
         var conditions = listOf<Statement>()
         for (pair in pairs) {
             distance = distance or (pair.distanceInfo.distance ?: 0)
@@ -85,7 +87,7 @@ class DependenceTester(val function: Function) {
         }
         if (distance == 0) {
             return ParallelizableLoop(loop, conditions)
-        }
+        }*/
         return null
     }
 }

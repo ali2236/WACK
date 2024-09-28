@@ -4,7 +4,6 @@ import analysis.dfa.DfaFact
 import analysis.dfa.DfaValue
 import ir.expression.*
 import ir.finder.BreadthFirstExpressionFinder
-import ir.finder.Finders
 import ir.statement.Statement
 import ir.statement.SymbolLoad
 import ir.wasm.WasmValueType
@@ -15,64 +14,8 @@ data class Access(
     val scope: AccessScope,
     val facts: Set<DfaFact>,
 ) {
-    fun distance(a2: Access): DistanceResult {
-        val conditions = mutableListOf<Statement>()
-        if (symbol is Load || a2.symbol is Load) {
-            val s1 = symbol as Load
-            val s2 = a2.symbol as Load
-            // check if same memory
-            if (s1.memoryIndex != s2.memoryIndex) {
-                return DistanceResult.noCollision
-            }
 
-            // polynomials
-            val p1 = this.polynomial()
-            val p2 = a2.polynomial()
-
-            // check bounds
-            try {
-
-                val b1 = this.bounds(p1)
-                val b2 = a2.bounds(p2)
-                if (!b1.intersect(b2)) {
-                    return DistanceResult.noCollision
-                } else {
-                    return DistanceResult.collision
-                }
-            } catch (e: Exception) {
-                // TODO: check bounds at runtime
-                // 1. find the base
-                val base1 = p1.base()
-                val base2 = p2.base()
-                // 2. add it to the offset to get linear memory array base
-                val linearBase1 = BinaryOP.plus(base1, p1.getOffset())
-                val linearBase2 = BinaryOP.plus(base2, p2.getOffset())
-                // check_bounds(A, C)
-                // 3. check if access do not cross each other's bounds
-                // A. A != C
-                conditions.add(BinaryOP(WasmValueType.i32, BinaryOP.Operator.neq, linearBase1, linearBase2))
-                // B. if A.max < C.min or A.min > C.min
-                return DistanceResult(null, conditions)
-            }
-
-
-            // TODO: check gcd
-
-            // distance
-            // TODO: distance is only relevant if they are in the same address
-            val source = p1
-            val sink = p2
-            val distance = sink - source
-
-            return DistanceResult(
-                distance.calculate(distance.symbols().associateWith { Value.zero }).value.toInt(),
-                conditions
-            )
-        }
-        return DistanceResult.noCollision
-    }
-
-    private fun polynomial(): Polynomial {
+    fun polynomial(): Polynomial {
         if (symbol !is Load) {
             throw Exception("Polynomial Only usable on Load Symbols!")
         }
@@ -84,7 +27,8 @@ data class Access(
         return poly
     }
 
-    fun bounds(poly: Polynomial = polynomial()): ArrayBounds {
+    fun bounds(): ArrayBounds {
+        val poly = this.polynomial()
         if (symbol !is Load) {
             throw Exception("Bound Only usable on Load Symbols!")
         }
