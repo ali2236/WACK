@@ -5,6 +5,7 @@ import analysis.dfa.Dfa
 import ir.finder.BreadthFirstExpressionFinder
 import ir.statement.Function
 import ir.statement.RangeLoop
+import ir.statement.Statement
 import java.util.Stack
 
 class DependenceTester(val function: Function) {
@@ -17,26 +18,68 @@ class DependenceTester(val function: Function) {
         val rangeLoops =
             BreadthFirstExpressionFinder(RangeLoop::class.java, true).also { it.visit(function) {} }.result()
         for (topLevelRangeLoop in rangeLoops) {
-            val result = testLoop(topLevelRangeLoop)
+            val result = testTopLevelLoop(topLevelRangeLoop)
             loops.addAll(result)
         }
         return loops
     }
 
+    private fun testTopLevelLoop(topLevelRangeLoop: RangeLoop) : List<ParallelizableLoop> {
+        val finder = AccessFinder(topLevelRangeLoop, dfa)
+        val subLoops = finder.subLoops()
+        val accesses = finder.accesses().filter { access ->
+            // don't include access to loop symbols
+            !subLoops.any { loop ->
+                loop.symbol == access.symbol
+            }
+        }
+        val pairs = mutableListOf<AccessPair>()
+        for (i in accesses.indices) {
+            for (j in accesses.indices) {
+                if (i == j) continue
+                val a1 = accesses[i]
+                val a2 = accesses[j]
+                if (a1.accessType == a2.accessType && a2.accessType == AccessType.Read) continue
+                val dependencePossible = DependenceTests.dependencePossible(a1, a2) == DependenceResult.inconclusive
+                if(dependencePossible){
+                    pairs.add(AccessPair(a1, a2))
+                }
+            }
+        }
+        val partitionedPairs = SubscriptPartitioner.partition(pairs, subLoops)
+        for(partition in partitionedPairs){
+            for (pair in partition){
+                when(pair.findType()){
+                    SubscriptDependenceType.ZIV -> {
+                        if(pair.sink.symbol == pair.source.symbol){
+                            // TODO: dependent?
+                            return listOf()
+                        } else {
+                            // independent
+                        }
+                    }
+                    SubscriptDependenceType.SIV -> TODO()
+                    SubscriptDependenceType.MIV -> TODO()
+                }
+            }
+        }
+        return listOf(ParallelizableLoop(topLevelRangeLoop))
+    }
+
     // return most outer parallizable loop
     // if the outer loop is not parallizable should return a list of nested loops that are
     // if nothing is parallalizable return an empty list
-    private fun testLoop(loop: RangeLoop, parents: List<RangeLoop> = listOf()): List<ParallelizableLoop> {
+/*    private fun testLoopBottomUp(loop: RangeLoop, parents: List<RangeLoop> = listOf()): List<ParallelizableLoop> {
         // check children
         val subLoops = BreadthFirstExpressionFinder(RangeLoop::class.java).also { loop.visit(it) }.result()
-        val subParallelLoops = subLoops.map { testLoop(it, parents + listOf(loop)) }.flatten()
+        val subParallelLoops = subLoops.map { testLoopBottomUp(it, parents + listOf(loop)) }.flatten()
         val everyChildIsParallel = subLoops.all { sub -> subParallelLoops.any { par -> par.loop == sub } }
 
         // if self & all_children -> self
         // if !self -> children
         if (everyChildIsParallel) {
             // check self
-            val parallelLoop = checkIfLoopIsParallelizable(loop, parents)
+            val parallelLoop = checkIfLoopIsParallelizableBottomUp(loop, parents)
             if (parallelLoop != null) {
                 // carry children conditions
                 val childrenConditions = subParallelLoops.map { it.conditions }.flatten()
@@ -48,7 +91,7 @@ class DependenceTester(val function: Function) {
         return listOf()
     }
 
-    private fun checkIfLoopIsParallelizable(loop: RangeLoop, parents: List<RangeLoop> = listOf()): ParallelizableLoop? {
+    private fun checkIfLoopIsParallelizableBottomUp(loop: RangeLoop, parents: List<RangeLoop> = listOf()): ParallelizableLoop? {
         val scope = Stack<RangeLoop>()
         parents.forEach(scope::push)
         scope.push(loop)
@@ -59,7 +102,7 @@ class DependenceTester(val function: Function) {
                 if (i == j) continue
                 val a1 = accesses[i]
                 val a2 = accesses[j]
-                if(a1.accessType == a2.accessType && a2.accessType == AccessType.Read) continue
+                if (a1.accessType == a2.accessType && a2.accessType == AccessType.Read) continue
 
                 // TODO: non loop symbols can cause dependencies
 
@@ -79,15 +122,15 @@ class DependenceTester(val function: Function) {
             }
         }
         // TODO: rewrite
-       /* var distance = 0
+
+        //var distance = MutableList(10) { 0 }
         var conditions = listOf<Statement>()
         for (pair in pairs) {
-            distance = distance or (pair.distanceInfo.distance ?: 0)
             conditions = conditions + pair.distanceInfo.conditions
         }
-        if (distance == 0) {
+        if (pairs.size == 0) {
             return ParallelizableLoop(loop, conditions)
-        }*/
+        }
         return null
-    }
+    }*/
 }

@@ -12,7 +12,7 @@ class GCDTest : DependenceTest {
         val multipliers = p1.multipliers() + p2.multipliers()
         val gcd = gcd(multipliers.map { it.value.toInt() })
         val rem = p1.getOffset().value.toInt() - p2.getOffset().value.toInt()
-        if(rem % gcd == 0){
+        if(gcd % rem == 0){
             // independent
             return DependenceResult.noCollision
         } else {
