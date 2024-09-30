@@ -1,12 +1,12 @@
 package analysis.ddt
 
-import analysis.ddt.tests.DependenceTests
+import analysis.ddt.tests.DependenceTester
+import analysis.ddt.tests.GCDTest
+import analysis.ddt.tests.ZIVTest
 import analysis.dfa.Dfa
 import ir.finder.BreadthFirstExpressionFinder
 import ir.statement.Function
 import ir.statement.RangeLoop
-import ir.statement.Statement
-import java.util.Stack
 
 class DependenceTester(val function: Function) {
 
@@ -40,7 +40,7 @@ class DependenceTester(val function: Function) {
                 val a1 = accesses[i]
                 val a2 = accesses[j]
                 if (a1.accessType == a2.accessType && a2.accessType == AccessType.Read) continue
-                val dependencePossible = DependenceTests.dependencePossible(a1, a2) == DependenceResult.inconclusive
+                val dependencePossible = DependenceTester.dependencePossible(a1, a2) == DependenceResult.inconclusive
                 if(dependencePossible){
                     pairs.add(AccessPair(a1, a2))
                 }
@@ -51,86 +51,29 @@ class DependenceTester(val function: Function) {
             for (pair in partition){
                 when(pair.findType()){
                     SubscriptDependenceType.ZIV -> {
-                        if(pair.sink.symbol == pair.source.symbol){
-                            // TODO: dependent?
-                            return listOf()
-                        } else {
-                            // independent
+                       val result = DependenceTester.runTests(
+                           pair.source,
+                           pair.sink,
+                           listOf(ZIVTest())
+                       )
+                        if(result?.independent == true){
+                            break // partition is independent
                         }
                     }
-                    SubscriptDependenceType.SIV -> TODO()
-                    SubscriptDependenceType.MIV -> TODO()
+                    else -> {
+                        // gcd test
+                        // bunjree test
+                        // range test
+                        val result = DependenceTester.runTests(
+                            pair.source,
+                            pair.sink,
+                            listOf(GCDTest())
+                            )
+                        println(result)
+                    }
                 }
             }
         }
         return listOf(ParallelizableLoop(topLevelRangeLoop))
     }
-
-    // return most outer parallizable loop
-    // if the outer loop is not parallizable should return a list of nested loops that are
-    // if nothing is parallalizable return an empty list
-/*    private fun testLoopBottomUp(loop: RangeLoop, parents: List<RangeLoop> = listOf()): List<ParallelizableLoop> {
-        // check children
-        val subLoops = BreadthFirstExpressionFinder(RangeLoop::class.java).also { loop.visit(it) }.result()
-        val subParallelLoops = subLoops.map { testLoopBottomUp(it, parents + listOf(loop)) }.flatten()
-        val everyChildIsParallel = subLoops.all { sub -> subParallelLoops.any { par -> par.loop == sub } }
-
-        // if self & all_children -> self
-        // if !self -> children
-        if (everyChildIsParallel) {
-            // check self
-            val parallelLoop = checkIfLoopIsParallelizableBottomUp(loop, parents)
-            if (parallelLoop != null) {
-                // carry children conditions
-                val childrenConditions = subParallelLoops.map { it.conditions }.flatten()
-                return listOf(ParallelizableLoop(parallelLoop.loop, parallelLoop.conditions + childrenConditions))
-            }
-        } else {
-            return subParallelLoops
-        }
-        return listOf()
-    }
-
-    private fun checkIfLoopIsParallelizableBottomUp(loop: RangeLoop, parents: List<RangeLoop> = listOf()): ParallelizableLoop? {
-        val scope = Stack<RangeLoop>()
-        parents.forEach(scope::push)
-        scope.push(loop)
-        val accesses = BreadthOnlyAccessFinder(scope, dfa.finder()).accesses()
-        val pairs = mutableListOf<AccessPair>()
-        for (i in accesses.indices) {
-            for (j in accesses.indices) {
-                if (i == j) continue
-                val a1 = accesses[i]
-                val a2 = accesses[j]
-                if (a1.accessType == a2.accessType && a2.accessType == AccessType.Read) continue
-
-                // TODO: non loop symbols can cause dependencies
-
-                // determine dependency type between them
-                try {
-                    val result = DependenceTests.test(a1, a2) ?: continue
-
-                    if (result.distance != null || result.conditions.isNotEmpty()) {
-                        val pair = AccessPair(a1, a2, result)
-                        pairs.add(pair)
-                    }
-                } catch (e: Exception) {
-                    // TODO: this is only here to make the test fail
-                    //pairs.add(AccessPair(a1, a2, DependenceResult(-1)))
-                    //println("Dependency probably exists")
-                }
-            }
-        }
-        // TODO: rewrite
-
-        //var distance = MutableList(10) { 0 }
-        var conditions = listOf<Statement>()
-        for (pair in pairs) {
-            conditions = conditions + pair.distanceInfo.conditions
-        }
-        if (pairs.size == 0) {
-            return ParallelizableLoop(loop, conditions)
-        }
-        return null
-    }*/
 }
