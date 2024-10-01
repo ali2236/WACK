@@ -25,9 +25,9 @@ class DependenceTester(val function: Function) {
         return loops
     }
 
-    private fun testTopLevelLoop(topLevelRangeLoop: RangeLoop) : List<ParallelizableLoop> {
+    private fun testTopLevelLoop(topLevelRangeLoop: RangeLoop): List<ParallelizableLoop> {
         val finder = AccessFinder(topLevelRangeLoop, dfa)
-        if(finder.functionCalls().isNotEmpty()){
+        if (finder.functionCalls().isNotEmpty()) {
             // has function calls
             // no parallel loops
             return listOf()
@@ -47,26 +47,29 @@ class DependenceTester(val function: Function) {
                 val a2 = accesses[j]
                 if (a1.accessType == a2.accessType && a2.accessType == AccessType.Read) continue
                 val dependencePossible = DependenceTester.dependencePossible(a1, a2) == DependenceResult.inconclusive
-                if(dependencePossible){
+                if (dependencePossible) {
                     pairs.add(AccessPair(a1, a2))
                 }
             }
         }
         val partitionedPairs = SubscriptPartitioner.partition(pairs, subLoops)
-        var dependenceResult : DependenceResult? = null
-        for(partition in partitionedPairs){
-            for (pair in partition){
-                when(pair.findType()){
+        var dependenceResult: DependenceResult? = null
+        for (partition in partitionedPairs) {
+            for (pair in partition) {
+                when (pair.findType()) {
                     SubscriptDependenceType.ZIV -> {
-                       val result = DependenceTester.runTests(
-                           pair.source,
-                           pair.sink,
-                           listOf(ZIVTest())
-                       )
-                        if(result?.independent == true){
+                        val result = DependenceTester.runTests(
+                            pair.source,
+                            pair.sink,
+                            listOf(ZIVTest())
+                        )
+                        if (result?.independent == true) {
                             break // partition is independent
+                        } else {
+                            dependenceResult = result?.merge(dependenceResult)
                         }
                     }
+
                     else -> {
                         // gcd test
                         // banerjee test
@@ -75,7 +78,7 @@ class DependenceTester(val function: Function) {
                             pair.source,
                             pair.sink,
                             listOf(GCDTest(), MIVTest())
-                            )
+                        )
 
                         dependenceResult = result?.merge(dependenceResult)
                     }
@@ -84,14 +87,15 @@ class DependenceTester(val function: Function) {
         }
         // TODO: runtime dependence test
         // TODO: use dependence result to return parallel loop
-        if(pairs.isEmpty()){
+        if (pairs.isEmpty()) {
             // no dependencies
             return listOf(ParallelizableLoop(topLevelRangeLoop))
-        }/* else if(dependenceResult != null){
-            val parallelLoops = dependenceResult.direction.filter { it.value == Direction.Equal }.keys.map { ParallelizableLoop(it) }
-            return parallelLoops.subList(0, 1)
-        }*/ else {
-            return listOf()
+        } else if (dependenceResult != null) {
+            if (dependenceResult.direction[topLevelRangeLoop] == Direction.Equal) {
+                return listOf(ParallelizableLoop(topLevelRangeLoop))
+            }
+            // TODO: inner-loops
         }
+        return listOf()
     }
 }
