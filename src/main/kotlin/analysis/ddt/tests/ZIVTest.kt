@@ -14,7 +14,7 @@ class ZIVTest : DependenceTest() {
             // dependent
             // add all direction vectors for all common loops
             val commonLoops = a1.scope.intersect(a2.scope)
-            val directionVector = commonLoops.associateWith { Direction.any }
+            val directionVector = commonLoops.associateWith { Direction.Any }
             return DependenceResult(directionVector)
         } else {
             // independent

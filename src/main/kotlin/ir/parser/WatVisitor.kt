@@ -121,7 +121,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val functionIndex = Index.parse(ctx.var_().first().text)
             val calledFunction = module.functions.find(functionIndex)
             val (paramsTypes, resultTypes) = calledFunction.type.getParamsAndResults(module)
-            val params = paramsTypes.map { stack.pop() }
+            val params = paramsTypes.map { stack.pop() }.toMutableList()
             val call = FunctionCall(functionIndex, params, resultTypes)
             if (resultTypes.size == 0) {
                 stack.push(call)

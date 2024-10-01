@@ -2,14 +2,15 @@ package ir.statement
 
 import generation.WatWriter
 import ir.expression.Expression
+import ir.finder.Visitor
 import ir.wasm.Index
 import ir.wasm.WasmValueType
 
 class IndirectFunctionCall(
     val tableIndex: Index,
     val typeIndex: Index,
-    val functionIndex: Expression,
-    val params: List<Expression>,
+    var functionIndex: Expression,
+    val params: MutableList<Expression>,
     val returnType: List<WasmValueType>
 ) : BasicStatement() {
 
@@ -31,5 +32,12 @@ class IndirectFunctionCall(
         wat.writeAll(params.asReversed())
         functionIndex.wat(wat)
         wat.writeLine("call_indirect $tableIndex (type $typeIndex)", this)
+    }
+
+    override fun visit(v: Visitor) {
+        v.visit(functionIndex) {this.functionIndex = it as Expression}
+        v.visit(params) {i, stmt ->
+            params[i] = stmt as Expression
+        }
     }
 }

@@ -2,12 +2,13 @@ package ir.statement
 
 import generation.WatWriter
 import ir.expression.Expression
+import ir.finder.Visitor
 
 class BrIf(
     condition: Expression,
     target: Block,
     val depth: Int,
-    val result: Expression? = null
+    var result: Expression? = null
 ) : If(
     condition,
     mutableListOf(Br(target, depth, result)),
@@ -28,4 +29,8 @@ class BrIf(
         wat.writeLine("br_if $depth", this)
     }
 
+    override fun visit(v: Visitor) {
+        if(result != null) v.visit(result!!){this.result = it as Expression?}
+        super.visit(v)
+    }
 }

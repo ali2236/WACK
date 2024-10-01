@@ -5,15 +5,13 @@ import ir.expression.Expression
 import ir.expression.Load
 import ir.expression.Symbol
 import ir.finder.Visitor
-import ir.statement.AssignmentStore
-import ir.statement.RangeLoop
-import ir.statement.Statement
-import ir.statement.SymbolLoad
+import ir.statement.*
 import java.util.Stack
 
 class AccessFinder(parentScope: RangeLoop, val dfa: Dfa) : Visitor() {
 
     private val accesses = mutableListOf<Access>()
+    private val functionCalls = mutableListOf<Statement>() // <FunctionCall|IndirectFunctionCall>
     private val scope = Stack<RangeLoop>()
     private val subLoops = mutableListOf<RangeLoop>()
     private val finder = dfa.finder()
@@ -73,6 +71,14 @@ class AccessFinder(parentScope: RangeLoop, val dfa: Dfa) : Visitor() {
                     return // maybe dont go deeper
                 }
             }
+
+            is FunctionCall -> {
+                functionCalls.add(v)
+            }
+
+            is IndirectFunctionCall -> {
+                functionCalls.add(v)
+            }
         }
         if (v !is Expression){
             currentStatement = v
@@ -104,5 +110,9 @@ class AccessFinder(parentScope: RangeLoop, val dfa: Dfa) : Visitor() {
 
     fun accesses(): List<Access> {
         return accesses
+    }
+
+    fun functionCalls(): List<Statement> {
+        return functionCalls
     }
 }

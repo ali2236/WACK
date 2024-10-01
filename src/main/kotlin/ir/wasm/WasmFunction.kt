@@ -15,7 +15,7 @@ data class WasmFunction(
         get() = type.params + locals
 
     fun call(vararg params: Expression): FunctionCall {
-        return FunctionCall(index, listOf(*params), type.result)
+        return FunctionCall(index, mutableListOf(*params), type.result)
     }
 
     override fun getSectionIndex(): Index {

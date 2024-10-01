@@ -2,8 +2,9 @@ package ir.statement
 
 import generation.WatWriter
 import ir.expression.Expression
+import ir.finder.Visitor
 
-class BrTable(val selector: Expression, val depths : List<Int>) : BasicStatement() {
+class BrTable(var selector: Expression, val depths : List<Int>) : BasicStatement() {
 
     override fun write(out: Appendable) {
         out.append("switch(")
@@ -21,5 +22,9 @@ class BrTable(val selector: Expression, val depths : List<Int>) : BasicStatement
     override fun wat(wat: WatWriter) {
         selector.wat(wat)
         wat.writeLine("br_table ${depths.joinToString(" ")}")
+    }
+
+    override fun visit(v: Visitor) {
+        v.visit(selector){this.selector = it as Expression}
     }
 }

@@ -27,6 +27,11 @@ class DependenceTester(val function: Function) {
 
     private fun testTopLevelLoop(topLevelRangeLoop: RangeLoop) : List<ParallelizableLoop> {
         val finder = AccessFinder(topLevelRangeLoop, dfa)
+        if(finder.functionCalls().isNotEmpty()){
+            // has function calls
+            // no parallel loops
+            return listOf()
+        }
         val subLoops = finder.subLoops()
         val accesses = finder.accesses().filter { access ->
             // don't include access to loop symbols
@@ -48,6 +53,7 @@ class DependenceTester(val function: Function) {
             }
         }
         val partitionedPairs = SubscriptPartitioner.partition(pairs, subLoops)
+        var dependenceResult : DependenceResult? = null
         for(partition in partitionedPairs){
             for (pair in partition){
                 when(pair.findType()){
@@ -63,18 +69,29 @@ class DependenceTester(val function: Function) {
                     }
                     else -> {
                         // gcd test
-                        // bunjree test
+                        // banerjee test
                         // range test
                         val result = DependenceTester.runTests(
                             pair.source,
                             pair.sink,
                             listOf(GCDTest(), MIVTest())
                             )
-                        println(result)
+
+                        dependenceResult = result?.merge(dependenceResult)
                     }
                 }
             }
         }
-        return listOf(ParallelizableLoop(topLevelRangeLoop))
+        // TODO: runtime dependence test
+        // TODO: use dependence result to return parallel loop
+        if(pairs.isEmpty()){
+            // no dependencies
+            return listOf(ParallelizableLoop(topLevelRangeLoop))
+        }/* else if(dependenceResult != null){
+            val parallelLoops = dependenceResult.direction.filter { it.value == Direction.Equal }.keys.map { ParallelizableLoop(it) }
+            return parallelLoops.subList(0, 1)
+        }*/ else {
+            return listOf()
+        }
     }
 }

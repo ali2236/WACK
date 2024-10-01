@@ -5,12 +5,13 @@ import ir.Mode
 import ir.Names
 import ir.expression.Expression
 import ir.expression.SingleResultFunction
+import ir.finder.Visitor
 import ir.wasm.Index
 import ir.wasm.WasmValueType
 
 class FunctionCall(
     val functionIndex: Index,
-    val params: List<Expression>,
+    val params: MutableList<Expression>,
     val returnType: List<WasmValueType>,
 ) : BasicStatement() {
 
@@ -30,6 +31,12 @@ class FunctionCall(
         out.append(")")
         if (returnType.isEmpty()) {
             out.append(";\n")
+        }
+    }
+
+    override fun visit(v: Visitor) {
+        v.visit(params) { i, stmt ->
+            params[i] = stmt as Expression
         }
     }
 

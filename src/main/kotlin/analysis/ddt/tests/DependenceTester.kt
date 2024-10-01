@@ -6,7 +6,6 @@ import analysis.ddt.DependenceTest
 
 object DependenceTester {
 
-
 /*
     fun test(a1: Access, a2: Access): DependenceResult? {
         val tests = listOf(

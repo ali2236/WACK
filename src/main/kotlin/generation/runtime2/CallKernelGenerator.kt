@@ -19,7 +19,7 @@ object CallKernelGenerator {
         val kernelIndex =  Symbol(WasmScope.local, WasmValueType.i32, Index.number(1))
         val kernelType = module.findOrAddType(listOf(WasmValueType.i32), listOf())
         val callKernel = Function(callKernelFunction, mutableListOf(
-            IndirectFunctionCall(kernelTabel.index, kernelType.index, kernelIndex, listOf(threadId), listOf())
+            IndirectFunctionCall(kernelTabel.index, kernelType.index, kernelIndex, mutableListOf(threadId), listOf())
         ))
         program.statements.add(callKernel)
         module.exports.add(WasmExport("\"call_kernel\"", WasmExportKind.func, callKernelFunction.index))

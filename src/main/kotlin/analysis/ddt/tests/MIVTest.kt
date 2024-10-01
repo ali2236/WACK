@@ -13,7 +13,7 @@ class MIVTest : DependenceTest() {
             val s1 = p1.getSubscript(loop.symbol)
             val s2 = p2.getSubscript(loop.symbol)
             if(!s1.valid || !s2.valid){
-                dv[loop] = Direction.any
+                dv[loop] = Direction.Any
             } else {
                 dv[loop] = Direction.fromInt(s1.offset - s2.offset)
             }
