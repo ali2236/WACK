@@ -13,6 +13,4 @@ class BaseTest : DependenceTest() {
         }
         return DependenceResult.inconclusive
     }
-
-    override fun exceptionResult() : DependenceResult = DependenceResult.noCollision
 }
