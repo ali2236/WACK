@@ -2,6 +2,7 @@ package analysis.ddt
 
 import analysis.ddt.tests.DependenceTester
 import analysis.ddt.tests.GCDTest
+import analysis.ddt.tests.MIVTest
 import analysis.ddt.tests.ZIVTest
 import analysis.dfa.Dfa
 import ir.finder.BreadthFirstExpressionFinder
@@ -67,7 +68,7 @@ class DependenceTester(val function: Function) {
                         val result = DependenceTester.runTests(
                             pair.source,
                             pair.sink,
-                            listOf(GCDTest())
+                            listOf(GCDTest(), MIVTest())
                             )
                         println(result)
                     }

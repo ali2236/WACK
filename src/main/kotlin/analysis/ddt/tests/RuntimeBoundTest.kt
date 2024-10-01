@@ -7,7 +7,8 @@ import ir.expression.BinaryOP
 import ir.statement.Statement
 import ir.wasm.WasmValueType
 
-class RuntimeBoundTest : DependenceTest {
+@Deprecated("needs updating")
+class RuntimeBoundTest : DependenceTest() {
     override fun test(a1: Access, a2: Access): DependenceResult? {
         val p1 = a1.polynomial()
         val p2 = a2.polynomial()
@@ -24,6 +25,6 @@ class RuntimeBoundTest : DependenceTest {
         val conditions = mutableListOf<Statement>()
         conditions.add(BinaryOP(WasmValueType.i32, BinaryOP.Operator.neq, linearBase1, linearBase2))
         // B. if A.max < C.min or A.min > C.min
-        return DependenceResult(null, conditions)
+        return DependenceResult(mapOf(), conditions)
     }
 }

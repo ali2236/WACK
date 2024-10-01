@@ -5,7 +5,7 @@ import analysis.ddt.DependenceResult
 import analysis.ddt.DependenceTest
 import analysis.ddt.Direction
 
-class ZIVTest : DependenceTest {
+class ZIVTest : DependenceTest() {
     override fun test(a1: Access, a2: Access): DependenceResult {
         val p1 = a1.polynomial()
         val p2 = a2.polynomial()

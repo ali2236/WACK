@@ -8,10 +8,13 @@ import ir.finder.Visitor
 import ir.statement.Statement
 import ir.statement.SymbolLoad
 
+// also find <ax+c> where <x> is <symbol|load>
 class AddressPolynomialFinder(address: Expression) : Visitor() {
 
     private val p = Polynomial()
     private var multiplier = Value.one
+    private var symbol : SymbolLoad? = null
+    private var sign : Long = 1L
 
     init {
         visit(address) {}
@@ -35,23 +38,36 @@ class AddressPolynomialFinder(address: Expression) : Visitor() {
                             multiplier = multiplier.multiply(v.right as Value)
                             visit(v.left){}
                             multiplier = oldMultiplier as Value
+                        } else if(v.right is BinaryOP && v.left is Value){
+                            // multiply operation by value
+                            val oldMultiplier = multiplier.clone()
+                            multiplier = multiplier.multiply(v.left as Value)
+                            visit(v.right){}
+                            multiplier = oldMultiplier as Value
                         } else {
                             // no way
                             throw Exception("couldn't decode $v")
                         }
                     }
                     BinaryOP.Operator.sub.sign -> {
-                        v.left.visit(this)
-                        val oldMultiplier = multiplier.clone() as Value
-                        multiplier = multiplier.multiply(-1)
-                        v.right.visit(this)
-                        multiplier = oldMultiplier
-                        return
+                        if(v.left is SymbolLoad && v.right is Value){
+                            v.left.visit(this)
+                            symbol = v.left as SymbolLoad
+                            sign = sign * -1
+                            v.right.visit(this)
+                            symbol = null
+                            sign = sign * -1
+                            return
+                        }
                     }
                 }
             }
             is Value -> {
-                p.addOffset(v.multiply(multiplier))
+                if(symbol == null){
+                    p.addOffset(v)
+                } else {
+                    p.addSymbolOffset(symbol!!, v.multiply(sign))
+                }
                 return
             }
             is SymbolLoad -> {

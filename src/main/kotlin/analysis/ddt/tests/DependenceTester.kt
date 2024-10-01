@@ -29,14 +29,14 @@ object DependenceTester {
 
     fun runTests(a1: Access, a2: Access, tests: List<DependenceTest>) : DependenceResult? {
         for (tester in tests){
-            try {
-                val testResult = tester.test(a1, a2)
-                if(testResult != null){
-                    // dependence exists
-                    return testResult
-                }
+            val testResult = try {
+                tester.test(a1, a2)
             } catch (e: Exception){
-                // do nothing - go to the next test
+                tester.exceptionResult()
+            }
+            if(testResult != null){
+                // dependence exists
+                return testResult
             }
         }
         return DependenceResult.inconclusive

@@ -58,4 +58,8 @@ data class Access(
 
         return ArrayBounds(min, max)
     }
+
+    override fun toString(): String {
+        return "$accessType: $symbol"
+    }
 }

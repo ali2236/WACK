@@ -7,6 +7,7 @@ import ir.statement.SymbolLoad
 
 open class Polynomial {
     private var symbolMultiplier = mutableMapOf<SymbolLoad, Value>()
+    private var symbolOffset = mutableMapOf<SymbolLoad, Value>()
     private var offset: Value = Value.zero
 
     fun addOffset(v: Value) {
@@ -15,6 +16,10 @@ open class Polynomial {
 
     fun getOffset(): Value {
         return offset
+    }
+
+    fun addSymbolOffset(symbol: SymbolLoad, value: Value = Value.zero) {
+        symbolOffset[symbol] = symbolOffset.getOrDefault(symbol, Value.zero).add(value)
     }
 
     fun addMultiplier(symbol: SymbolLoad, value: Value = Value.one) {
@@ -79,6 +84,18 @@ open class Polynomial {
     }
 
     override fun toString(): String {
-        return symbolMultiplier.entries.joinToString("+") { "${it.value}x${it.key}" } + "+$offset"
+        return symbols().joinToString("+") { symbol ->
+            val multiplier = symbolMultiplier.getOrDefault(symbol, Value.one)
+            val offset = symbolOffset.getOrDefault(symbol, Value.zero)
+            val m = if (multiplier == Value.one) "" else "${multiplier}x"
+            val o = if (offset == Value.zero) "" else if (offset.value.toInt() > 0) "+$offset" else "$offset"
+            "($m$symbol$o)"
+        } + "+$offset"
+    }
+
+    fun getSubscript(symbol: SymbolLoad): Subscript {
+        val multiplier = symbolMultiplier.getOrDefault(symbol, Value.zero).value.toInt()
+        val offset = symbolOffset.getOrDefault(symbol, Value.zero).value.toInt()
+        return Subscript(multiplier, symbol, offset)
     }
 }
