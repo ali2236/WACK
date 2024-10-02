@@ -1,3 +1,5 @@
+import external.Wasmtime
+import external.runTimed
 import java.io.File
 
 fun main(args: Array<String>) {
@@ -10,9 +12,12 @@ fun main(args: Array<String>) {
     )
     for (sample in samples) {
         val output = WAPC.compile(sample.toPath(), generateDotFiles = true)
-        /*val time = runTimed { Wasmtime.runWithThreadsEnabled(output) }
-        println("running...")
-        println(time)*/
+        /*val s_time = runTimed { Wasmtime.run(sample.toPath()) }
+        println("running serial...")
+        println(s_time)
+        val p_time = runTimed { Wasmtime.runWithThreadsEnabled(output) }
+        println("running parallel...")
+        println(p_time)*/
     }
 }
 

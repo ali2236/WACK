@@ -4,9 +4,12 @@ import analysis.ddt.DependenceTester
 import ir.annotations.*
 import ir.expression.BinaryOP
 import ir.expression.Load
+import ir.expression.Symbol
+import ir.finder.ExpressionFinder
 import ir.finder.Finders
 import ir.statement.Function
 import ir.statement.Program
+import ir.statement.Store
 
 class ParallelForAnnotator : Transformer {
     override fun apply(program: Program) {
@@ -34,20 +37,27 @@ class ParallelForAnnotator : Transformer {
                 // find stack_base
                 val symbols = Finders.symbols(parallelLoop.conditions.first())
                 val stackBase = symbols.first()
-                // 1. set @stack_base annotation
+                // set @stack_base annotation
                 loop.annotations.add(StackBase(stackBase))
-                // 2. replace all stack_base symbols with global_stack_base
-                // 3. set global_stack_base to local_stack_base before
-                //println("Added Stack Base To Parallel For Loop")
             } else if(parallelLoop.loop.symbol is Load) {
                 val loopSymbol = parallelLoop.loop.symbol as Load
                 // find stack_base
                 val symbols = Finders.symbols(loopSymbol)
                 val stackBase = symbols.firstOrNull()
-                // 1. set @stack_base annotation
+                // set @stack_base annotation
                 stackBase?.let {
                     loop.annotations.add(StackBase(stackBase))
                 }
+            }
+
+            // privatize all variables
+            val vars = ExpressionFinder(Symbol::class.java, setOf(Load::class.java, Store::class.java))
+                .also { parallelLoop.loop.visit(it) }
+                .result()
+                .toSet()
+
+            vars.forEach {
+                loop.annotations.add(Private(it))
             }
         }
     }

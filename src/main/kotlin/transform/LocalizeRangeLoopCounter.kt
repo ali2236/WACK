@@ -14,6 +14,7 @@ import ir.statement.SymbolLoad
 import ir.wasm.Index
 import ir.wasm.WasmScope
 
+@Deprecated("not used")
 class LocalizeRangeLoopCounter : Transformer {
     override fun apply(program: Program) {
         program.statements

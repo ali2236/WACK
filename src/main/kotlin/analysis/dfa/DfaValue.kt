@@ -14,7 +14,7 @@ interface DfaValue {
                     if (other.value == value) {
                         return this
                     } else {
-                        return Unknown()
+                        return Alias()
                     }
                 }
 
@@ -49,40 +49,18 @@ interface DfaValue {
         }
     }
 
-/*    class Undeclared : DfaValue {
+    open class Alias(val expr: Expression? = null) : DfaValue {
         override fun join(other: DfaValue): DfaValue {
-            return other
-        }
-
-        override fun equals(other: Any?): Boolean {
-            return other is Undeclared
-        }
-
-        override fun toString(): String {
-            return "T"
-        }
-
-        override fun asValue(): Value {
-            throw Exception()
-        }
-
-        override fun hashCode(): Int {
-            return javaClass.hashCode()
-        }
-    }*/
-
-    open class Unknown(val expr: Expression? = null) : DfaValue {
-        override fun join(other: DfaValue): DfaValue {
-            return Unknown()
+            return Alias()
         }
 
 
         override fun toString(): String {
-            return "?"
+            return expr?.toString() ?: "?"
         }
 
         override fun equals(other: Any?): Boolean {
-            return other is Unknown
+            return other is Alias
         }
 
         override fun hashCode(): Int {
@@ -95,7 +73,7 @@ interface DfaValue {
     }
 
     // to: exclusive in loop - inclusive outside
-    class Range(val from: Expression,val to: Expression) : Unknown(){
+    class Range(val from: Expression,val to: Expression) : Alias(){
         override fun toString(): String {
             return "[$from, $to]"
         }

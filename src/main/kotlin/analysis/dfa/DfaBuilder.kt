@@ -151,7 +151,7 @@ object DfaBuilder {
             start.IN.put(
                 DfaFact(
                     Symbol(WasmScope.local, params[i], Index.number(i)),
-                    DfaValue.Unknown(),
+                    DfaValue.Alias(),
                 )
             )
         }
@@ -227,10 +227,10 @@ object DfaBuilder {
                         }
                         return DfaValue.Expr(expr)
                     } else {
-                        return DfaValue.Unknown(expr)
+                        return DfaValue.Alias(expr)
                     }
                 } else {
-                    return DfaValue.Unknown(expr)
+                    return DfaValue.Alias(expr)
                 }
             }
 
@@ -248,7 +248,7 @@ object DfaBuilder {
                     val result = evalUnaryOp(expr, dfaFacts)
                     return DfaValue.Expr(result)
                 } catch (e: java.lang.Exception) {
-                    return DfaValue.Unknown(expr)
+                    return DfaValue.Alias(expr)
                 }
             }
 
@@ -257,7 +257,7 @@ object DfaBuilder {
             }
 
             is FunctionResult, is SingleResultFunction, is ResultBlock, is MemoryGrow, is MemorySize, is CMPXCHG -> {
-                return DfaValue.Unknown(expr)
+                return DfaValue.Alias(expr)
             }
 
             is Select -> {
@@ -267,7 +267,7 @@ object DfaBuilder {
                     val res = if (value == 0) expr.val1 else expr.val2
                     return explainExpression(res, dfaFacts)
                 } else {
-                    return DfaValue.Unknown(expr)
+                    return DfaValue.Alias(expr)
                 }
             }
 
@@ -276,7 +276,7 @@ object DfaBuilder {
                 if (v is DfaValue.Expr) {
                     return DfaValue.Expr(Value(expr.toType, v.value.toString()))
                 } else {
-                    return DfaValue.Unknown(expr)
+                    return DfaValue.Alias(expr)
                 }
             }
 
