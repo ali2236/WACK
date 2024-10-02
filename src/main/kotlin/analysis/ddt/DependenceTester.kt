@@ -66,7 +66,9 @@ class DependenceTester(val function: Function) {
                         if (result?.independent == true) {
                             break // partition is independent
                         } else {
-                            dependenceResult = result?.merge(dependenceResult)
+                            result?.let {
+                                dependenceResult = it.merge(dependenceResult)
+                            }
                         }
                     }
 
@@ -80,7 +82,9 @@ class DependenceTester(val function: Function) {
                             listOf(GCDTest(), MIVTest())
                         )
 
-                        dependenceResult = result?.merge(dependenceResult)
+                        result?.let {
+                            dependenceResult = it.merge(dependenceResult)
+                        }
                     }
                 }
             }
@@ -91,10 +95,13 @@ class DependenceTester(val function: Function) {
             // no dependencies
             return listOf(ParallelizableLoop(topLevelRangeLoop))
         } else if (dependenceResult != null) {
-            if (dependenceResult.direction[topLevelRangeLoop] == Direction.Equal) {
+            if (dependenceResult!!.direction[topLevelRangeLoop] == Direction.Equal) {
                 return listOf(ParallelizableLoop(topLevelRangeLoop))
+            } else {
+                // TODO: inner-loops
+                val innerLoops = dependenceResult!!.direction.filter { it.value == Direction.Equal }
+                return innerLoops.map { ParallelizableLoop(it.key) }
             }
-            // TODO: inner-loops
         }
         return listOf()
     }

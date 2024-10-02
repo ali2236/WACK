@@ -39,6 +39,15 @@ class ParallelForAnnotator : Transformer {
                 // 2. replace all stack_base symbols with global_stack_base
                 // 3. set global_stack_base to local_stack_base before
                 //println("Added Stack Base To Parallel For Loop")
+            } else if(parallelLoop.loop.symbol is Load) {
+                val loopSymbol = parallelLoop.loop.symbol as Load
+                // find stack_base
+                val symbols = Finders.symbols(loopSymbol)
+                val stackBase = symbols.firstOrNull()
+                // 1. set @stack_base annotation
+                stackBase?.let {
+                    loop.annotations.add(StackBase(stackBase))
+                }
             }
         }
     }
