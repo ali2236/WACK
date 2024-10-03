@@ -16,6 +16,8 @@ class PolyBenchBenchmark {
     fun benchmark(){
         val header = "name,serial time,parallel time"
         println(header)
+        var totalSerialTime = Duration.ZERO
+        var totalParallelTime = Duration.ZERO
         val results = Files.list(_dir)
             .filter { Files.isRegularFile(it) }
             .filter { it.extension == "wasm" }
@@ -24,6 +26,8 @@ class PolyBenchBenchmark {
                 val serialTime = runTimed { Wasmtime.run(serialFile) }
                 val parallelFile = WAPC.compile(serialFile)
                 val parallelTime = runTimed { Wasmtime.runWithThreadsEnabled(parallelFile) }
+                totalSerialTime += serialTime
+                totalParallelTime += parallelTime
                 BenchmarkResult(name, serialTime, parallelTime)
             }
             .map(BenchmarkResult::toString)
@@ -31,6 +35,8 @@ class PolyBenchBenchmark {
             .toList()
         val resultFile = Files.createFile(Path("./src/test/resources/polybench-${Date().time}.csv"))
         resultFile.writeLines(listOf(header) + results)
+        val avgSpeedup = (totalSerialTime.inWholeMilliseconds / totalParallelTime.inWholeMilliseconds.toDouble())
+        println("Avg Speedup: x${avgSpeedup}")
     }
 
     class BenchmarkResult(val name: String, val serialTime: Duration, val parallelTime: Duration) {
