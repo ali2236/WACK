@@ -28,7 +28,8 @@ class FactsFinder(val dfa: Dfa,val block: DfaNode, stmt: Statement) : Visitor() 
             is RangeLoop -> {
                 val fact = DfaFact(v.symbol, v.range)
                 block.GEN.put(fact)
-                if (block.next != null) { // kina works
+                if (block.next != null) { // kinda works
+                    // TODO: check if the variable is not reassigned in that block
                     dfa.nodes[block.next].GEN.put(DfaFact(v.symbol, DfaValue.Expr(v.range.to)))
                 }
                 return

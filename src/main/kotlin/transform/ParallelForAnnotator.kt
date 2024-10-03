@@ -13,6 +13,9 @@ import ir.statement.Store
 
 class ParallelForAnnotator : Transformer {
     override fun apply(program: Program) {
+        if(!WAPC.params!!.parallelize){
+            return
+        }
         program.statements
             .filterIsInstance<Function>()
             .filter { !it.hasAnnotation(Skip::class.java) }

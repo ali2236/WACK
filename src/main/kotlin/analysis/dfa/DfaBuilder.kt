@@ -151,7 +151,7 @@ object DfaBuilder {
             start.IN.put(
                 DfaFact(
                     Symbol(WasmScope.local, params[i], Index.number(i)),
-                    DfaValue.Alias(),
+                    DfaValue.Alias(null), // unknown
                 )
             )
         }
@@ -166,14 +166,15 @@ object DfaBuilder {
                 )
             )
         }
-        (function.functionData.type.params + function.functionData.locals).forEachIndexed { index, localType ->
+        // this was removed because it was wrong?
+        /*(function.functionData.type.params + function.functionData.locals).forEachIndexed { index, localType ->
             start.IN.put(
                 DfaFact(
                     Symbol(WasmScope.local, localType, Index.number(index)),
                     DfaValue.Expr(Value(localType, localType.defaultValue()))
                 )
             )
-        }
+        }*/
     }
 
     private fun initializeGEN(dfa: Dfa) {
@@ -239,7 +240,8 @@ object DfaBuilder {
                     val result = evalBinaryOp(expr, dfaFacts)
                     return DfaValue.Expr(result)
                 } catch (e: ExpressionViolation) {
-                    return e.left.join(e.right)
+                    //return e.left.join(e.right)
+                    return DfaValue.Alias(expr)
                 }
             }
 
@@ -286,7 +288,7 @@ object DfaBuilder {
         }
     }
 
-    fun evalBinaryOp(op: BinaryOP, facts: Set<DfaFact>): Expression {
+    private fun evalBinaryOp(op: BinaryOP, facts: Set<DfaFact>): Expression {
         if (op.left is BinaryOP) {
             op.left = evalBinaryOp(op.left as BinaryOP, facts)
         }
@@ -354,7 +356,7 @@ object DfaBuilder {
         }
     }
 
-    fun evalUnaryOp(op: UnaryOP, facts: Set<DfaFact>): Expression {
+    private fun evalUnaryOp(op: UnaryOP, facts: Set<DfaFact>): Expression {
         var value = op.value
         if (op.value !is Value) {
             val fact = explainExpression(op.value, facts)

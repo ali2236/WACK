@@ -36,9 +36,11 @@ object WAPC {
     }
 
     data class Params(
-        val generateDotFiles: Boolean = false,
+        val parallelize : Boolean = true,
         val parallelizeInnerLoops: Boolean = false,
         val threads: Int = 8,
+        val generateDotFiles: Boolean = false,
+        val dfaStatementId: Boolean = false,
     )
 
 }

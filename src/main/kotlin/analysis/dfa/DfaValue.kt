@@ -51,12 +51,23 @@ interface DfaValue {
 
     open class Alias(val expr: Expression? = null) : DfaValue {
         override fun join(other: DfaValue): DfaValue {
-            return Alias()
+            return Alias(
+                when(other){
+                    is Expr -> other.value
+                    is Range -> null
+                    is Alias -> other.expr
+                    else -> null
+                }
+            ) // TODO: validate doesn't mess up anything
         }
 
 
         override fun toString(): String {
-            return expr?.toString() ?: "?"
+            if(expr == null){
+                return  "?"
+            } else {
+                return "\"$expr\""
+            }
         }
 
         override fun equals(other: Any?): Boolean {
@@ -74,6 +85,7 @@ interface DfaValue {
 
     // to: exclusive in loop - inclusive outside
     class Range(val from: Expression,val to: Expression) : Alias(){
+
         override fun toString(): String {
             return "[$from, $to]"
         }

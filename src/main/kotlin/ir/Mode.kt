@@ -9,6 +9,7 @@ object Mode {
         }
     }
 
+    // TODO: move to [WACK]
     val debug = true
     val multipleMemories = true
     val annotations = true

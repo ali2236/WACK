@@ -1,5 +1,6 @@
 package transform
 
+import WAPC
 import ir.statement.Program
 import transform.constant_propegation.ConstantPropagation
 import transform.restructure.*
