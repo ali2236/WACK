@@ -1,5 +1,6 @@
 package analysis.ddt
 
+import WAPC
 import analysis.ddt.tests.DependenceTester
 import analysis.ddt.tests.GCDTest
 import analysis.ddt.tests.MIVTest
@@ -97,8 +98,8 @@ class DependenceTester(val function: Function) {
         } else if (dependenceResult != null) {
             if (dependenceResult!!.direction[topLevelRangeLoop] == Direction.Equal) {
                 return listOf(ParallelizableLoop(topLevelRangeLoop))
-            } else {
-                // TODO: inner-loops
+            } else if (WAPC.params!!.parallelizeInnerLoops) {
+                // inner-loops
                 val innerLoops = dependenceResult!!.direction.filter { it.value == Direction.Equal }
                 return innerLoops.map { ParallelizableLoop(it.key) }
             }

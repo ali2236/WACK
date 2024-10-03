@@ -11,13 +11,13 @@ fun main(args: Array<String>) {
         File("./samples/polybench/adi.wasm"),
     )
     for (sample in samples) {
-        val output = WAPC.compile(sample.toPath(), generateDotFiles = true)
-        /*val s_time = runTimed { Wasmtime.run(sample.toPath()) }
+        val output = WAPC.compile(sample.toPath(), params = WAPC.Params(generateDotFiles = true))
+        val s_time = runTimed { Wasmtime.run(sample.toPath()) }
         println("running serial...")
         println(s_time)
         val p_time = runTimed { Wasmtime.runWithThreadsEnabled(output) }
         println("running parallel...")
-        println(p_time)*/
+        println(p_time)
     }
 }
 

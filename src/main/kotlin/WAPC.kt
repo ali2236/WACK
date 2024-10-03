@@ -15,17 +15,30 @@ object WAPC {
         Files.createDirectories(Path("./out/intermediate"))
     }
 
-    fun compile(input: Path, output: Path? = null, generateDotFiles:Boolean = false): Path {
-        val inputFile = input.toFile()
-        val program = Program.from(inputFile)
-        TransformationPasses.apply(program)
-        WasiThreadsGenerator().apply(program)
-        if(generateDotFiles){
-            Analysis.writeDotFiles(program, inputFile.nameWithoutExtension)
+    var params: Params? = null
+
+    fun compile(input: Path, output: Path? = null, params: Params = Params()): Path {
+        this.params = params
+        try {
+            val inputFile = input.toFile()
+            val program = Program.from(inputFile)
+            TransformationPasses.apply(program)
+            WasiThreadsGenerator().apply(program)
+            if (params.generateDotFiles) {
+                Analysis.writeDotFiles(program, inputFile.nameWithoutExtension)
+            }
+            val outputFile = output?.toFile() ?: File("./out/intermediate/wack_${inputFile.nameWithoutExtension}.wat")
+            program.exportAsWasm(outputFile)
+            return outputFile.toPath()
+        } finally {
+            this.params = null
         }
-        val outputFile = output?.toFile() ?: File("./out/intermediate/wack_${inputFile.nameWithoutExtension}.wat")
-        program.exportAsWasm(outputFile)
-        return outputFile.toPath()
     }
+
+    data class Params(
+        val generateDotFiles: Boolean = false,
+        val parallelizeInnerLoops: Boolean = false,
+        val threads: Int = 8,
+    )
 
 }

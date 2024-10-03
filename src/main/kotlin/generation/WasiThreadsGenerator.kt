@@ -1,5 +1,6 @@
 package generation
 
+import WAPC
 import generation.wack.*
 import ir.Mode
 import generation.wasi.threads.WasiThreadSpawnGenerator
@@ -12,12 +13,12 @@ import ir.expression.Value
 import ir.statement.Assignment
 import ir.statement.Program
 
-class WasiThreadsGenerator : Generator {
+class WasiThreadsGenerator() : Generator {
     override fun apply(program: Program) {
         Mode.insure(Mode::multipleMemories, true)
         val mutex = MutexLibraryGenerator.generate(program)
         val threadArg = ThreadArgEncoderGenerator.generate(program)
-        val threadCount = ThreadCountGenerator(8).generate(program)
+        val threadCount = ThreadCountGenerator(WAPC.params!!.threads).generate(program)
         val metaLib = MetaLibrary.generate(program)
         val threadSpawn = WasiThreadSpawnGenerator.generate(program)
         val runParallel =
