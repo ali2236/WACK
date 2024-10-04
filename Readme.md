@@ -13,22 +13,18 @@
 - [x] Move Increment Restructure to Optimization Passes
 - [x] Privatize Loop Symbol if needed
 - [x] Generate Deep-Loop Kernels correctly
-- [ ] Dependence Analysis P54
-- [ ] GCD Test
-- [ ] Data Dependency Test
+- [x] Dependence Analysis
+- [x] GCD Test
+- [x] Data Dependency Test
 - [ ] Eval or Runtime Evaluation
 - [ ] Runtime limit evaluation(omp if)
 - [ ] Profitability Analysis
+- [ ] Permit Pure Functions in loops
+- [ ]`+=` operator
 - [ ] Thread Local Storage (TLS)
 
 Currently not supported:
 - O3
-- `+=` operator
-
-Loop Analysis Steps:
-if Pass GCD Test -> parallel
-else test dependence
-else false
 
 ### How to Run
 ```

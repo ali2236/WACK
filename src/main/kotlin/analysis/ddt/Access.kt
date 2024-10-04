@@ -20,7 +20,7 @@ data class Access(
             throw Exception("Polynomial Only usable on Load Symbols!")
         }
         val address = symbol.address
-        val poly = AddressPolynomialFinder(address).result()
+        val poly = AddressPolynomialFinder(address, facts).result()
 
         poly.addOffset(Value(WasmValueType.i32, symbol.offset.toString()))
 

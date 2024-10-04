@@ -9,7 +9,7 @@ fun main(args: Array<String>) {
         File("./samples/polybench/2mm.wasm"),
     )
     for (sample in samples) {
-        val output = WAPC.compile(sample.toPath(), params = WAPC.Params(generateDotFiles = true, parallelize = false, dfaStatementId = true))
+        val output = WAPC.compile(sample.toPath(), params = WAPC.Params(generateDotFiles = true, dfaStatementId = true))
         /*val s_time = runTimed { Wasmtime.run(sample.toPath()) }
         println("running serial...")
         println(s_time)

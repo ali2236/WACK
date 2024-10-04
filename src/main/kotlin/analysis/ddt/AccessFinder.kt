@@ -1,9 +1,11 @@
 package analysis.ddt
 
 import analysis.dfa.Dfa
+import analysis.dfa.DfaValue
 import ir.expression.Expression
 import ir.expression.Load
 import ir.expression.Symbol
+import ir.finder.BreadthFirstExpressionFinder
 import ir.finder.Visitor
 import ir.statement.*
 import java.util.Stack
@@ -16,6 +18,7 @@ class AccessFinder(parentScope: RangeLoop, val dfa: Dfa) : Visitor() {
     private val subLoops = mutableListOf<RangeLoop>()
     private val finder = dfa.finder()
     private var currentStatement: Statement? = null
+    private var dialias = DiAlias()
 
     init {
         visit(parentScope) {}
@@ -36,15 +39,22 @@ class AccessFinder(parentScope: RangeLoop, val dfa: Dfa) : Visitor() {
             }
 
             is AssignmentStore -> {
+                val facts = finder.at(v)
+                var assignedTo = v.assignedTo()
+                if (assignedTo is Load){
+                    // check for aliases in address
+                     assignedTo = dialias.apply(assignedTo, facts) as SymbolLoad
+                }
                 val access = Access(
-                    v.assignedTo(),
+                    assignedTo,
                     AccessType.Write,
                     AccessScope(scope),
                     finder.at(v) ?: setOf()
                 )
                 accesses.add(access)
                 currentStatement = v
-                visit(v.assignedWith()) { v.replaceAssign(it as Expression) }
+                val unaliased = dialias.apply(v.assignedWith(), facts)
+                visit(unaliased) {}
                 return
             }
 

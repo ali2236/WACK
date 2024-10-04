@@ -1,15 +1,15 @@
 package analysis.ddt
 
-import ir.expression.BinaryOP
-import ir.expression.Expression
-import ir.expression.Symbol
-import ir.expression.Value
+import analysis.dfa.DfaFact
+import analysis.dfa.DfaValue
+import ir.expression.*
+import ir.finder.BreadthFirstExpressionFinder
 import ir.finder.Visitor
 import ir.statement.Statement
 import ir.statement.SymbolLoad
 
 // also find <ax+c> where <x> is <symbol|load>
-class AddressPolynomialFinder(address: Expression) : Visitor() {
+class AddressPolynomialFinder(val address: Expression, val facts: Set<DfaFact>) : Visitor() {
 
     private val p = Polynomial()
     private var multiplier = Value.one
@@ -53,10 +53,10 @@ class AddressPolynomialFinder(address: Expression) : Visitor() {
                         if(v.left is SymbolLoad && v.right is Value){
                             v.left.visit(this)
                             symbol = v.left as SymbolLoad
-                            sign = sign * -1
+                            sign *= -1
                             v.right.visit(this)
                             symbol = null
-                            sign = sign * -1
+                            sign *= -1
                             return
                         }
                     }
