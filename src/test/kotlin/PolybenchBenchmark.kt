@@ -14,11 +14,12 @@ class PolyBenchBenchmark {
     private val _dir = Path("./samples/polybench")
     @Test
     fun benchmark(){
-        val header = "name,serial time,parallel time"
+        // header
+        val header = "name,serial time,parallel time,speedup"
         println(header)
-        var totalSerialTime = Duration.ZERO
-        var totalParallelTime = Duration.ZERO
-        val results = Files.list(_dir)
+
+        // run benchmark
+        val rows = Files.list(_dir)
             .filter { Files.isRegularFile(it) }
             .filter { it.extension == "wasm" }
             .map { serialFile ->
@@ -26,22 +27,37 @@ class PolyBenchBenchmark {
                 val serialTime = runTimed { Wasmtime.run(serialFile) }
                 val parallelFile = WAPC.compile(serialFile)
                 val parallelTime = runTimed { Wasmtime.runWithThreadsEnabled(parallelFile) }
-                totalSerialTime += serialTime
-                totalParallelTime += parallelTime
                 BenchmarkResult(name, serialTime, parallelTime)
-            }
-            .map(BenchmarkResult::toString)
-            .map { println(it); it }
+            }.map { println(it); it } // for printing while list is not fully processed
             .toList()
+
+        // write csv file
         val resultFile = Files.createFile(Path("./src/test/resources/polybench-${Date().time}.csv"))
-        resultFile.writeLines(listOf(header) + results)
-        val avgSpeedup = (totalSerialTime.inWholeMilliseconds / totalParallelTime.inWholeMilliseconds.toDouble())
+        resultFile.writeLines(listOf(header) + rows.map { it.toString() })
+
+        // avg time
+        val totalSerialTime = rows.map { it.serialTime.inWholeMilliseconds }.reduce(Long::plus)
+        val totalParallelTime = rows.map { it.parallelTime.inWholeMilliseconds }.reduce(Long::plus)
+        val avgSpeedup = (totalSerialTime / totalParallelTime.toDouble())
         println("Avg Speedup: x${avgSpeedup}")
+
+        // Anomalies:
+        println("================ Anomalies ===================")
+        //      1. no speed up
+        println("No Speedup:")
+        rows.filter { it.speedup <= 1 }.forEach { println(it) }
+        println()
+        //      2. speed up more than number of threads
+        println("Unusual Speedup:")
+        rows.filter { it.speedup >= 8 }.forEach { println(it) }
+
     }
 
     class BenchmarkResult(val name: String, val serialTime: Duration, val parallelTime: Duration) {
+        val speedup : Double
+            get() = (serialTime.inWholeMilliseconds / parallelTime.inWholeMilliseconds.toDouble())
         override fun toString() : String {
-            return "$name,$serialTime,$parallelTime"
+            return "$name,$serialTime,$parallelTime,x${String.format("%.2f", speedup)}"
         }
     }
 
