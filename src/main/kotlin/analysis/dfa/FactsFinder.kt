@@ -1,6 +1,7 @@
 package analysis.dfa
 
 import ir.expression.BinaryOP
+import ir.expression.Value
 import ir.finder.Visitor
 import ir.statement.*
 
@@ -28,9 +29,19 @@ class FactsFinder(val dfa: Dfa,val block: DfaNode, stmt: Statement) : Visitor() 
             is RangeLoop -> {
                 val fact = DfaFact(v.symbol, v.range)
                 block.GEN.put(fact)
-                if (block.next != null) { // kinda works
+                // add Range information into data flow analysis
+                if (block.next != null) {
+                    // range.to can be a non compile time constant
+                    val dfaValue = when(v.range.to){
+                        is Value -> DfaValue.Expr(v.range.to)
+                        else -> DfaValue.Alias(v.range.to)
+                    }
                     // TODO: check if the variable is not reassigned in that block
-                    dfa.nodes[block.next].GEN.put(DfaFact(v.symbol, DfaValue.Expr(v.range.to)))
+                    val target = dfa.nodes[block.next]
+                    val symbolReAssigned = target.GEN.facts.any { it.symbol == v.symbol }
+                    if (!symbolReAssigned){
+                        target.GEN.put(DfaFact(v.symbol, dfaValue))
+                    }
                 }
                 return
             }

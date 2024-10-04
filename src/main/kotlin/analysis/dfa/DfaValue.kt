@@ -1,5 +1,6 @@
 package analysis.dfa
 
+import WAPC
 import ir.expression.Expression
 import ir.expression.Value
 
@@ -63,7 +64,7 @@ interface DfaValue {
 
 
         override fun toString(): String {
-            if(expr == null){
+            if(expr == null || !WAPC.params!!.dfaShowAlias){
                 return  "?"
             } else {
                 return "\"$expr\""
