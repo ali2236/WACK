@@ -1,6 +1,5 @@
 package ir.finder
 
-import ir.expression.Load
 import ir.expression.Symbol
 import ir.statement.Assignment
 import ir.statement.Statement

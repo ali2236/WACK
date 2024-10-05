@@ -2,8 +2,9 @@ package ir.statement
 
 import generation.WatWriter
 import ir.expression.Expression
+import ir.finder.Visitor
 
-class Br(val target: Block, var depth: Int, val result: Expression? = null) : BasicStatement() {
+class Br(val target: Block, var depth: Int, var result: Expression? = null) : BasicStatement() {
     override fun write(out: Appendable) {
         val resultValue = if (result != null) " $result" else ""
         if (target is Loop && depth == 0) {
@@ -18,5 +19,11 @@ class Br(val target: Block, var depth: Int, val result: Expression? = null) : Ba
     override fun wat(wat: WatWriter) {
         result?.wat(wat)
         wat.writeLine("br $depth", this)
+    }
+
+    override fun visit(v: Visitor) {
+        if (result != null){
+            v.visit(result!!) {this.result = it as Expression?}
+        }
     }
 }

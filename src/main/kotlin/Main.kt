@@ -6,10 +6,10 @@ fun main(args: Array<String>) {
         //File("./samples/kernel_matrix_multiply.wasm"),
         //File("./samples/matrix_multiply.wasm"),
         //File("./src/test/resources/src/unknown_heap_allocated_kernel_call.wasm")
-        File("./samples/polybench/2mm.wasm"),
+        File("./samples/polybench/floyd-warshall.wasm"),
     )
     for (sample in samples) {
-        val output = WAPC.compile(sample.toPath(), params = WAPC.Params(generateDotFiles = true, dfaStatementId = true))
+        val output = WAPC.compile(sample.toPath(), params = WAPC.Params(generateDotFiles = true, parallelize = true))
         /*val s_time = runTimed { Wasmtime.run(sample.toPath()) }
         println("running serial...")
         println(s_time)

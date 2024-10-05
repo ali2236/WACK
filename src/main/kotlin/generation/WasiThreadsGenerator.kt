@@ -15,6 +15,7 @@ import ir.statement.Program
 
 class WasiThreadsGenerator() : Generator {
     override fun apply(program: Program) {
+        if(!WAPC.params!!.parallelize) return
         Mode.insure(Mode::multipleMemories, true)
         val mutex = MutexLibraryGenerator.generate(program)
         val threadArg = ThreadArgEncoderGenerator.generate(program)
