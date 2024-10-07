@@ -12,14 +12,34 @@ import kotlin.time.Duration
 
 class PolyBenchBenchmark {
     private val _dir = Path("./samples/polybench")
+
     @Test
-    fun benchmark(){
+    fun O0_MINI_DATASET() {
+        benchmark("O0", "mini_dataset", false)
+    }
+
+    @Test
+    fun O0_LARGE_DATASET() {
+        benchmark("O0", "large_dataset", true)
+    }
+
+    @Test
+    fun O3_LARGE_DATASET() {
+        benchmark("O3", "large_dataset", true)
+    }
+
+    @Test
+    fun O0_EXTRALARGE_DATASET() {
+        benchmark("O0", "extralarge_dataset", true)
+    }
+
+    fun benchmark(optimization: String, datasetSize: String, writeResultsToCSV: Boolean) {
         // header
         val header = "name,serial time,parallel time,speedup"
         println(header)
 
         // run benchmark
-        val rows = Files.list(_dir)
+        val rows = Files.list(_dir.resolve("$optimization/$datasetSize"))
             .filter { Files.isRegularFile(it) }
             .filter { it.extension == "wasm" }
             .map { serialFile ->
@@ -32,8 +52,11 @@ class PolyBenchBenchmark {
             .toList()
 
         // write csv file
-        val resultFile = Files.createFile(Path("./src/test/resources/polybench-${Date().time}.csv"))
-        resultFile.writeLines(listOf(header) + rows.map { it.toString() })
+        if (writeResultsToCSV) {
+            val filePath = Path("./src/test/resources/polybench-$optimization-$datasetSize-${Date().time}.csv")
+            val resultFile = Files.createFile(filePath)
+            resultFile.writeLines(listOf(header) + rows.map { it.toString() })
+        }
 
         // avg time
         val totalSerialTime = rows.map { it.serialTime.inWholeMilliseconds }.reduce(Long::plus)
@@ -54,9 +77,10 @@ class PolyBenchBenchmark {
     }
 
     class BenchmarkResult(val name: String, val serialTime: Duration, val parallelTime: Duration) {
-        val speedup : Double
+        val speedup: Double
             get() = (serialTime.inWholeMilliseconds / parallelTime.inWholeMilliseconds.toDouble())
-        override fun toString() : String {
+
+        override fun toString(): String {
             return "$name,$serialTime,$parallelTime,x${String.format("%.2f", speedup)}"
         }
     }
