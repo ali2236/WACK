@@ -68,7 +68,7 @@ class PolyBenchBenchmark {
         println("================ Anomalies ===================")
         //      1. no speed up
         println("No Speedup:")
-        rows.filter { it.speedup <= 1 }.forEach { println(it) }
+        rows.filter { it.serialTime.inWholeMilliseconds > 200 }.filter { it.speedup <= 1 }.forEach { println(it) }
         println()
         //      2. speed up more than number of threads
         println("Unusual Speedup:")

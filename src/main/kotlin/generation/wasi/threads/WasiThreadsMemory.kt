@@ -16,11 +16,6 @@ class WasiThreadsMemory(val specialFirst: Boolean = true) {
         // make all memories shared + imported + exported
         program.module.memories.forEachIndexed { i, it ->
 
-            // TODO: make min memory also max
-            if(i==0){
-                it.min = 2048
-            }
-
             // make shared
             it.shared = true
             if (it.max == null) {
