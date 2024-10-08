@@ -28,8 +28,8 @@ object WAPC {
                 Analysis.writeDotFiles(program, inputFile.nameWithoutExtension)
             }
             val outputFile = output?.toFile() ?: File("./out/intermediate/wack_${inputFile.nameWithoutExtension}.wat")
-            program.exportAsWasm(outputFile)
-            return outputFile.toPath()
+            val wasmFile = program.exportAsWasm(outputFile)
+            return wasmFile.toPath()
         } finally {
             this.params = null
         }

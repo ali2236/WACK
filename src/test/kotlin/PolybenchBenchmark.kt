@@ -35,25 +35,27 @@ class PolyBenchBenchmark {
 
     fun benchmark(optimization: String, datasetSize: String, writeResultsToCSV: Boolean) {
         // header
-        val header = "name,serial time,parallel time,speedup"
+        val header = "index,name,serial time,parallel time,speedup"
         println(header)
 
         // run benchmark
+        var i = 1
+        val params = WAPC.Params(threads = 16)
         val rows = Files.list(_dir.resolve("$optimization/$datasetSize"))
             .filter { Files.isRegularFile(it) }
             .filter { it.extension == "wasm" }
             .map { serialFile ->
                 val name = serialFile.nameWithoutExtension
                 val serialTime = runTimed { Wasmtime.run(serialFile) }
-                val parallelFile = WAPC.compile(serialFile)
+                val parallelFile = WAPC.compile(serialFile, params = params)
                 val parallelTime = runTimed { Wasmtime.runWithThreadsEnabled(parallelFile) }
-                BenchmarkResult(name, serialTime, parallelTime)
+                BenchmarkResult(i++, name, serialTime, parallelTime)
             }.map { println(it); it } // for printing while list is not fully processed
             .toList()
 
         // write csv file
         if (writeResultsToCSV) {
-            val filePath = Path("./src/test/resources/polybench-$optimization-$datasetSize-${Date().time}.csv")
+            val filePath = Path("./src/test/resources/polybench-$optimization-$datasetSize-t${params.threads}-${Date().time}.csv")
             val resultFile = Files.createFile(filePath)
             resultFile.writeLines(listOf(header) + rows.map { it.toString() })
         }
@@ -72,16 +74,16 @@ class PolyBenchBenchmark {
         println()
         //      2. speed up more than number of threads
         println("Unusual Speedup:")
-        rows.filter { it.speedup >= 8 }.forEach { println(it) }
+        rows.filter { it.speedup >= params.threads }.forEach { println(it) }
 
     }
 
-    class BenchmarkResult(val name: String, val serialTime: Duration, val parallelTime: Duration) {
+    class BenchmarkResult(val index: Int, val name: String, val serialTime: Duration, val parallelTime: Duration) {
         val speedup: Double
             get() = (serialTime.inWholeMilliseconds / parallelTime.inWholeMilliseconds.toDouble())
 
         override fun toString(): String {
-            return "$name,$serialTime,$parallelTime,x${String.format("%.2f", speedup)}"
+            return "$index,$name,$serialTime,$parallelTime,x${String.format("%.2f", speedup)}"
         }
     }
 
