@@ -1,10 +1,8 @@
 package analysis.ddt
 
 import WAPC
+import analysis.ddt.tests.*
 import analysis.ddt.tests.DependenceTester
-import analysis.ddt.tests.GCDTest
-import analysis.ddt.tests.MIVTest
-import analysis.ddt.tests.ZIVTest
 import analysis.dfa.Dfa
 import ir.finder.BreadthFirstExpressionFinder
 import ir.statement.Function
@@ -18,7 +16,9 @@ class DependenceTester(val function: Function) {
         val loops = mutableListOf<ParallelizableLoop>()
         // for each top level Loop
         val rangeLoops =
-            BreadthFirstExpressionFinder(RangeLoop::class.java, true).also { it.visit(function) {} }.result()
+            BreadthFirstExpressionFinder(RangeLoop::class.java, true)
+                .also { it.visit(function) {} }
+                .result()
         for (topLevelRangeLoop in rangeLoops) {
             val result = testTopLevelLoop(topLevelRangeLoop)
             loops.addAll(result)

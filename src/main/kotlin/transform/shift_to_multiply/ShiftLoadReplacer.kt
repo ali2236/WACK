@@ -5,6 +5,7 @@ import ir.expression.Load
 import ir.expression.Value
 import ir.finder.Visitor
 import ir.statement.Statement
+import ir.statement.Store
 import kotlin.math.pow
 
 class ShiftLoadReplacer : Visitor() {
@@ -13,6 +14,11 @@ class ShiftLoadReplacer : Visitor() {
 
     override fun visit(v: Statement, replace: (Statement) -> Unit) {
         when(v){
+            is Store -> {
+                inLoad = true
+                super.visit(v, replace)
+                inLoad = false
+            }
             is Load -> {
                 inLoad = true
                 super.visit(v, replace)

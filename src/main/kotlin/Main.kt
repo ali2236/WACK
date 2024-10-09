@@ -6,7 +6,8 @@ fun main(args: Array<String>) {
         //File("./samples/kernel_matrix_multiply.wasm"),
         //File("./samples/matrix_multiply.wasm"),
         //File("./src/test/resources/src/unknown_heap_allocated_kernel_call.wasm")
-        File("./samples/polybench/O3/large_dataset/2mm.wasm"),
+        File("./samples/ddt/gcd_test.wasm"),
+        //File("./samples/polybench/O3/large_dataset/2mm.wasm"),
     )
     for (sample in samples) {
         val output = WAPC.compile(sample.toPath(), params = WAPC.Params(generateDotFiles = true, parallelize = true))

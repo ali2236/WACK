@@ -35,8 +35,13 @@ open class Polynomial {
         return symbolMultiplier.values.toList()
     }
 
-    fun base() : Expression {
-        // symbol or constant address
+    // symbol
+    fun base() : Expression? {
+        return symbolMultiplier.entries.firstOrNull { it.value == Value.one }?.key as Expression?
+    }
+
+    // symbol or constant address
+    fun baseOrOffset() : Expression {
         val symbol = symbolMultiplier.entries.firstOrNull { it.value == Value.one }?.key ?: offset
         return symbol as Expression
     }

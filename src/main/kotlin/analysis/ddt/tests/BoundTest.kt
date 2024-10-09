@@ -4,7 +4,7 @@ import analysis.ddt.Access
 import analysis.ddt.DependenceResult
 import analysis.ddt.DependenceTest
 
-@Deprecated("Use a Scientific test instead")
+
 class BoundTest : DependenceTest() {
     override fun test(a1: Access, a2: Access): DependenceResult? {
         try {

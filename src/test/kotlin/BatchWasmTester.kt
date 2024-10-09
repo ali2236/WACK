@@ -11,27 +11,36 @@ import kotlin.time.Duration
 
 abstract class BatchWasmTester {
 
-    fun batchTest(dir: Path, params: WAPC.Params = WAPC.Params()) : Stream<BenchmarkResult> {
+    fun batchTest(dir: Path, params: WAPC.Params = WAPC.Params()): Stream<BenchmarkResult> {
         var i = 1
         return Files.list(dir)
             .filter { Files.isRegularFile(it) }
             .filter { it.extension == "wasm" }
-            .map {serialFile ->
+            .map { serialFile ->
                 val name = serialFile.nameWithoutExtension
-                val serialTime = runTimed { Wasmtime.run(serialFile) }
+                lateinit var serialOutput: String
+                lateinit var parallelOutput: String
+                val serialTime = runTimed { serialOutput = Wasmtime.run(serialFile) }
                 val parallelFile = WAPC.compile(serialFile, params = params)
-                val parallelTime = runTimed { Wasmtime.runWithThreadsEnabled(parallelFile) }
-                BenchmarkResult(i++, name, serialTime, parallelTime)
+                val parallelTime = runTimed { parallelOutput = Wasmtime.runWithThreadsEnabled(parallelFile) }
+                BenchmarkResult(i++, name, serialTime, parallelTime, serialOutput, parallelOutput)
             }
     }
 
-    fun writeToCSVFile(name: String, data: List<BenchmarkResult>){
+    fun writeToCSVFile(name: String, data: List<BenchmarkResult>) {
         val filePath = Path("./src/test/resources/$name.csv")
         val resultFile = Files.createFile(filePath)
         resultFile.writeLines(listOf(BenchmarkResult.header) + data.map(BenchmarkResult::toString))
     }
 
-    class BenchmarkResult(val index: Int, val name: String, val serialTime: Duration, val parallelTime: Duration) {
+    class BenchmarkResult(
+        val index: Int,
+        val name: String,
+        val serialTime: Duration,
+        val parallelTime: Duration,
+        val serialOutput: String,
+        val parallelOutput: String,
+    ) {
         val speedup: Double
             get() = (serialTime.inWholeMilliseconds / parallelTime.inWholeMilliseconds.toDouble())
 

@@ -14,8 +14,8 @@ class RuntimeBoundTest : DependenceTest() {
         val p2 = a2.polynomial()
         // TODO: check bounds at runtime
         // 1. find the base
-        val base1 = p1.base()
-        val base2 = p2.base()
+        val base1 = p1.baseOrOffset()
+        val base2 = p2.baseOrOffset()
         // 2. add it to the offset to get linear memory array base
         val linearBase1 = BinaryOP.plus(base1, p1.getOffset())
         val linearBase2 = BinaryOP.plus(base2, p2.getOffset())
