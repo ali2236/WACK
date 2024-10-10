@@ -4,6 +4,7 @@ import analysis.ddt.Access
 import analysis.ddt.DependenceResult
 import analysis.ddt.DependenceTest
 import ir.expression.BinaryOP
+import ir.expression.Value
 import ir.statement.Statement
 import ir.wasm.WasmValueType
 
@@ -17,8 +18,8 @@ class RuntimeBoundTest : DependenceTest() {
         val base1 = p1.baseOrOffset()
         val base2 = p2.baseOrOffset()
         // 2. add it to the offset to get linear memory array base
-        val linearBase1 = BinaryOP.plus(base1, p1.getOffset())
-        val linearBase2 = BinaryOP.plus(base2, p2.getOffset())
+        val linearBase1 = BinaryOP.plus(base1, Value.i32(p1.constant))
+        val linearBase2 = BinaryOP.plus(base2, Value.i32(p2.constant))
         // check_bounds(A, C)
         // 3. check if access do not cross each other's bounds
         // A. A != C

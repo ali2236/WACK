@@ -20,9 +20,9 @@ data class Access(
             throw Exception("Polynomial Only usable on Load Symbols!")
         }
         val address = symbol.address
-        val poly = AddressPolynomialFinder(address, facts).result()
+        val poly = AddressPolynomialFinder(address, scope, facts).result()
 
-        poly.addOffset(Value(WasmValueType.i32, symbol.offset.toString()))
+        poly.constant += symbol.offset
 
         return poly
     }
@@ -53,8 +53,8 @@ data class Access(
         val minFacts = symbolsRange.mapValues { it.value.from as Value }
 
 
-        val max = poly.calculate(maxFacts).value.toLong()
-        val min = poly.calculate(minFacts).value.toLong()
+        val max = poly.calculate(maxFacts)
+        val min = poly.calculate(minFacts)
 
         return ArrayBounds(min, max)
     }

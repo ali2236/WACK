@@ -12,7 +12,7 @@ class BaseBoundTest : DependenceTest() {
         val p2 = a2.polynomial()
         val d = p1 - p2
         if(d.symbols().isEmpty()){
-            val offset = d.getOffset()
+
 
         }
         return DependenceResult()

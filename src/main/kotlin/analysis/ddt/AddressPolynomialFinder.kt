@@ -4,79 +4,93 @@ import analysis.dfa.DfaFact
 import analysis.dfa.DfaValue
 import ir.expression.*
 import ir.finder.BreadthFirstExpressionFinder
+import ir.finder.Finders
 import ir.finder.Visitor
 import ir.statement.Statement
 import ir.statement.SymbolLoad
 
 // also find <ax+c> where <x> is <symbol|load>
 // sometimes <c> is nested within multiple BinOp
-class AddressPolynomialFinder(val address: Expression, val facts: Set<DfaFact>) : Visitor() {
+class AddressPolynomialFinder(val address: Expression, val scope: AccessScope, val facts: Set<DfaFact>) : Visitor() {
 
     private val p = Polynomial()
-    private var multiplier = Value.one
-    private var symbol : SymbolLoad? = null
-    private var sign : Long = 1L
+    private var subscript: Subscript? = null
+    private var operator: BinaryOP.Operator = BinaryOP.Operator.add
 
     init {
-        visit(address) {}
+
+        split(address).forEach { part ->
+            val symbols =
+                BreadthFirstExpressionFinder(SymbolLoad::class.java, true).also { it.visit(part) {} }.result().toSet()
+            val symbol = when (symbols.size) {
+                0 -> null
+                1 -> symbols.first()
+                else -> scope.loops.map { it.symbol }.toSet().intersect(symbols).firstOrNull()
+            }
+            if (symbol != null) {
+                subscript = Subscript(symbol = symbol)
+            }
+            visit(part) {}
+            if(subscript != null){
+                p.addSubscript(subscript!!)
+            }
+        }
     }
 
+    private fun split(expr: Expression): List<Expression> {
+        if (expr is BinaryOP && expr.operator == BinaryOP.Operator.add) {
+            return split(expr.left) + split(expr.right)
+        }
+        return listOf(expr)
+    }
+
+    // BFS
     override fun visit(v: Statement, replace: (Statement) -> Unit) {
         when (v) {
-            // terminal nodes
             is BinaryOP -> {
                 when (v.operator.sign) {
                     BinaryOP.Operator.mul.sign -> {
-                        if (v.left is Value && v.right is SymbolLoad) {
-                            p.addMultiplier(v.right as SymbolLoad, v.left as Value)
-                            return
-                        } else if (v.right is Value && v.left is SymbolLoad) {
-                            p.addMultiplier(v.left as SymbolLoad, v.right as Value)
-                            return
-                        } else if(v.left is BinaryOP && v.right is Value){
-                            // multiply operation by value
-                            val oldMultiplier = multiplier.clone()
-                            multiplier = multiplier.multiply(v.right as Value)
-                            visit(v.left){}
-                            multiplier = oldMultiplier as Value
-                        } else if(v.right is BinaryOP && v.left is Value){
-                            // multiply operation by value
-                            val oldMultiplier = multiplier.clone()
-                            multiplier = multiplier.multiply(v.left as Value)
-                            visit(v.right){}
-                            multiplier = oldMultiplier as Value
-                        } else {
-                            // no way
-                            throw Exception("couldn't decode $v")
-                        }
+                        operator = v.operator
                     }
                     BinaryOP.Operator.sub.sign -> {
-                        if(v.left is SymbolLoad && v.right is Value){
-                            v.left.visit(this)
-                            symbol = v.left as SymbolLoad
-                            sign *= -1
-                            v.right.visit(this)
-                            symbol = null
-                            sign *= -1
-                            return
+                        visit(v.left) {}
+                        operatorScope(BinaryOP.Operator.sub) {
+                            visit(v.right) {}
                         }
+                        return
                     }
                 }
             }
+
             is Value -> {
-                if(symbol == null){
-                    p.addOffset(v)
+                if (subscript == null) {
+                    p.constant += v.toInt()
                 } else {
-                    p.addSymbolOffset(symbol!!, v.multiply(sign))
+                    val vv = v.value.toInt()
+                    when(operator){
+                        BinaryOP.Operator.add -> {
+                            subscript!!.offset += vv
+                        }
+                        BinaryOP.Operator.mul -> {
+                            subscript!!.multiplier *= vv
+                            subscript!!.offset *= vv // maybe remove this line?
+                        }
+                        BinaryOP.Operator.sub -> {
+                            subscript!!.offset -= vv
+                        }
+                    }
                 }
-                return
-            }
-            is SymbolLoad -> {
-                p.addMultiplier(v, multiplier)
                 return
             }
         }
         super.visit(v, replace)
+    }
+
+    private fun operatorScope(newOperator: BinaryOP.Operator, scope: () -> Unit) {
+        val oldOperator = operator
+        operator = newOperator
+        scope()
+        operator = oldOperator
     }
 
     fun result(): Polynomial {

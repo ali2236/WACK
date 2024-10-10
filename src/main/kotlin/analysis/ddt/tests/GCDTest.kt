@@ -10,8 +10,8 @@ class GCDTest : DependenceTest() {
         val p2 = a2.polynomial()
 
         val multipliers = p1.multipliers() + p2.multipliers()
-        val gcd = gcd(multipliers.map { it.value.toInt() })
-        val rem = p1.getOffset().value.toInt() - p2.getOffset().value.toInt()
+        val gcd = gcd(multipliers)
+        val rem = p1.constant - p2.constant
         if(rem % gcd == 0){ // depintine equasion has a solution
             // dependent
             return DependenceResult.inconclusive

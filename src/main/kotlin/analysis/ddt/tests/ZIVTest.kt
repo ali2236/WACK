@@ -10,7 +10,7 @@ class ZIVTest : DependenceTest() {
         val p1 = a1.polynomial()
         val p2 = a2.polynomial()
         val diff = p2 - p1
-        if(diff.getOffset().value.toInt() == 0 && diff.multipliers().all { it.value.toInt() == 0 }){
+        if(diff.constant == 0 && diff.multipliers().all { it == 0 }){
             // dependent
             // add all direction vectors for all common loops
             val commonLoops = a1.scope.intersect(a2.scope)

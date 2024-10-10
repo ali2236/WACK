@@ -4,49 +4,42 @@ import ir.expression.Expression
 import ir.expression.Symbol
 import ir.expression.Value
 import ir.statement.SymbolLoad
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
-open class Polynomial {
-    private var symbolMultiplier = mutableMapOf<SymbolLoad, Value>()
-    private var symbolOffset = mutableMapOf<SymbolLoad, Value>()
-    private var offset: Value = Value.zero
-
-    fun addOffset(v: Value) {
-        offset = offset.add(v)
-    }
-
-    fun getOffset(): Value {
-        return offset
-    }
-
-    fun addSymbolOffset(symbol: SymbolLoad, value: Value = Value.zero) {
-        symbolOffset[symbol] = symbolOffset.getOrDefault(symbol, Value.zero).add(value)
-    }
-
-    fun addMultiplier(symbol: SymbolLoad, value: Value = Value.one) {
-        symbolMultiplier[symbol] = symbolMultiplier.getOrDefault(symbol, Value.zero).add(value)
-    }
+open class Polynomial(
+    private val subscripts: MutableList<Subscript> = mutableListOf<Subscript>(),
+    var constant: Int = 0
+) {
 
     fun symbols(): Set<SymbolLoad> {
-        return symbolMultiplier.keys.union(symbolOffset.keys)
+        return subscripts.map { it.symbol }.toSet()
     }
 
+    fun multipliers(): List<Int> {
+        return subscripts.map { it.multiplier }
+    }
 
-    fun multipliers(): List<Value> {
-        return symbolMultiplier.values.toList()
+    fun getSubscript(symbol: SymbolLoad): Subscript {
+        return subscripts.first { it.symbol == symbol }
+    }
+
+    fun addSubscript(subscript: Subscript) {
+        subscripts.add(subscript)
     }
 
     // symbol
-    fun base() : Expression? {
-        return symbolMultiplier.entries.firstOrNull { it.value == Value.one }?.key as Expression?
+    fun base(): Expression? {
+        return subscripts.firstOrNull { it.multiplier == 1 }?.symbol as Expression?
     }
 
     // symbol or constant address
-    fun baseOrOffset() : Expression {
-        val symbol = symbolMultiplier.entries.firstOrNull { it.value == Value.one }?.key ?: offset
-        return symbol as Expression
+    fun baseOrOffset(): Expression {
+        return base() ?: Value.i32(constant)
     }
 
-    fun calculate(symbolValue: Map<SymbolLoad, Value>): Value {
+    fun calculate(symbolValue: Map<SymbolLoad, Value>): Long {
         // validate
         for (symbol in symbols()) {
             if (!symbolValue.containsKey(symbol)) {
@@ -54,53 +47,45 @@ open class Polynomial {
             }
         }
 
-        var sum = offset
+        var sum = constant.toLong()
         // calculate
-        for (symbol in symbols()) {
-            val multiplier = symbolMultiplier[symbol]!!
-            val value = symbolValue[symbol]!!
-            val result = multiplier.multiply(value)
-            sum = sum.add(result)
+        for (subscript in subscripts) {
+            val multiplier = subscript.multiplier
+            val value = symbolValue[subscript.symbol]!!.value.toInt()
+            sum += multiplier * value
         }
 
         return sum
     }
 
     operator fun minus(other: Polynomial): Polynomial {
-        val p = Polynomial()
-        p.addOffset(offset.add(other.offset.multiply(-1)))
-        // copy
-        for (symbol in symbols()) {
-            p.addMultiplier(symbol, symbolMultiplier[symbol]!!)
-        }
-        // deduct
-        for (symbol in other.symbols()) {
-            p.symbolMultiplier[symbol] =
-                p.symbolMultiplier
-                    .getOrDefault(symbol, Value.zero)
-                    .add(other.symbolMultiplier[symbol]!!.multiply(-1))
-        }
-        for(symbol in p.symbolMultiplier.keys){
-            if(p.symbolMultiplier[symbol] == Value.zero){
-                p.symbolMultiplier.remove(symbol)
+        val s1 = subscripts
+        val s2 = other.subscripts
+        val s3 = mutableListOf<Subscript>()
+
+        for (sub in s1 + s2) {
+            val sub2 = s3.firstOrNull { it.symbol == sub.symbol }
+            if (sub2 == null) {
+                // if new add
+                s3.add(sub)
+            } else {
+                // else deduct
+                val sub3 = Subscript(
+                    abs(sub.multiplier - sub2.multiplier),
+                    sub.symbol,
+                    abs(sub.offset - sub2.offset)
+                )
+                s3.remove(sub2)
+                if(sub3.multiplier != 0){
+                    s3.add(sub3)
+                }
             }
         }
-        return p
+
+        return Polynomial(s3, abs(constant - other.constant))
     }
 
     override fun toString(): String {
-        return symbols().joinToString("+") { symbol ->
-            val multiplier = symbolMultiplier.getOrDefault(symbol, Value.one)
-            val offset = symbolOffset.getOrDefault(symbol, Value.zero)
-            val m = if (multiplier == Value.one) "" else "${multiplier}x"
-            val o = if (offset == Value.zero) "" else if (offset.value.toInt() > 0) "+$offset" else "$offset"
-            "($m$symbol$o)"
-        } + "+$offset"
-    }
-
-    fun getSubscript(symbol: SymbolLoad): Subscript {
-        val multiplier = symbolMultiplier.getOrDefault(symbol, Value.zero).value.toInt()
-        val offset = symbolOffset.getOrDefault(symbol, Value.zero).value.toInt()
-        return Subscript(multiplier, symbol, offset)
+        return subscripts.joinToString("+") { s -> s.toString() } + "+$constant"
     }
 }

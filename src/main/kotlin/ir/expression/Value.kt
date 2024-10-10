@@ -34,8 +34,8 @@ open class Value(val type: WasmValueType, val value: String) : ImmutableExpressi
         return result
     }
 
-    fun add(i : Long): Value {
-        return when(type){
+    fun add(i: Long): Value {
+        return when (type) {
             WasmValueType.i32 -> Value(type, (value.toInt() + i).toString())
             WasmValueType.i64 -> Value(type, (value.toLong() + i).toString())
             WasmValueType.f32 -> Value(type, (value.toFloat() + i).toString())
@@ -44,8 +44,8 @@ open class Value(val type: WasmValueType, val value: String) : ImmutableExpressi
         }
     }
 
-    fun add(i: Value): Value{
-        return when(i.type){
+    fun add(i: Value): Value {
+        return when (i.type) {
             WasmValueType.i32 -> add(i.value.toLong())
             WasmValueType.i64 -> add(i.value.toLong())
             else -> throw Exception("should use an integer add")
@@ -53,7 +53,7 @@ open class Value(val type: WasmValueType, val value: String) : ImmutableExpressi
     }
 
     fun multiply(i: Long): Value {
-        return when(type){
+        return when (type) {
             WasmValueType.i32 -> Value(type, (value.toInt() * i).toString())
             WasmValueType.i64 -> Value(type, (value.toLong() * i).toString())
             WasmValueType.f32 -> Value(type, (value.toFloat() * i).toString())
@@ -62,8 +62,8 @@ open class Value(val type: WasmValueType, val value: String) : ImmutableExpressi
         }
     }
 
-    fun multiply(i: Value): Value{
-        return when(i.type){
+    fun multiply(i: Value): Value {
+        return when (i.type) {
             WasmValueType.i32 -> multiply(i.value.toLong())
             WasmValueType.i64 -> multiply(i.value.toLong())
             else -> throw Exception("should use an integer add")
@@ -74,8 +74,12 @@ open class Value(val type: WasmValueType, val value: String) : ImmutableExpressi
         return Value(toType, toType.fromNumber(type.number(value)))
     }
 
+    fun toInt(): Int {
+        return value.toInt()
+    }
+
     companion object {
-        fun i32(i: Int): Expression {
+        fun i32(i: Int): Value {
             return Value(WasmValueType.i32, "$i")
         }
 
