@@ -9,6 +9,7 @@ import ir.statement.Statement
 import ir.statement.SymbolLoad
 
 // also find <ax+c> where <x> is <symbol|load>
+// sometimes <c> is nested within multiple BinOp
 class AddressPolynomialFinder(val address: Expression, val facts: Set<DfaFact>) : Visitor() {
 
     private val p = Polynomial()

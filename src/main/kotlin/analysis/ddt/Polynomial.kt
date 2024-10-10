@@ -27,7 +27,7 @@ open class Polynomial {
     }
 
     fun symbols(): Set<SymbolLoad> {
-        return symbolMultiplier.keys
+        return symbolMultiplier.keys.union(symbolOffset.keys)
     }
 
 

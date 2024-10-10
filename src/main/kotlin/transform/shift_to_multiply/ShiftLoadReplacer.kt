@@ -15,15 +15,17 @@ class ShiftLoadReplacer : Visitor() {
     override fun visit(v: Statement, replace: (Statement) -> Unit) {
         when(v){
             is Store -> {
+                val lastState = inLoad
                 inLoad = true
                 super.visit(v, replace)
-                inLoad = false
+                inLoad = lastState
             }
-            is Load -> {
+            /*is Load -> {
+                val lastState = inLoad
                 inLoad = true
                 super.visit(v, replace)
-                inLoad = false
-            }
+                inLoad = lastState
+            }*/
             is BinaryOP -> {
                 if (inLoad && v.operator == BinaryOP.Operator.shl && v.right is Value){
                     replace(BinaryOP(
@@ -32,6 +34,7 @@ class ShiftLoadReplacer : Visitor() {
                         left = v.left,
                         right = Value(v.type, 2.0.pow((v.right as Value).value.toDouble()).toInt().toString())
                     ))
+                    super.visit(v, replace)
                 } else {
                     super.visit(v, replace)
                 }
