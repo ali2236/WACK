@@ -96,7 +96,7 @@ class DependenceTester(val function: Function) {
             // no dependencies
             return listOf(ParallelizableLoop(topLevelRangeLoop))
         } else if (dependenceResult != null) {
-            if (dependenceResult!!.direction[topLevelRangeLoop] == Direction.Equal) {
+            if (dependenceResult == DependenceResult.noCollision || dependenceResult!!.direction[topLevelRangeLoop] == Direction.Equal) {
                 return listOf(ParallelizableLoop(topLevelRangeLoop))
             } else if (WAPC.params!!.parallelizeInnerLoops) {
                 // inner-loops

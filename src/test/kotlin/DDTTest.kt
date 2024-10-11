@@ -7,10 +7,16 @@ class DDTTest : BatchWasmTester() {
 
     @Test
     fun all(){
-        batchTest(_dir)
+        gcd()
+    }
+
+    @Test
+    fun gcd(){
+        // can also test [reduction] & [loop normalization: loops that don't start from 0]
+        batchTest(_dir.resolve("gcd"))
             .map { println(it); it }
             .forEach { result ->
                 assertEquals(result.serialOutput, result.parallelOutput)
-        }
+            }
     }
 }

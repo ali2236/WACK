@@ -9,16 +9,12 @@ import kotlin.math.max
 import kotlin.math.min
 
 open class Polynomial(
-    private val subscripts: MutableList<Subscript> = mutableListOf<Subscript>(),
+    val subscripts: MutableList<Subscript> = mutableListOf<Subscript>(),
     var constant: Int = 0
 ) {
 
     fun symbols(): Set<SymbolLoad> {
         return subscripts.map { it.symbol }.toSet()
-    }
-
-    fun multipliers(): List<Int> {
-        return subscripts.map { it.multiplier }
     }
 
     fun getSubscript(symbol: SymbolLoad): Subscript {

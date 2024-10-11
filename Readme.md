@@ -20,7 +20,7 @@
 - [ ] Runtime limit evaluation(omp if)
 - [ ] Profitability Analysis
 - [ ] Permit Pure Functions in loops
-- [x]`+=` operator
+- [x] `+=` operator
 - [ ] Thread Local Storage (TLS)
 
 Currently not supported:
