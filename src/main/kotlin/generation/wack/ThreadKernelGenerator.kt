@@ -43,12 +43,14 @@ object ThreadKernelGenerator {
                     val rangeFrom = rangeLoop.range.from
                     val rangeTo = rangeLoop.range.to
                     if (Finders.symbols(rangeFrom).isNotEmpty()) {
-                        throw Exception("Can't Deduce Loop From Range: $rangeFrom")
+                        // TODO: dont ignore
+                        // throw Exception("Can't Deduce Loop From Range: $rangeFrom")
                     }
                     if (Finders.symbols(rangeTo).isNotEmpty()) {
                         // RangeTo is not constant
                         // check condition
 
+                        // TODO: dont ignore
                         //throw Exception("Can't Deduce Loop To Range: $rangeTo")
                     }
                     // from & to are constants!

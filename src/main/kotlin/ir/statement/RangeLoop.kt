@@ -21,4 +21,7 @@ class RangeLoop(
         v.visit(symbol) { this.symbol = it as SymbolLoad }
         super.visit(v)
     }
+
+    val conditionBinaryOP: BinaryOP
+        get() = condition as BinaryOP
 }

@@ -98,27 +98,4 @@ class RangeLoopRestructure : Restructure() {
         return initialExpressionOf(block.parent, block.indexInParent, symbol)
     }
 
-    private val BinaryOP.endExclusive: Expression
-        get() {
-            if (right is Value) {
-                return when (operator.sign) {
-                    "<" -> right as Value
-                    "<=" -> (right as Value).add(1)
-                    ">" -> (right as Value).add(1)
-                    ">=" -> (right as Value)
-                    "!=" -> (right as Value)
-                    else -> throw Exception("operator ${operator.sign} is not supported")
-                }
-            } else {
-                return when (operator.sign) {
-                    "<" -> right
-                    "<=" -> BinaryOP.plus(right, Value.one)
-                    ">" -> BinaryOP.plus(right, Value.one)
-                    ">=" -> right
-                    "!=" -> right
-                    else -> throw Exception("operator ${operator.sign} is not supported")
-                }
-            }
-        }
-
 }

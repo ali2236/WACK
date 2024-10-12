@@ -67,6 +67,31 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
         return result
     }
 
+    // range-loop condition
+    val endExclusive: Expression
+        get() {
+            if (right is Value) {
+                return when (operator.sign) {
+                    "<" -> right as Value
+                    "<=" -> (right as Value).add(1)
+                    ">" -> (right as Value).add(1)
+                    ">=" -> (right as Value)
+                    "!=" -> (right as Value)
+                    else -> throw Exception("operator ${operator.sign} is not supported")
+                }
+            } else {
+                return when (operator.sign) {
+                    "<" -> right
+                    "<=" -> BinaryOP.plus(right, Value.one)
+                    ">" -> BinaryOP.plus(right, Value.one)
+                    ">=" -> right
+                    "!=" -> right
+                    else -> throw Exception("operator ${operator.sign} is not supported")
+                }
+            }
+        }
+
+
 
     data class Operator(val sign: String, val watName: String, var signed: WasmBitSign? = null) {
 

@@ -1,7 +1,6 @@
 package transform
 
 import analysis.dfa.DfaValue
-import ir.annotations.For
 import ir.annotations.Skip
 import ir.expression.*
 import ir.finder.BreadthFirstExpressionFinder
@@ -34,7 +33,6 @@ class LoopNormalization : Transformer {
         if (loop.range.from is Value && loop.range.from != Value.zero) {
             val symbol = loop.symbol
             val from = loop.range.from
-            val to = loop.range.to
             val symbolType = when (symbol) {
                 is Symbol -> symbol.exprType()
                 is Load -> symbol.exprType()
@@ -42,7 +40,7 @@ class LoopNormalization : Transformer {
             }
             // replacements
             lateinit var newFrom: Expression
-            lateinit var newTo: Expression
+            var newTo: Expression?
             // replace loop range:
             // 1. before loop body: replace <symbol> = <from> with <symbol> = 0
             val rv = ReverseVisitor()
@@ -61,7 +59,22 @@ class LoopNormalization : Transformer {
             })
 
             // 2. in loop condition: replace <symbol> < <to> with <symbol> < <to> - <from>
-            val bv = object : Visitor() {
+            val conditionVisitor = object :Visitor(){
+                override fun visit(v: Statement, replace: (Statement) -> Unit) {
+                    if(v is BinaryOP && v.right !is Value){
+                        newTo = BinaryOP(
+                            v.exprType(),
+                            BinaryOP.Operator.sub,
+                            v.right,
+                            from,
+                        )
+                        v.right = newTo!!
+                    }
+                }
+            }
+            conditionVisitor.visit(loop.condition) {}
+/*            val bv = object : Visitor() {
+                // TODO: Unused code?
                 override fun visit(v: Statement, replace: (Statement) -> Unit) {
                     if (v == to) {
                         newTo = BinaryOP(
@@ -70,12 +83,14 @@ class LoopNormalization : Transformer {
                             to,
                             from,
                         )
-                        replace(newTo)
+                        replace(newTo as BinaryOP)
                     }
                     super.visit(v, replace)
                 }
             }
-            bv.visit(loop) {}
+            if (newTo == null){
+                loop.visit(bv)
+            }*/
 
             // 3. in loop body: replace <symbol> with <symbol>+<from>
             val cv = object : Visitor() {
@@ -102,7 +117,7 @@ class LoopNormalization : Transformer {
             cv.visit(loop.instructions) { i, stmt -> loop.instructions[i] = stmt }
 
             // 4. in loop metadata: replace loop-range with new loop-range
-            loop.range = DfaValue.Range(newFrom, newTo)
+            loop.range = DfaValue.Range(newFrom, loop.conditionBinaryOP.endExclusive)
         }
     }
 }

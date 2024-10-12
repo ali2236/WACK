@@ -45,7 +45,7 @@ abstract class BatchWasmTester {
             get() = (serialTime.inWholeMilliseconds / parallelTime.inWholeMilliseconds.toDouble())
 
         override fun toString(): String {
-            return "$index,$name,$serialTime,$parallelTime,x${String.format("%.2f", speedup)}"
+            return "$index,$name,$serialTime,$parallelTime,${String.format("%.2f", speedup)}"
         }
 
         companion object {
