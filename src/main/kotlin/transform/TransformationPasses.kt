@@ -16,6 +16,7 @@ object TransformationPasses {
             ConditionalLoopRestructure(),
             IncrementRestructure(),
             RangeLoopRestructure(),
+            LoopNormalization(),
             ParallelForAnnotator(),
             StackBaseAliasAnnotator(),
             MarkLoopCountersAsPrivate(),
