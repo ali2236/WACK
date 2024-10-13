@@ -18,8 +18,8 @@ class AddressPolynomialFinder(val address: Expression, val scope: AccessScope, v
     private var operator: BinaryOP.Operator = BinaryOP.Operator.add
 
     init {
-
-        split(address).forEach { part ->
+        val parts = split(address)
+        parts.forEach { part ->
             val symbols =
                 BreadthFirstExpressionFinder(SymbolLoad::class.java, true).also { it.visit(part) {} }.result().toSet()
             val symbol = when (symbols.size) {
@@ -53,7 +53,9 @@ class AddressPolynomialFinder(val address: Expression, val scope: AccessScope, v
                         operator = v.operator
                     }
                     BinaryOP.Operator.sub.sign -> {
-                        visit(v.left) {}
+                        operatorScope(BinaryOP.Operator.add){
+                            visit(v.left) {}
+                        }
                         operatorScope(BinaryOP.Operator.sub) {
                             visit(v.right) {}
                         }
