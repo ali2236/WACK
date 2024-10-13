@@ -8,6 +8,7 @@ object DependenceTester {
 
     fun dependencePossible(a1: Access, a2: Access): DependenceResult?{
         val tests = listOf(
+            TypeTest(),
             MemoryTest(),
             BoundTest(),
             BaseTest(),

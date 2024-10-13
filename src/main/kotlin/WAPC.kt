@@ -46,6 +46,7 @@ object WAPC {
         val generateDotFiles: Boolean = false,
         val dfaStatementId: Boolean = false,
         val dfaShowAlias: Boolean = true,
+        val normalizeLoops: Boolean = true,
     )
 
 }

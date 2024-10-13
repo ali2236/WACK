@@ -10,15 +10,17 @@ class MIVTest : DependenceTest() {
         val commonLoops = a1.scope.intersect(a2.scope) // TODO: should be common and dependent loops
         val dv = mutableMapOf<RangeLoop, Direction>()
         for (loop in commonLoops) {
-            val s1 = p1.getSubscript(loop.symbol)
-            val s2 = p2.getSubscript(loop.symbol)
-            if (s1.valid xor s2.valid) {
-                dv[loop] = Direction.Any
-            } else if (s1.valid or s2.valid) {
-                dv[loop] = Direction.fromInt(s1.offset - s2.offset)
-            } else {
-                dv[loop] = Direction.Equal
-            }
+            try {
+                val s1 = p1.getSubscript(loop.symbol)
+                val s2 = p2.getSubscript(loop.symbol)
+                if (s1.valid xor s2.valid) {
+                    dv[loop] = Direction.Any
+                } else if (s1.valid or s2.valid) {
+                    dv[loop] = Direction.fromInt(s1.offset - s2.offset)
+                } else {
+                    dv[loop] = Direction.Equal
+                }
+            } catch (e: Exception){}
         }
         return DependenceResult(dv)
     }

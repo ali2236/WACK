@@ -59,6 +59,12 @@ abstract class Restructure : Transformer {
         block.parent = currentBlock.parent
         block.indexInParent = currentBlock.indexInParent
         currentBlock.parent!!.instructions[currentBlock.indexInParent!!] = block
+        block.instructions.forEachIndexed { i, stmt ->
+            if (stmt is Block){
+                stmt.parent = block
+                stmt.indexInParent = i
+            }
+        }
     }
 
     fun replaceCurrentInstruction(stmt: Statement) {

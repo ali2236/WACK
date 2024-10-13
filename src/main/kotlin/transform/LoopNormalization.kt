@@ -1,5 +1,6 @@
 package transform
 
+import WAPC
 import analysis.dfa.DfaValue
 import ir.annotations.Skip
 import ir.expression.*
@@ -11,6 +12,9 @@ import ir.statement.Function
 
 class LoopNormalization : Transformer {
     override fun apply(program: Program) {
+        if (!WAPC.params!!.normalizeLoops){
+            return
+        }
         program.statements.filterIsInstance<Function>()
             .filterNot { it.hasAnnotation(Skip::class.java) }
             .forEach { function ->

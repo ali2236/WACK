@@ -20,7 +20,7 @@ data class DependenceResult(
         val allLoops = direction.keys + other.direction.keys
         val dirs = mutableMapOf<RangeLoop, Direction>()
         for (loop in allLoops){
-            val d1 = other.direction[loop]
+            val d1 = direction[loop]
             val d2 = other.direction[loop]
             if (d1 == null && d2 != null){
                 dirs[loop] = d2
@@ -30,6 +30,6 @@ data class DependenceResult(
                 dirs[loop] = d1.product(d2)
             }
         }
-        return DependenceResult(direction, this.conditions + other.conditions)
+        return DependenceResult(dirs, this.conditions + other.conditions)
     }
 }

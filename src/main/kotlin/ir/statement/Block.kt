@@ -114,4 +114,15 @@ open class Block(
     fun <T : WackAnnotation> hasAnnotation(clazz: Class<T>): Boolean {
         return annotations.any { clazz.isInstance(it) }
     }
+
+    fun childOf(block: Block): Boolean {
+        var current : Block? = parent
+        while (current != null){
+            if (current == block){
+                return true
+            }
+            current = current.parent
+        }
+        return false
+    }
 }

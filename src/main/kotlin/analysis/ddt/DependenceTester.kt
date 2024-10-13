@@ -96,12 +96,17 @@ class DependenceTester(val function: Function) {
             // no dependencies
             return listOf(ParallelizableLoop(topLevelRangeLoop))
         } else if (dependenceResult != null) {
-            if (dependenceResult == DependenceResult.noCollision || dependenceResult!!.direction[topLevelRangeLoop] == Direction.Equal) {
+            val noCollision = dependenceResult == DependenceResult.noCollision
+            val topLevelHasNoDependence =
+                dependenceResult!!.direction[topLevelRangeLoop] == Direction.Equal
+            if (noCollision || topLevelHasNoDependence) {
                 return listOf(ParallelizableLoop(topLevelRangeLoop))
             } else if (WAPC.params!!.parallelizeInnerLoops) {
                 // inner-loops
-                val innerLoops = dependenceResult!!.direction.filter { it.value == Direction.Equal }
-                return innerLoops.map { ParallelizableLoop(it.key) }
+                var parallelizableLoops = dependenceResult!!.direction.filter { it.value == Direction.Equal }
+                // select the ones that are not sub-loops of other parallelizable loops
+                parallelizableLoops = parallelizableLoops.filter { (pl, d) -> !parallelizableLoops.any { (loop, d) -> pl.childOf(loop) } }
+                return parallelizableLoops.map { ParallelizableLoop(it.key) }
             }
         }
         return listOf()
