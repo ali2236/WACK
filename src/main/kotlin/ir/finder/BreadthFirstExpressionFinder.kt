@@ -14,7 +14,6 @@ class BreadthFirstExpressionFinder<T : Visitable>(
 
     override fun visit(vs: Iterable<Statement>, replace: (Int, Statement) -> Unit) {
         q.add(vs)
-
     }
 
     private fun _visit(vs: Iterable<Statement>){

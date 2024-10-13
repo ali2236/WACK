@@ -6,7 +6,7 @@ fun main(args: Array<String>) {
         //File("./samples/kernel_matrix_multiply.wasm"),
         //File("./samples/matrix_multiply.wasm"),
         //File("./src/test/resources/src/unknown_heap_allocated_kernel_call.wasm")
-        File("./samples/ddt/gcd/gcd_test_2.wasm"),
+        File("./samples/transform/loop_normalization/loop_normalization.wasm"),
         //File("./samples/polybench/O3/large_dataset/2mm.wasm"),
     )
     for (sample in samples) {
