@@ -8,6 +8,7 @@ import ir.wasm.WasmFunction
 import ir.wasm.WasmImport
 import ir.wasm.WasmValueType
 
+@Deprecated("use WasiThreadsLibrary")
 object WasiThreadSpawnGenerator {
     fun generate(program: Program) : WasmFunction {
         val module = program.module

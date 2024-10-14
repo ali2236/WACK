@@ -1,5 +1,6 @@
 package generation.wack
 
+import ir.expression.Expression
 import ir.expression.Load
 import ir.expression.Symbol
 import ir.expression.Value
@@ -7,7 +8,12 @@ import ir.statement.Program
 import ir.statement.Store
 import ir.wasm.*
 
-class MetaLibrary(val getStackBase: WasmFunction, val setStackBase: WasmFunction, val metaMemory: WasmMemory) {
+class MetaLibrary(
+    val maxThreads: Property,
+    val stackBase: Property,
+    val kernelId: Property,
+    val metaMemory: WasmMemory
+) {
     companion object {
         fun generate(program: Program): MetaLibrary {
             val module = program.module
@@ -17,33 +23,73 @@ class MetaLibrary(val getStackBase: WasmFunction, val setStackBase: WasmFunction
             val metaMemory = WasmMemory(m, 1, 1, true)
             module.memories.add(metaMemory)
 
-            // offsets
-            val stackBase = Value.i32(0)
 
             // functions
-            val getStackBase = program.addFunction(
-                name = "wack__get_stack_base",
-                result = listOf(WasmValueType.i32),
-                instructions = mutableListOf(
-                    Load(WasmValueType.i32, stackBase, metaMemory.index)
-                ),
+            val i32Bytes = 4
+            val maxThreads = Property.fromAddress(
+                program,
+                "max_threads",
+                WasmValueType.i32,
+                metaMemory,
+                Value.zero,
+                0 * i32Bytes
             )
-            val setStackBase = program.addFunction(
-                name = "wack__set_stack_base",
-                params = listOf(WasmValueType.i32),
-                instructions = mutableListOf(
-                    Store(
-                        Load(WasmValueType.i32, stackBase, metaMemory.index),
-                        Symbol.localI32(Index.number(0))
-                    )
-                ),
+            val stackBase = Property.fromAddress(
+                program,
+                "stack_base",
+                WasmValueType.i32,
+                metaMemory,
+                Value.zero,
+                1 * i32Bytes
+            )
+            val kernelId = Property.fromAddress(
+                program,
+                "kernel_id",
+                WasmValueType.i32,
+                metaMemory,
+                Value.zero,
+                2 * i32Bytes
             )
 
-            return MetaLibrary(
-                getStackBase.functionData,
-                setStackBase.functionData,
-                metaMemory,
-            )
+            return MetaLibrary(maxThreads, stackBase, kernelId, metaMemory)
+        }
+    }
+
+    class Property(
+        val get: WasmFunction,
+        val set: WasmFunction,
+    ) {
+        companion object {
+            fun fromAddress(
+                program: Program,
+                name: String,
+                type: WasmValueType,
+                memory: WasmMemory,
+                base: Expression,
+                offset: Int
+            ): Property {
+                val getter = program.addFunction(
+                    name = "wack__get_$name",
+                    result = listOf(type),
+                    instructions = mutableListOf(
+                        Load(type, base, memory.index, offset = offset)
+                    ),
+                )
+                val setter = program.addFunction(
+                    name = "wack__set_$name",
+                    params = listOf(type),
+                    instructions = mutableListOf(
+                        Store(
+                            Load(type, base, memory.index),
+                            Symbol(WasmScope.local, type, Index.number(0)),
+                        )
+                    ),
+                )
+                return Property(
+                    getter.functionData,
+                    setter.functionData,
+                )
+            }
         }
     }
 }

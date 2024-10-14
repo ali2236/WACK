@@ -2,37 +2,36 @@ package generation
 
 import WAPC
 import generation.wack.*
+import generation.wasi.threads.KernelTableGenerator
 import ir.Mode
-import generation.wasi.threads.WasiThreadSpawnGenerator
-import generation.wasi.threads.WasiThreadStartGenerator
+import generation.wasi.threads.WasiThreadsLibrary
 import generation.wasi.threads.WasiThreadsMemory
-import generation.wasm.threads.MutexLibraryGenerator
+import generation.wasm.threads.MutexLibrary
 import ir.annotations.CallKernel
 import ir.annotations.StackBase
 import ir.expression.Value
-import ir.statement.Assignment
 import ir.statement.Program
 
 class WasiThreadsGenerator() : Generator {
     override fun apply(program: Program) {
         if(!WAPC.params!!.parallelize) return
         Mode.insure(Mode::multipleMemories, true)
-        val mutex = MutexLibraryGenerator.generate(program)
-        val threadArg = ThreadArgEncoderGenerator.generate(program)
-        val threadCount = ThreadCountGenerator(WAPC.params!!.threads).generate(program)
         val metaLib = MetaLibrary.generate(program)
-        val threadSpawn = WasiThreadSpawnGenerator.generate(program)
-        val runParallel =
-            RunParallelFunctionGenerator.generate(program, threadCount.symbol, mutex, threadArg, threadSpawn)
-        ThreadKernelGenerator.generate(program, threadCount.symbol, metaLib) { function, block ->
+        val wackThread = WackThread.generate(program)
+        val mutex = MutexLibrary.generate(program, wackThread.threadsMemory)
+        val wasiThreads = WasiThreadsLibrary.generate(program)
+        val supportLibrary = SupportLibrary.generate(program, mutex, metaLib, wackThread, wasiThreads)
+        ThreadKernelGenerator.generate(program, metaLib) { function, block ->
             block.instructions.clear()
             val kernelId = block.annotations.filterIsInstance<CallKernel>().first().kernelIndex
             block.annotations.filterIsInstance<StackBase>().firstOrNull()?.symbol?.let { localStackBase ->
-                block.instructions.add(metaLib.setStackBase.call(localStackBase))
+                block.instructions.add(metaLib.stackBase.set.call(localStackBase))
             }
-            block.instructions.add(runParallel.call(Value.i32(kernelId)))
+            block.instructions.add(supportLibrary.parallel.call(Value.i32(kernelId)))
         }
-        WasiThreadStartGenerator.generate(program, threadArg, mutex, threadCount.symbol)
+        // generate this table after generating kernels
+        val kernelTable = KernelTableGenerator.generate(program)
+        WasiThreadStart.generate(program, mutex, wackThread, kernelTable, metaLib)
         WasiThreadsMemory().apply(program)
     }
 }

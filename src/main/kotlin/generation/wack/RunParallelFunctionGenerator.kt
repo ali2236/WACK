@@ -19,6 +19,7 @@ import ir.wasm.WasmValueType
 ///
 /// Generates the [parallel] function
 ///
+@Deprecated("use SupportLibrary instead")
 object RunParallelFunctionGenerator {
     fun generate(
         program: Program, threadCount: Expression, mutex: MutexLibrary, arg: ThreadArg, threadSpawn: WasmFunction

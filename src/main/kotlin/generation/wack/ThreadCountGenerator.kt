@@ -4,6 +4,7 @@ import ir.expression.Value
 import ir.statement.Program
 import ir.wasm.*
 
+@Deprecated("use meta library")
 class ThreadCountGenerator(val initialCount : Int) {
     fun generate(program: Program) : WasmGlobal {
         val module = program.module

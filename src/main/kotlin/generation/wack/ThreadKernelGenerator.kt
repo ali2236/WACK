@@ -13,7 +13,6 @@ import ir.wasm.*
 object ThreadKernelGenerator {
     fun generate(
         program: Program,
-        threadCount: Expression,
         metaLib: MetaLibrary,
         generateCallKernel: (Function, Block) -> Unit,
     ): List<Block> {
@@ -78,7 +77,7 @@ object ThreadKernelGenerator {
                         instructions.add(
                             Assignment(
                                 stackBase,
-                                metaLib.getStackBase.call().result,
+                                metaLib.stackBase.get.call().result,
                             )
                         )
 
@@ -101,7 +100,7 @@ object ThreadKernelGenerator {
                                         WasmValueType.i32,
                                         BinaryOP.Operator.div.copy(signed = WasmBitSign.s),
                                         size,
-                                        threadCount,
+                                        metaLib.maxThreads.get.call().result,
                                     ),
                                     threadId,
                                 )
@@ -121,7 +120,7 @@ object ThreadKernelGenerator {
                                             WasmValueType.i32,
                                             BinaryOP.Operator.div.copy(signed = WasmBitSign.s),
                                             size,
-                                            threadCount,
+                                            metaLib.maxThreads.get.call().result,
                                         ),
                                         BinaryOP(
                                             WasmValueType.i32,
@@ -134,7 +133,7 @@ object ThreadKernelGenerator {
                                         WasmValueType.i32, BinaryOP.Operator.eq, threadId, BinaryOP(
                                             WasmValueType.i32,
                                             BinaryOP.Operator.sub,
-                                            threadCount,
+                                            metaLib.maxThreads.get.call().result,
                                             Value(WasmValueType.i32, "1")
                                         )
                                     ),

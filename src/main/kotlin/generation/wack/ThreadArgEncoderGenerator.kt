@@ -6,6 +6,7 @@ import ir.statement.Program
 import ir.statement.RawWat
 import ir.wasm.*
 
+@Deprecated("use struct wack_thread")
 object ThreadArgEncoderGenerator {
 
     fun generate(program: Program): ThreadArg {

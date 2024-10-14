@@ -13,6 +13,7 @@ export function thread_start(int tid, int args){
     unlockMutex(thread_id)
 }
  */
+@Deprecated("old implementation")
 object WasiThreadStartGenerator {
     fun generate(program: Program, arg: ThreadArg, mutex: MutexLibrary, threadCount: Expression) {
         val module = program.module
