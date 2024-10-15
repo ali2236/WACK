@@ -1,5 +1,6 @@
 package generation.wack
 
+import WAPC
 import ir.expression.Expression
 import ir.expression.Load
 import ir.expression.Symbol
@@ -9,6 +10,7 @@ import ir.statement.Store
 import ir.wasm.*
 
 class MetaLibrary(
+    val getMaxThreads: Expression,
     val maxThreads: Property,
     val stackBase: Property,
     val kernelId: Property,
@@ -31,27 +33,24 @@ class MetaLibrary(
                 "max_threads",
                 WasmValueType.i32,
                 metaMemory,
-                Value.zero,
-                0 * i32Bytes
+                Value.i32(0 * i32Bytes),
             )
             val stackBase = Property.fromAddress(
                 program,
                 "stack_base",
                 WasmValueType.i32,
                 metaMemory,
-                Value.zero,
-                1 * i32Bytes
+                Value.i32(1 * i32Bytes)
             )
             val kernelId = Property.fromAddress(
                 program,
                 "kernel_id",
                 WasmValueType.i32,
                 metaMemory,
-                Value.zero,
-                2 * i32Bytes
+                Value.i32(2 * i32Bytes)
             )
 
-            return MetaLibrary(maxThreads, stackBase, kernelId, metaMemory)
+            return MetaLibrary(Value.i32(WAPC.params!!.threads), maxThreads, stackBase, kernelId, metaMemory)
         }
     }
 
@@ -66,7 +65,7 @@ class MetaLibrary(
                 type: WasmValueType,
                 memory: WasmMemory,
                 base: Expression,
-                offset: Int
+                offset: Int = 0,
             ): Property {
                 val getter = program.addFunction(
                     name = "wack__get_$name",

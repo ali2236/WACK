@@ -4,16 +4,19 @@ import generation.wasm.threads.MutexLibrary
 import ir.expression.BinaryOP
 import ir.expression.Symbol
 import ir.statement.*
-import ir.wasm.Index
-import ir.wasm.WasmFunction
-import ir.wasm.WasmTable
-import ir.wasm.WasmValueType
+import ir.wasm.*
 
 class WasiThreadStart(
     val wasiThreadStart: WasmFunction
 ) {
     companion object {
-        fun generate(program: Program, mutexLib: MutexLibrary, wackThread: WackThread, kernelTable: WasmTable, meta: MetaLibrary) : WasiThreadStart{
+        fun generate(
+            program: Program,
+            mutexLib: MutexLibrary,
+            wackThread: WackThread,
+            kernelTable: WasmTable,
+            meta: MetaLibrary
+        ): WasiThreadStart {
             val kernelType = program.module.findOrAddType(params = listOf(WasmValueType.i32)).index
             val tid = Symbol.localI32(Index.number(1))
             val mutex = Symbol.localI32(Index.number(2))
@@ -25,12 +28,16 @@ class WasiThreadStart(
                 instructions = mutableListOf(
                     wackThread.setState(tid, WackThread.State.Started),
                     Assignment(mutex, wackThread.getMutex(tid)),
-                    Block(
+                    tid,
+                    meta.kernelId.get.call().result,
+                    RawWat("call_indirect ${kernelTable.index} (type $kernelType)"),
+                    mutexLib.unlock.call(mutex),
+                    /*Block(
                         mutableListOf(
                             Loop(
                                 mutableListOf(
                                     Assignment(state, wackThread.getState(tid)),
-                                    mutexLib.lock.call(mutex),
+                                    // mutexLib.lock.call(mutex),
                                     If(
                                         condition = BinaryOP(
                                             WasmValueType.i32,
@@ -56,13 +63,22 @@ class WasiThreadStart(
                                         ),
                                     ),
                                     mutexLib.unlock.call(mutex),
-                                    RawWat("br 0"),
+                                    RawWat("br 1"),
                                 ),
-                            )
-                        )
-                    ),
+                            ),
+                            wackThread.setState(tid, WackThread.State.Stopped),
+                        ),
+                    ),*/
                 ),
             )
+
+            // exports
+            val wasiThreadStartExport = WasmExport(
+                "\"wasi_thread_start\"",
+                WasmExportKind.func,
+                wasiThreadStart.functionData.index,
+            )
+            program.module.exports.add(wasiThreadStartExport)
 
             return WasiThreadStart(wasiThreadStart.functionData)
         }

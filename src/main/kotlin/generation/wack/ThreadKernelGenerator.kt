@@ -1,5 +1,6 @@
 package generation.wack
 
+import WAPC
 import ir.annotations.*
 import ir.expression.*
 import ir.finder.AnnotationFinder
@@ -71,6 +72,7 @@ object ThreadKernelGenerator {
                         val stackBase = Symbol(WasmScope.local, WasmValueType.i32, Index.number(1))
                         val start = Symbol(WasmScope.local, WasmValueType.i32, Index.number(2))
                         val end = Symbol(WasmScope.local, WasmValueType.i32, Index.number(3))
+                        val maxThreads = metaLib.getMaxThreads
 
                         // TODO: Only if has stack_base
                         // new stack_base
@@ -100,7 +102,7 @@ object ThreadKernelGenerator {
                                         WasmValueType.i32,
                                         BinaryOP.Operator.div.copy(signed = WasmBitSign.s),
                                         size,
-                                        metaLib.maxThreads.get.call().result,
+                                        maxThreads,
                                     ),
                                     threadId,
                                 )
@@ -120,7 +122,7 @@ object ThreadKernelGenerator {
                                             WasmValueType.i32,
                                             BinaryOP.Operator.div.copy(signed = WasmBitSign.s),
                                             size,
-                                            metaLib.maxThreads.get.call().result,
+                                            maxThreads,
                                         ),
                                         BinaryOP(
                                             WasmValueType.i32,
@@ -133,7 +135,7 @@ object ThreadKernelGenerator {
                                         WasmValueType.i32, BinaryOP.Operator.eq, threadId, BinaryOP(
                                             WasmValueType.i32,
                                             BinaryOP.Operator.sub,
-                                            metaLib.maxThreads.get.call().result,
+                                            maxThreads,
                                             Value(WasmValueType.i32, "1")
                                         )
                                     ),

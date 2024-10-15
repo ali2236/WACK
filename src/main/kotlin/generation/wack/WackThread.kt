@@ -1,6 +1,7 @@
 package generation.wack
 
 import ir.expression.*
+import ir.statement.Nop
 import ir.statement.Program
 import ir.statement.Statement
 import ir.statement.Store
@@ -17,19 +18,26 @@ class WackThread(
 ) {
 
     fun setTid(threadId: Expression, tid: Expression) : Statement{
-        return setProperty.call(threadId, Property.tid.value(), tid)
+        return Nop()
+        //return setProperty.call(threadId, Property.tid.value(), tid)
     }
 
-    fun getState(threadId: Expression) : Expression {
+    /*fun getState(threadId: Expression) : Expression {
         return getProperty.call(threadId, Property.state.value()).result
-    }
+    }*/
 
     fun setState(threadId: Expression, state: State) : Statement{
-        return setProperty.call(threadId, Property.state.value(), state.value())
+        return Nop()
+        //return setProperty.call(threadId, Property.state.value(), state.value())
     }
 
     fun getMutex(threadId: Expression): Expression {
-        return getPropertyAddress.call(threadId, Property.mutex.value()).result
+        return BinaryOP(
+            WasmValueType.i32,
+            BinaryOP.Operator.mul,
+            threadId,
+            Value.i32(4)
+        )// getPropertyAddress.call(threadId, Property.mutex.value()).result
     }
 
     companion object {
@@ -101,7 +109,7 @@ class WackThread(
             )
 
             return WackThread(
-                getThreadProperty.functionData,
+                getThreadPropertyAddress.functionData,
                 getThreadProperty.functionData,
                 setThreadProperty.functionData,
                 threadsMemory,
@@ -109,10 +117,10 @@ class WackThread(
         }
     }
 
-    enum class Property {
-        tid,
-        mutex,
-        state;
+    private enum class Property {
+        //tid,
+        mutex;
+        //state;
 
         fun value(): Expression {
             return Value.i32(this.ordinal)

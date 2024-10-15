@@ -70,10 +70,7 @@ void set_thread_property(int thread_id, int property, int value){
 */
 
 void make_thread_pool(int max_threads){
-    if(get_max_threads() != 0){
-        return;
-    }
-    set_max_threads(max_threads);
+    if(get_max_threads() != 0) return;
     for(int i=0;i<max_threads;i++){
         set_thread_property(i, __wack_thread_id, i);
         lock_mutex(get_thread_property_address(__wack_thread_mutex));
@@ -81,6 +78,7 @@ void make_thread_pool(int max_threads){
             exit(1);
         }
     }
+    set_max_threads(max_threads);
 }
 
 __attribute__((export_name("parallel")))
@@ -89,11 +87,15 @@ void parallel(int kernel_id) {
     num_threads = get_max_threads();
     for (int i = 0; i < num_threads; ++i) {
         set_wack_thread_property(i, __wack_thread_state, __status_has_task);
-        unlock_mutex(get_wack_thread_property_address(i, __wack_thread_mutex));
+        //unlock_mutex(get_wack_thread_property_address(i, __wack_thread_mutex));
+        lock_mutex(get_wack_thread_property_address(i, __wack_thread_mutex));
+        if(thread_spawn(i) < 0){
+             exit(1);
+        }
     }
     for (int i = 0; i < num_threads; ++i){
-        while(get_wack_thread_property(i, __wack_thread_state) != __status_task_done){}
-        lock_mutex(get_wack_thread_property_address(i, __wack_thread_mutex));
+        //lock_mutex(get_wack_thread_property_address(i, __wack_thread_mutex));
+        join_mutex(get_wack_thread_property_address(i, __wack_thread_mutex));
     }
 }
 
@@ -106,7 +108,7 @@ void wasi_thread_start(int id, int tid){
     int mutex = get_wack_thread_property_address(tid, __wack_thread_mutex);
     while(true){
             int state = get_wack_thread_property(tid, __wack_thread_exit);
-            lock_mutex(mutex);
+            //lock_mutex(mutex);
             if(state == __status_signal_end){
                   break;
             }
@@ -116,6 +118,7 @@ void wasi_thread_start(int id, int tid){
                 set_wack_thread_property(tid, __wack_thread_state, __status_task_done);
             }
             unlock_mutex(mutex);
+            break;
     }
     set_wack_thread_property(tid, __wack_thread_state, __status_stopped);
 }

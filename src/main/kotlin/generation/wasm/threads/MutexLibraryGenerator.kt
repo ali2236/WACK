@@ -12,6 +12,8 @@ class MutexLibrary(
 ) {
     companion object {
         fun generate(program: Program, memory: WasmMemory): MutexLibrary {
+            val m = memory.index
+
             // functions
             val tryLockMutex = program.addFunction(
                 name = "wack__try_lock_mutex",
@@ -19,7 +21,7 @@ class MutexLibrary(
                     RawWat("local.get 0"),
                     RawWat("i32.const 0"),
                     RawWat("i32.const 1"),
-                    RawWat("i32.atomic.rmw.cmpxchg ${memory.index}"),
+                    RawWat("i32.atomic.rmw.cmpxchg $m"),
                     RawWat("i32.eqz"),
                 )
             )
@@ -38,7 +40,7 @@ class MutexLibrary(
                                     RawWat("local.get 0"),
                                     RawWat("i32.const 1"),
                                     RawWat("i64.const -1"),
-                                    RawWat("memory.atomic.wait32 ${memory.index}"),
+                                    RawWat("memory.atomic.wait32 $m"),
                                     RawWat("drop"),
                                     RawWat("br 0"),
                                 )
@@ -54,10 +56,10 @@ class MutexLibrary(
                 instructions = mutableListOf(
                     RawWat("local.get 0"),
                     RawWat("i32.const 0"),
-                    RawWat("i32.atomic.store ${memory.index}"),
+                    RawWat("i32.atomic.store $m"),
                     RawWat("local.get 0"),
                     RawWat("i32.const 1"),
-                    RawWat("memory.atomic.notify ${memory.index}"),
+                    RawWat("memory.atomic.notify $m"),
                     RawWat("drop"),
                 ),
             )
