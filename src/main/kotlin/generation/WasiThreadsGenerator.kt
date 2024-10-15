@@ -12,7 +12,7 @@ import ir.annotations.StackBase
 import ir.expression.Value
 import ir.statement.Program
 
-class WasiThreadsGenerator() : Generator {
+class WasiThreadsGenerator : Generator {
     override fun apply(program: Program) {
         if(!WAPC.params!!.parallelize) return
         Mode.insure(Mode::multipleMemories, true)

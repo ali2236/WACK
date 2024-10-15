@@ -14,6 +14,7 @@ class MetaLibrary(
     val maxThreads: Property,
     val stackBase: Property,
     val kernelId: Property,
+    val threadPoolState: Property,
     val metaMemory: WasmMemory
 ) {
     companion object {
@@ -49,8 +50,22 @@ class MetaLibrary(
                 metaMemory,
                 Value.i32(2 * i32Bytes)
             )
+            val threadPoolState = Property.fromAddress(
+                program,
+                "thread_pool_state",
+                WasmValueType.i32,
+                metaMemory,
+                Value.i32(3 * i32Bytes)
+            )
 
-            return MetaLibrary(Value.i32(WAPC.params!!.threads), maxThreads, stackBase, kernelId, metaMemory)
+            return MetaLibrary(
+                maxThreads.get.call().result,
+                maxThreads,
+                stackBase,
+                kernelId,
+                threadPoolState,
+                metaMemory,
+            )
         }
     }
 

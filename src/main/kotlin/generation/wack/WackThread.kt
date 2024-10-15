@@ -17,27 +17,12 @@ class WackThread(
     val threadsMemory: WasmMemory,
 ) {
 
-    fun setTid(threadId: Expression, tid: Expression) : Statement{
-        return Nop()
-        //return setProperty.call(threadId, Property.tid.value(), tid)
+    fun getMutex1(threadId: Expression): Expression {
+        return getPropertyAddress.call(threadId, Property.mutex1.value()).result
     }
 
-    /*fun getState(threadId: Expression) : Expression {
-        return getProperty.call(threadId, Property.state.value()).result
-    }*/
-
-    fun setState(threadId: Expression, state: State) : Statement{
-        return Nop()
-        //return setProperty.call(threadId, Property.state.value(), state.value())
-    }
-
-    fun getMutex(threadId: Expression): Expression {
-        return BinaryOP(
-            WasmValueType.i32,
-            BinaryOP.Operator.mul,
-            threadId,
-            Value.i32(4)
-        )// getPropertyAddress.call(threadId, Property.mutex.value()).result
+    fun getMutex2(threadId: Expression): Expression {
+        return getPropertyAddress.call(threadId, Property.mutex2.value()).result
     }
 
     companion object {
@@ -46,7 +31,7 @@ class WackThread(
 
             // memory
             val m = Index.next(module.memories)
-            val threadsMemory = WasmMemory(m, 1, 1, true)
+            val threadsMemory = WasmMemory(m, 4, 4, true)
             module.memories.add(threadsMemory)
 
             // functions
@@ -118,9 +103,7 @@ class WackThread(
     }
 
     private enum class Property {
-        //tid,
-        mutex;
-        //state;
+        mutex1, mutex2;
 
         fun value(): Expression {
             return Value.i32(this.ordinal)
@@ -130,19 +113,6 @@ class WackThread(
             fun size(): Int {
                 return Property.values().size * 4
             }
-        }
-    }
-
-    enum class State {
-        Stopped,
-        Started,
-        HasTask,
-        RunningTask,
-        TaskDone,
-        SignalExit,;
-
-        fun value(): Expression {
-            return Value.i32(this.ordinal)
         }
     }
 }

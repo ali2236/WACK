@@ -1,9 +1,11 @@
 package generation.wack
 
 import WAPC
+import generation.debug.PrintLibrary
 import generation.wasi.threads.WasiThreadsLibrary
 import generation.wasm.threads.MutexLibrary
 import ir.expression.BinaryOP
+import ir.expression.Load
 import ir.expression.Symbol
 import ir.expression.Value
 import ir.statement.*
@@ -32,9 +34,9 @@ class SupportLibrary(
                     If(
                         condition = BinaryOP(
                             WasmValueType.i32,
-                            BinaryOP.Operator.neq,
-                            meta.getMaxThreads,
-                            Value.zero,
+                            BinaryOP.Operator.eq,
+                            meta.threadPoolState.get.call().result,
+                            Value.one,
                         ),
                         trueBody = mutableListOf(Return())
                     ),
@@ -49,10 +51,7 @@ class SupportLibrary(
                                     makeThreadPoolMaxThreads,
                                 ),
                                 trueBody = mutableListOf(
-                                    // set_thread_property(i, __wack_thread_id, i);
-                                    wackThread.setTid(makeThreadPoolTid, makeThreadPoolTid),
-                                    // lock_mutex(get_thread_property_address(__wack_thread_mutex));
-                                    mutex.lock.call(wackThread.getMutex(makeThreadPoolTid)),
+                                    mutex.lock.call(wackThread.getMutex2(makeThreadPoolTid)),
                                     // if(thread_spawn(i) < 0) exit(1)
                                     If(
                                         condition = BinaryOP(
@@ -71,8 +70,30 @@ class SupportLibrary(
                             )
                         ),
                     ),
+                    // set_thread_pool_state(1);
+                    meta.threadPoolState.set.call(Value.one),
                     // set_max_threads(max_threads);
                     meta.maxThreads.set.call(makeThreadPoolMaxThreads),
+                ),
+            )
+
+            val destroyThreadPool = program.addFunction(
+                name = "destroy_thread_pool",
+                locals = listOf(WasmValueType.i32),
+                instructions = mutableListOf(
+                    If(
+                        condition = BinaryOP(
+                            WasmValueType.i32,
+                            BinaryOP.Operator.eq,
+                            meta.threadPoolState.get.call().result,
+                            Value.zero,
+                        ),
+                        trueBody = mutableListOf(Unreachable())
+                    ),
+                    // set_thread_pool_state(0);
+                    meta.threadPoolState.set.call(Value.zero),
+                    // set_max_threads(0);
+                    meta.maxThreads.set.call(Value.zero),
                 ),
             )
 
@@ -85,7 +106,7 @@ class SupportLibrary(
                 params = listOf(WasmValueType.i32),
                 locals = listOf(WasmValueType.i32, WasmValueType.i32),
                 instructions = mutableListOf(
-                    //makeThreadPool.functionData.call(Value.i32(WAPC.params!!.threads)), // TODO: move to somewhere else
+                    makeThreadPool.functionData.call(Value.i32(WAPC.params!!.threads)), // TODO: move to somewhere else
                     meta.maxThreads.set.call(Value.i32(WAPC.params!!.threads)),
                     meta.kernelId.set.call(kernelId),
                     Assignment(threadCount, meta.getMaxThreads),
@@ -100,17 +121,8 @@ class SupportLibrary(
                                     threadCount,
                                 ),
                                 trueBody = mutableListOf(
-                                    wackThread.setState(threadId, WackThread.State.HasTask),
-                                    mutex.lock.call(wackThread.getMutex(threadId)),
-                                    If(
-                                        condition = BinaryOP(
-                                            WasmValueType.i32,
-                                            BinaryOP.Operator.lt.copy(signed = WasmBitSign.u),
-                                            wasiThreads.spawnThread.call(threadId).result,
-                                            Value.zero,
-                                        ),
-                                        trueBody = mutableListOf(Unreachable()),
-                                    ),
+                                    mutex.lock.call(wackThread.getMutex1(threadId)),
+                                    mutex.unlock.call( wackThread.getMutex2(threadId)),
                                     Assignment(threadId, BinaryOP.increment(threadId)),
                                     RawWat("br 1"),
                                 ),
@@ -128,20 +140,7 @@ class SupportLibrary(
                                     threadCount,
                                 ),
                                 trueBody = mutableListOf(
-                                    /*Loop(
-                                        instructions = mutableListOf(
-                                            If(
-                                                condition = BinaryOP(
-                                                    WasmValueType.i32,
-                                                    BinaryOP.Operator.neq,
-                                                    wackThread.getState(threadId),
-                                                    WackThread.State.TaskDone.value(),
-                                                ),
-                                                trueBody = mutableListOf(RawWat("br 1")),
-                                            ),
-                                        ),
-                                    ),*/
-                                    mutex.join.call(wackThread.getMutex(threadId)),
+                                    mutex.join.call(wackThread.getMutex1(threadId)),
                                     Assignment(threadId, BinaryOP.increment(threadId)),
                                     RawWat("br 1"),
                                 ),

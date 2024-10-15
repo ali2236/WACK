@@ -11,6 +11,8 @@
   (type $set_i32_type (func (param i32)))
   (type $get_i32_type (func (result i32)))
   (import "wasi" "thread-spawn" (func $thread_spawn (type $thread_spawn_type)))
+  (import "env" "memory" (memory $runtime_mutex_memory 4 4 shared))
+  (import "env" "memory-1"  (memory $runtime_memory 1 1 shared))
   (func $nothing (type $kernel_type) (param $thread_id i32)
     nop
   )
@@ -181,8 +183,8 @@
     ;;i32.const 0
     ;;call $wait_mutex_lock
   )
-  (memory $runtime_mutex_memory 4 4 shared) ;; 64kb * 4 for thread join lock
-  (memory $runtime_memory 1 1 shared) ;; 64kb for {int stack_base}
+  (export "memory" (memory $runtime_mutex_memory)) ;; 64kb * 4 for thread join lock
+  (export "memory-1" (memory $runtime_memory)) ;; 64kb for {int stack_base}
   (global $num_threads (mut i32) (i32.const 8)) ;; $num_threads
   (export "wasi_thread_start" (func $wasi_thread_start2)) ;; not for public use
   (export "_start" (func $test))

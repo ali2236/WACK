@@ -1,4 +1,5 @@
 import analysis.Analysis
+import external.WasmMerge
 import generation.WasiThreadsGenerator
 import ir.statement.Program
 import transform.TransformationPasses
@@ -33,6 +34,10 @@ object WAPC {
             }
             val outputFile = output?.toFile() ?: File("./out/intermediate/wack_${inputFile.nameWithoutExtension}.wat")
             val wasmFile = program.exportAsWasm(outputFile)
+            /*val mergedFile = WasmMerge.merge(listOf(
+                Pair("wack", wasmFile),
+                Pair("print", File("./runtime/print.wasm"))
+            ), "merged")*/
             return wasmFile.toPath()
         } finally {
             this.params = null

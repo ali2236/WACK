@@ -15,14 +15,15 @@ fun main(args: Array<String>) {
         val output = WAPC.compile(
             sample.toPath(),
             params = WAPC.Params(
+                threads = 3,
                 generateDotFiles = true,
                 parallelize = true,
                 parallelizeInnerLoops = false,
                 normalizeLoops = false,
-                )
+            ),
         )
-        var sout : String? = null
-        var pout : String? = null
+        var sout: String? = null
+        var pout: String? = null
         val s_time = runTimed { sout = Wasmtime.run(sample.toPath()) }
         println("running serial...")
         println(s_time)
