@@ -1,6 +1,7 @@
 package generation.wack
 
 import generation.debug.PrintLibrary
+import generation.debug.WasmAssert
 import generation.wasm.threads.MutexLibrary
 import ir.expression.BinaryOP
 import ir.expression.Load
@@ -22,19 +23,19 @@ class WasiThreadStart(
         ): WasiThreadStart {
             val kernelType = program.module.findOrAddType(params = listOf(WasmValueType.i32)).index
             val tid = Symbol.localI32(Index.number(1))
-            val mutex1 = Symbol.localI32(Index.number(2))
-            val mutex2 = Symbol.localI32(Index.number(3))
-            val mutex2Load = Load(WasmValueType.i32, mutex2, wackThread.threadsMemory.index)
+            val mutex2Load = wackThread.readMutex2(tid)
             val wasiThreadStart = program.addFunction(
                 name = "wasi_thread_start",
                 params = listOf(WasmValueType.i32, WasmValueType.i32),
-                locals = listOf(WasmValueType.i32, WasmValueType.i32),
                 instructions = mutableListOf(
-                    Assignment(mutex1, wackThread.getMutex1(tid)),
-                    Assignment(mutex2, wackThread.getMutex2(tid)),
+                    WasmAssert.equal(wackThread.readMutex1(tid), Value.zero),
+                    WasmAssert.equal(wackThread.readMutex2(tid), Value.one),
                     Loop(
                         instructions = mutableListOf(
-                            mutexLib.join.call(mutex2),
+                            WasmAssert.equal(wackThread.readMutex1(tid), Value.zero),
+                            WasmAssert.equal(wackThread.readMutex2(tid), Value.one),
+                            mutexLib.lock.call(wackThread.getMutex2(tid)),
+                            mutexLib.unlock.call(wackThread.getMutex2(tid)),
                             IndirectFunctionCall(
                                 kernelTable.index,
                                 kernelType,
@@ -42,8 +43,20 @@ class WasiThreadStart(
                                 params = mutableListOf(tid),
                                 returnType = listOf()
                             ),
-                            mutexLib.lock.call(mutex2),
-                            mutexLib.unlock.call(mutex1),
+                            /*If(
+                                condition = BinaryOP(
+                                    WasmValueType.i32,
+                                    BinaryOP.Operator.eq,
+                                    mutex2Load,
+                                    Value.zero,
+                                ),
+                                trueBody = mutableListOf(mutexLib.lock.call(mutex2)),
+                            ),*/
+                            mutexLib.lock.call(wackThread.getMutex2(tid)),
+                            mutexLib.unlock.call(wackThread.getMutex1(tid)),
+                            WasmAssert.equal(wackThread.readMutex1(tid), Value.zero),
+                            WasmAssert.equal(wackThread.readMutex2(tid), Value.one),
+                            //Return(),
                             RawWat("br 0"),
                         )
                     ),

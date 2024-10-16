@@ -52,6 +52,7 @@ object WAPC {
         val dfaStatementId: Boolean = false,
         val dfaShowAlias: Boolean = true,
         val normalizeLoops: Boolean = true,
+        val enableAssets: Boolean = false,
     )
 
 }

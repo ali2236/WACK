@@ -2,6 +2,7 @@ package generation.wack
 
 import WAPC
 import generation.debug.PrintLibrary
+import generation.debug.WasmAssert
 import generation.wasi.threads.WasiThreadsLibrary
 import generation.wasm.threads.MutexLibrary
 import ir.expression.BinaryOP
@@ -40,6 +41,8 @@ class SupportLibrary(
                         ),
                         trueBody = mutableListOf(Return())
                     ),
+                    // set_max_threads(0);
+                    meta.maxThreads.set.call(makeThreadPoolMaxThreads),
                     // for(int i=0;i<max_threads;i++)
                     Loop(
                         mutableListOf(
@@ -51,7 +54,8 @@ class SupportLibrary(
                                     makeThreadPoolMaxThreads,
                                 ),
                                 trueBody = mutableListOf(
-                                    mutex.lock.call(wackThread.getMutex2(makeThreadPoolTid)),
+                                    wackThread.setMutex1(makeThreadPoolTid, Value.zero),
+                                    wackThread.setMutex2(makeThreadPoolTid, Value.one),
                                     // if(thread_spawn(i) < 0) exit(1)
                                     If(
                                         condition = BinaryOP(
@@ -88,12 +92,10 @@ class SupportLibrary(
                             meta.threadPoolState.get.call().result,
                             Value.zero,
                         ),
-                        trueBody = mutableListOf(Unreachable())
+                        trueBody = mutableListOf(Return())
                     ),
                     // set_thread_pool_state(0);
                     meta.threadPoolState.set.call(Value.zero),
-                    // set_max_threads(0);
-                    meta.maxThreads.set.call(Value.zero),
                 ),
             )
 
@@ -107,7 +109,6 @@ class SupportLibrary(
                 locals = listOf(WasmValueType.i32, WasmValueType.i32),
                 instructions = mutableListOf(
                     makeThreadPool.functionData.call(Value.i32(WAPC.params!!.threads)), // TODO: move to somewhere else
-                    meta.maxThreads.set.call(Value.i32(WAPC.params!!.threads)),
                     meta.kernelId.set.call(kernelId),
                     Assignment(threadCount, meta.getMaxThreads),
                     Assignment(threadId, Value.zero),
@@ -127,7 +128,7 @@ class SupportLibrary(
                                     RawWat("br 1"),
                                 ),
                             ),
-                        )
+                        ),
                     ),
                     Assignment(threadId, Value.zero),
                     Loop(
@@ -147,6 +148,7 @@ class SupportLibrary(
                             ),
                         )
                     ),
+                    //destroyThreadPool.functionData.call(),
                 ),
             )
 

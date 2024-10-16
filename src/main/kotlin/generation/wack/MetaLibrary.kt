@@ -1,6 +1,5 @@
 package generation.wack
 
-import WAPC
 import ir.expression.Expression
 import ir.expression.Load
 import ir.expression.Symbol
@@ -23,39 +22,40 @@ class MetaLibrary(
 
             // memory import/export
             val m = Index.next(module.memories)
-            val metaMemory = WasmMemory(m, 1, 1, true)
+            val metaMemory = WasmMemory(m, 4, 4, true)
             module.memories.add(metaMemory)
 
 
             // functions
-            val i32Bytes = 4
+            val i32Bits = 32
+            val base = Value.i32(8192)
             val maxThreads = Property.fromAddress(
                 program,
                 "max_threads",
                 WasmValueType.i32,
                 metaMemory,
-                Value.i32(0 * i32Bytes),
+                base.add(4L * i32Bits),
             )
             val stackBase = Property.fromAddress(
                 program,
                 "stack_base",
                 WasmValueType.i32,
                 metaMemory,
-                Value.i32(1 * i32Bytes)
+                base.add(1L * i32Bits),
             )
             val kernelId = Property.fromAddress(
                 program,
                 "kernel_id",
                 WasmValueType.i32,
                 metaMemory,
-                Value.i32(2 * i32Bytes)
+                base.add(2L * i32Bits),
             )
             val threadPoolState = Property.fromAddress(
                 program,
                 "thread_pool_state",
                 WasmValueType.i32,
                 metaMemory,
-                Value.i32(3 * i32Bytes)
+                base.add(3L * i32Bits),
             )
 
             return MetaLibrary(

@@ -15,7 +15,7 @@ fun main(args: Array<String>) {
         val output = WAPC.compile(
             sample.toPath(),
             params = WAPC.Params(
-                threads = 3,
+                threads = 8,
                 generateDotFiles = true,
                 parallelize = true,
                 parallelizeInnerLoops = false,
