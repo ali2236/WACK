@@ -11,7 +11,7 @@ class IndirectFunctionCall(
     val typeIndex: Index,
     var functionIndex: Expression,
     val params: MutableList<Expression>,
-    val returnType: List<WasmValueType>
+    val returnType: List<WasmValueType> = listOf()
 ) : BasicStatement() {
 
     override fun write(out: Appendable) {

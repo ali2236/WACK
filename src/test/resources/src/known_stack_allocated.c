@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "debug_print.h"
 #define N 3
 
 int main() {

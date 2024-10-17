@@ -99,7 +99,8 @@ void wasi_thread_start(int id, int tid){
     int mutex1 = get_wack_thread_property_address(tid, __wack_thread_mutex1);
     int mutex2 = get_wack_thread_property_address(tid, __wack_thread_mutex2);
     while(true){
-            join_mutex(mutex2);
+            lock_mutex(mutex2);
+            unlock_mutex(mutex2);
             call_kernel(get_kernel_id(), tid);
             lock_mutex(mutex2);
             unlock_mutex(mutex1);

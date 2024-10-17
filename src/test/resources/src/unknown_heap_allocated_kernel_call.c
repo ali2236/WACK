@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "debug_print.h"
 const int _N = 100;
 void matrix_multiply(int A[_N][_N], int B[_N][_N], int C[_N][_N], int n){
     for (int i = 0; i < n; i++) {

@@ -1,5 +1,6 @@
 package generation.wasm.threads
 
+import generation.debug.PrintLibrary
 import ir.expression.*
 import ir.statement.*
 import ir.statement.Function
@@ -10,8 +11,21 @@ class MutexLibrary(
     val unlock: WasmFunction,
     val join: WasmFunction,
 ) {
+
+    fun criticalSection(mutex: Expression = Value.zero, task: () -> Statement) : Array<Statement>{
+        val t = task()
+        if (t is Empty){
+            return arrayOf()
+        }
+        return arrayOf(
+            lock.call(mutex),
+            t,
+            unlock.call(mutex),
+        )
+    }
+
     companion object {
-        fun generate(program: Program, memory: WasmMemory): MutexLibrary {
+        fun generate(program: Program, memory: WasmMemory, print: PrintLibrary): MutexLibrary {
             val m = memory.index
 
             // functions
@@ -45,8 +59,9 @@ class MutexLibrary(
                                     RawWat("br 0"),
                                 )
                             ),
-                        )
+                        ),
                     ),
+                    //print.print(Symbol.localI32(Index.number(0)), Value.one),
                 ),
             )
 
@@ -61,6 +76,7 @@ class MutexLibrary(
                     RawWat("i32.const 1"),
                     RawWat("memory.atomic.notify $m"),
                     RawWat("drop"),
+                    //print.print(Symbol.localI32(Index.number(0)), Value.zero),
                 ),
             )
 

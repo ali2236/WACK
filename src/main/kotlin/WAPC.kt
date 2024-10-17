@@ -1,5 +1,4 @@
 import analysis.Analysis
-import external.WasmMerge
 import generation.WasiThreadsGenerator
 import ir.statement.Program
 import transform.TransformationPasses
@@ -52,7 +51,7 @@ object WAPC {
         val dfaStatementId: Boolean = false,
         val dfaShowAlias: Boolean = true,
         val normalizeLoops: Boolean = true,
-        val enableAssets: Boolean = false,
+        val enableAsserts: Boolean = false,
     )
 
 }

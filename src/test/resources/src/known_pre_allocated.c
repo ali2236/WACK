@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "debug_print.h"
 #define N 100
 
 int a[N][N];

@@ -22,6 +22,7 @@ class SupportLibrary(
             meta: MetaLibrary,
             wackThread: WackThread,
             wasiThreads: WasiThreadsLibrary,
+            print: PrintLibrary,
         ): SupportLibrary {
 
             // make_thread_pool
@@ -41,6 +42,7 @@ class SupportLibrary(
                         ),
                         trueBody = mutableListOf(Return())
                     ),
+                    print.print(Value.i32(500)),
                     // set_max_threads(0);
                     meta.maxThreads.set.call(makeThreadPoolMaxThreads),
                     // for(int i=0;i<max_threads;i++)
@@ -54,8 +56,8 @@ class SupportLibrary(
                                     makeThreadPoolMaxThreads,
                                 ),
                                 trueBody = mutableListOf(
-                                    wackThread.setMutex1(makeThreadPoolTid, Value.zero),
-                                    wackThread.setMutex2(makeThreadPoolTid, Value.one),
+                                    //wackThread.setMutex1(makeThreadPoolTid, Value.zero),
+                                    //wackThread.setMutex2(makeThreadPoolTid, Value.one),
                                     // if(thread_spawn(i) < 0) exit(1)
                                     If(
                                         condition = BinaryOP(
@@ -85,6 +87,7 @@ class SupportLibrary(
                 name = "destroy_thread_pool",
                 locals = listOf(WasmValueType.i32),
                 instructions = mutableListOf(
+                    print.print(Value.i32(502)),
                     If(
                         condition = BinaryOP(
                             WasmValueType.i32,
@@ -108,7 +111,9 @@ class SupportLibrary(
                 params = listOf(WasmValueType.i32),
                 locals = listOf(WasmValueType.i32, WasmValueType.i32),
                 instructions = mutableListOf(
-                    makeThreadPool.functionData.call(Value.i32(WAPC.params!!.threads)), // TODO: move to somewhere else
+                    print.print(Value.i32(300), kernelId),
+                    meta.maxThreads.set.call(Value.i32(WAPC.params!!.threads)),
+                    //makeThreadPool.functionData.call(Value.i32(WAPC.params!!.threads)), // TODO: move to somewhere else
                     meta.kernelId.set.call(kernelId),
                     Assignment(threadCount, meta.getMaxThreads),
                     Assignment(threadId, Value.zero),
@@ -123,7 +128,17 @@ class SupportLibrary(
                                 ),
                                 trueBody = mutableListOf(
                                     mutex.lock.call(wackThread.getMutex1(threadId)),
-                                    mutex.unlock.call( wackThread.getMutex2(threadId)),
+                                    print.print(kernelId, threadId),
+                                    //mutex.unlock.call( wackThread.getMutex2(threadId)),
+                                    If(
+                                        condition = BinaryOP(
+                                            WasmValueType.i32,
+                                            BinaryOP.Operator.lt.copy(signed = WasmBitSign.u),
+                                            wasiThreads.spawnThread.call(threadId).result,
+                                            Value.zero,
+                                        ),
+                                        trueBody = mutableListOf(Unreachable()),
+                                    ),
                                     Assignment(threadId, BinaryOP.increment(threadId)),
                                     RawWat("br 1"),
                                 ),

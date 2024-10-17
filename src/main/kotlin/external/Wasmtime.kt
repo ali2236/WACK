@@ -1,6 +1,8 @@
 package external
 
 import java.nio.file.Path
+import java.util.stream.Stream
+import kotlin.concurrent.thread
 
 object Wasmtime {
 
@@ -12,15 +14,12 @@ object Wasmtime {
         val command = listOf("wasmtime") + flags + listOf(path.toString())
         //println(command)
         val process = ProcessBuilder(command).start()
-        /*process.errorStream.reader().forEachLine {
-          throw Exception(it)
-        }*/
-        val reader = process.inputStream.bufferedReader()
+        val stderr = process.errorStream.bufferedReader().lines()
+        val stdin = process.inputStream.bufferedReader().lines()
+        val input = Stream.concat(stdin, stderr)
         val output = StringBuilder()
-        var line = reader.readLine()
-        while (line != null) {
-            output.appendLine(line)
-            line = reader.readLine()
+        thread {
+            input.forEach(output::appendLine)
         }
 
         process.waitFor()

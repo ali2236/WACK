@@ -79,7 +79,6 @@ class WackThread(
                     WasmValueType.i32,
                     getThreadPropertyAddress(tid, prop),
                     threadsMemory.index,
-                    offset,
                 )
             }
 
