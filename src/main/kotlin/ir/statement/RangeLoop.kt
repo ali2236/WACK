@@ -14,7 +14,7 @@ class RangeLoop(
     ConditionLoop(condition, instructions) {
 
     override fun writeHeader(out: Appendable) {
-        out.append("range-loop($symbol: [${range.from}, ${range.to}))")
+        out.append("range-loop($symbol: [${range.from}, ${range.to}])")
     }
 
     override fun visit(v: Visitor) {

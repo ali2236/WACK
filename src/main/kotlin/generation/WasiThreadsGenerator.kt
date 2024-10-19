@@ -23,17 +23,18 @@ class WasiThreadsGenerator : Generator {
         val mutex = MutexLibrary.generate(program, wackThread.threadsMemory, print.disable)
         val wasiThreads = WasiThreadsLibrary.generate(program)
         val supportLibrary = SupportLibrary.generate(program, mutex, metaLib, wackThread, wasiThreads, print.disable)
-        ThreadKernelGenerator.generate(program, metaLib) { function, block ->
+        ThreadKernelGenerator.generate(program, metaLib, mutex, print) { function, block ->
             block.instructions.clear()
             val kernelId = block.annotations.filterIsInstance<CallKernel>().first().kernelIndex
             block.annotations.filterIsInstance<StackBase>().firstOrNull()?.symbol?.let { localStackBase ->
                 block.instructions.add(metaLib.stackBase.set.call(localStackBase))
+                //block.instructions.addAll(mutex.criticalSection { print.print(localStackBase) })
             }
             block.instructions.add(supportLibrary.parallel.call(Value.i32(kernelId)))
         }
         // generate this table after generating kernels
         val kernelTable = KernelTableGenerator.generate(program)
-        WasiThreadStart.generate(program, mutex, wackThread, kernelTable, metaLib, print)
+        WasiThreadStart.generate(program, mutex, wackThread, kernelTable, metaLib, print.disable)
         WasiThreadsMemory().apply(program)
     }
 }

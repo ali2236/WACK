@@ -1,6 +1,9 @@
 package generation.wack
 
 import WAPC
+import analysis.dfa.DfaValue
+import generation.debug.PrintLibrary
+import generation.wasm.threads.MutexLibrary
 import ir.annotations.*
 import ir.expression.*
 import ir.finder.AnnotationFinder
@@ -15,6 +18,8 @@ object ThreadKernelGenerator {
     fun generate(
         program: Program,
         metaLib: MetaLibrary,
+        mutex: MutexLibrary,
+        print: PrintLibrary,
         generateCallKernel: (Function, Block) -> Unit,
     ): List<Block> {
         val module = program.module
@@ -68,10 +73,10 @@ object ThreadKernelGenerator {
 
                     // put loop as function body
                     val kernel = Function(kernelFunction).apply {
-                        val threadId = Symbol(WasmScope.local, WasmValueType.i32, Index.number(0))
-                        val stackBase = Symbol(WasmScope.local, WasmValueType.i32, Index.number(1))
-                        val start = Symbol(WasmScope.local, WasmValueType.i32, Index.number(2))
-                        val end = Symbol(WasmScope.local, WasmValueType.i32, Index.number(3))
+                        val threadId = Symbol.localI32(Index.number(0))
+                        val stackBase = Symbol.localI32(Index.number(1))
+                        val start = Symbol.localI32(Index.number(2))
+                        val end = Symbol.localI32(Index.number(3))
                         val maxThreads = metaLib.getMaxThreads
 
                         // TODO: Only if has stack_base
@@ -144,6 +149,13 @@ object ThreadKernelGenerator {
                             )
                         )
 
+                        // debug print range
+                        /*instructions.addAll(
+                            mutex.criticalSection { print.print(start, end) }
+                        )*/
+                        //instructions.addAll(mutex.criticalSection { print.print(stackBase) })
+
+                        forLoop.range = DfaValue.Range(start, end)
                         instructions.add(forLoop)
 
                         // replace locals with new boundaries
@@ -165,7 +177,7 @@ object ThreadKernelGenerator {
                                     return@associate Pair(private.symbol, newSymbol)
                                 }
                             }
-                        SymbolReplacer(toReplace).also { this.visit(it) }
+                        SymbolReplacer(toReplace).also { forLoop.visit(it) }
 
                         // replace condition.right with end
                         (rangeLoop.condition as BinaryOP).right = end// what to replace with end

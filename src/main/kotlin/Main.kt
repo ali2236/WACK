@@ -8,16 +8,16 @@ fun main(args: Array<String>) {
         //File("./samples/kernel_matrix_multiply.wasm"),
         //File("./samples/matrix_multiply.wasm"),
         //File("./src/test/resources/src/known_pre_allocated.wasm"),
-        //File("./samples/transform/loop_normalization/loop_normalization.wasm"),
-        File("./samples/polybench/O0/mini_dataset/2mm.wasm"),
+        //File("./samples/transform/loop_normalization/loop_normalization_2.wasm"),
+        File("./samples/polybench/O0/mini_dataset/cholesky.wasm"),
     )
     for (sample in samples) {
         val output = WAPC.compile(
             sample.toPath(),
             params = WAPC.Params(
-                threads = 80,
+                threads = 8,
                 generateDotFiles = true,
-                parallelize = true,
+                parallelize = false,
                 parallelizeInnerLoops = false,
                 normalizeLoops = true,
                 enableAsserts = true,
@@ -33,6 +33,8 @@ fun main(args: Array<String>) {
         val p_time = runTimed { pout = Wasmtime.runWithThreadsEnabled(output) }
         println(p_time)
         println(pout.orEmpty())
+
+        println("=====${if (sout == pout) "Exact Match" else "Different"}=====")
     }
 }
 

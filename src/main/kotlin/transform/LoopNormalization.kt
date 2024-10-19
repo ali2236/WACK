@@ -47,6 +47,7 @@ class LoopNormalization : Transformer {
     private fun normalizeLoopDirection(loop: RangeLoop){
         val symbol = loop.symbol
         val from = loop.range.from
+        val to = loop.range.to
         val symbolType = when (symbol) {
             is Symbol -> symbol.exprType()
             is Load -> symbol.exprType()
@@ -72,11 +73,12 @@ class LoopNormalization : Transformer {
             }
         })
         // 2. invert condition from <symbol> >= <to> --> <symbol> < <from>
-        // 3. in loop body replace <symbol> with <to> - <symbol>
+        // 3. in loop body replace <symbol> with (<to> + <from>) - <symbol>
         // 3.5. in loop body change increment from -- to ++
         val cv = object : Visitor() {
             override fun visit(v: Statement, replace: (Statement) -> Unit) {
                 if (v is If && v.condition == loop.condition){
+                    // 2
                     val c = loop.conditionBinaryOP
                     val newCondition = BinaryOP(c.type, c.operator.invert(), c.left, from)
                     v.condition = newCondition
@@ -84,18 +86,24 @@ class LoopNormalization : Transformer {
                     super.visit(v.instructions) {i, stmt -> v.instructions[i] = stmt}
                     return
                 } else if (v is Increment){
+                    // 3.5
                     v.stmt.replaceAssign(BinaryOP.plus(v.stmt.assignedTo() as Expression, Value.one))
                     v.direction = Increment.Direction.plus
                     return
                 }else if (v == symbol) {
-                    replace(
+                    // 3
+                    val substitute = BinaryOP(
+                        symbolType,
+                        BinaryOP.Operator.sub,
                         BinaryOP(
-                            symbolType,
-                            BinaryOP.Operator.sub,
+                            from.exprType(),
+                            BinaryOP.Operator.add,
                             from,
-                            v as Expression,
-                        )
+                            to,
+                        ), // TODO: cast to symbol type
+                        v as Expression,
                     )
+                    replace(substitute)
                 }
                 super.visit(v, replace)
             }
@@ -103,7 +111,7 @@ class LoopNormalization : Transformer {
         cv.visit(loop.instructions) { i, stmt -> loop.instructions[i] = stmt }
 
         // 4. update loop metadata
-        loop.range = DfaValue.Range(newFrom, loop.conditionBinaryOP.endExclusive)
+        loop.range = DfaValue.Range(newFrom, loop.conditionBinaryOP.endInclusive)
     }
 
     private fun normalizeLoopStart(loop: RangeLoop){
@@ -137,7 +145,10 @@ class LoopNormalization : Transformer {
         // 2. in loop condition: replace <symbol> < <to> with <symbol> < <to> - <from>
         val conditionVisitor = object :Visitor(){
             override fun visit(v: Statement, replace: (Statement) -> Unit) {
-                if(v is BinaryOP && v.right !is Value){
+                if(v is BinaryOP && v.right is Value && from is Value) {
+                    newTo = (v.right as Value).add(from.multiply(-1))
+                    v.right = newTo!!
+                }else if(v is BinaryOP) {
                     newTo = BinaryOP(
                         v.exprType(),
                         BinaryOP.Operator.sub,
@@ -193,6 +204,6 @@ class LoopNormalization : Transformer {
         cv.visit(loop.instructions) { i, stmt -> loop.instructions[i] = stmt }
 
         // 4. in loop metadata: replace loop-range with new loop-range
-        loop.range = DfaValue.Range(newFrom, loop.conditionBinaryOP.endExclusive)
+        loop.range = DfaValue.Range(newFrom, loop.conditionBinaryOP.endInclusive)
     }
 }

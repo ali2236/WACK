@@ -68,12 +68,12 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
     }
 
     // range-loop condition
-    val endExclusive: Expression
+    val endInclusive: Expression
         get() {
             if (right is Value) {
                 return when (operator.sign) {
-                    "<" -> right as Value
-                    "<=" -> (right as Value).add(1)
+                    "<" -> (right as Value).add(-1)
+                    "<=" -> (right as Value)
                     ">" -> (right as Value).add(1)
                     ">=" -> (right as Value)
                     "!=" -> (right as Value)
@@ -82,8 +82,8 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
             } else {
                 return when (operator.sign) {
                     "<" -> right
-                    "<=" -> BinaryOP.plus(right, Value.one)
-                    ">" -> BinaryOP.plus(right, Value.one)
+                    "<=" -> plus(right, Value.one)
+                    ">" -> plus(right, Value.one)
                     ">=" -> right
                     "!=" -> right
                     else -> throw Exception("operator ${operator.sign} is not supported")

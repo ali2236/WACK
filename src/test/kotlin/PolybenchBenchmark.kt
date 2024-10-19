@@ -2,6 +2,7 @@ import java.util.*
 import kotlin.io.path.Path
 import kotlin.streams.toList
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class PolyBenchBenchmark : BatchWasmTester() {
     private val _dir = Path("./samples/polybench")
@@ -33,11 +34,15 @@ class PolyBenchBenchmark : BatchWasmTester() {
         // run benchmark
         val params = WAPC.Params()
         val rows = batchTest(_dir.resolve("$optimization/$datasetSize"), params)
-            .map { println(it); it }
+            .map {
+                println(it)
+                assertEquals(it.serialOutput, it.parallelOutput, it.name)
+                it
+            }
             .toList()
 
         // write csv file
-        if(writeResultsToCSV) {
+        if (writeResultsToCSV) {
             writeToCSVFile("polybench-$optimization-$datasetSize-t${params.threads}-${Date().time}", rows)
         }
 
@@ -58,7 +63,6 @@ class PolyBenchBenchmark : BatchWasmTester() {
         rows.filter { it.speedup >= params.threads }.forEach { println(it) }
 
     }
-
 
 
 }

@@ -48,16 +48,15 @@ class RangeLoopRestructure : Restructure() {
             val initial = initialRuntimeValue ?: initialConstValue ?: return
 
             // symbol end value
-            val endExclusive = condition.endExclusive
+            val end = condition.endInclusive
 
-            // TODO: Normalize Increments
             // validate has Increment
             val hasIncrement = BreadthFirstExpressionFinder(Increment::class.java).also { loop.visit(it) }.result().any { inc -> inc.stmt.assignedTo() == symbol }
             if (!hasIncrement) {
                 return
             }
 
-            val rangeLoop = RangeLoop(symbol, DfaValue.Range(initial, endExclusive), condition, loop.instructions)
+            val rangeLoop = RangeLoop(symbol, DfaValue.Range(initial, end), condition, loop.instructions)
             replaceCurrentBlock(rangeLoop)
         }
     }

@@ -22,13 +22,13 @@ class MetaLibrary(
 
             // memory import/export
             val m = Index.next(module.memories)
-            val metaMemory = WasmMemory(m, 4, 4, true)
+            val metaMemory = WasmMemory(m, 1, 1, true)
             module.memories.add(metaMemory)
 
 
             // functions
-            val i32Bits = 32
-            val base = Value.i32(8192)
+            val i32Bits = 4
+            val base = Value.i32(0)
             val maxThreads = Property.fromAddress(
                 program,
                 "max_threads",
