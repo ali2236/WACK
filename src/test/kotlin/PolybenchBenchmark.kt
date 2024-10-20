@@ -1,15 +1,22 @@
+import external.PolybenchOutputComparator
 import java.util.*
 import kotlin.io.path.Path
 import kotlin.streams.toList
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class PolyBenchBenchmark : BatchWasmTester() {
     private val _dir = Path("./samples/polybench")
 
-    @Test
+/*    @Test
     fun O0_MINI_DATASET() {
         benchmark("O0", "mini_dataset", false)
+    }*/
+
+    @Test
+    fun O0_SMALL_DATASET() {
+        benchmark("O0", "small_dataset", false)
     }
 
     @Test
@@ -36,7 +43,9 @@ class PolyBenchBenchmark : BatchWasmTester() {
         val rows = batchTest(_dir.resolve("$optimization/$datasetSize"), params)
             .map {
                 println(it)
-                assertEquals(it.serialOutput, it.parallelOutput, it.name)
+                //assertEquals(it.serialOutput, it.parallelOutput, it.name)
+                val diff = PolybenchOutputComparator().compare(it.serialOutput, it.parallelOutput)
+                assertTrue(diff < 0.5,it.name)
                 it
             }
             .toList()

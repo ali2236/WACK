@@ -26,7 +26,7 @@ class MemoryFill(
         i.wat(wat)
         value.wat(wat)
         n.wat(wat)
-        val index = if(Mode.multipleMemories) " $memoryId" else ""
+        val index = if(WAPC.params!!.multipleMemories) " $memoryId" else ""
         wat.writeLine("memory.fill$index", this)
     }
 

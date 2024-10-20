@@ -11,11 +11,12 @@ import kotlin.time.Duration
 
 abstract class BatchWasmTester {
 
-    fun batchTest(dir: Path, params: WAPC.Params = WAPC.Params()): Stream<BenchmarkResult> {
+    fun batchTest(dir: Path, params: WAPC.Params = WAPC.Params(), skip: Set<String> = setOf()): Stream<BenchmarkResult> {
         var i = 1
         return Files.list(dir)
             .filter { Files.isRegularFile(it) }
             .filter { it.extension == "wasm" }
+            .filter { !skip.contains(it.nameWithoutExtension) }
             .map { serialFile ->
                 val name = serialFile.nameWithoutExtension
                 lateinit var serialOutput: String

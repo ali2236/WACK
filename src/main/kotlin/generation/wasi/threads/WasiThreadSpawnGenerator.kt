@@ -1,5 +1,6 @@
 package generation.wasi.threads
 
+import WAPC
 import ir.Mode
 import ir.statement.Function
 import ir.statement.Program
@@ -19,7 +20,7 @@ object WasiThreadSpawnGenerator {
         // imports
         val wasiThreadSpawnImport = WasmFunction(
             Index("wasi_thread_spawn"),
-            type = threadSpawnType, import = WasmImport("\"${Mode.threadSpawnModule}\"", "\"thread-spawn\"")
+            type = threadSpawnType, import = WasmImport("\"${WAPC.params!!.threadSpawnModule}\"", "\"thread-spawn\"")
         )
         module.functions.add(wasiThreadSpawnImport)
 

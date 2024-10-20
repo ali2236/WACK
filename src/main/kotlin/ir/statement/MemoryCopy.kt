@@ -27,7 +27,7 @@ class MemoryCopy(
         i1.wat(wat)
         i2.wat(wat)
         n.wat(wat)
-        val indexes = if (Mode.multipleMemories) " $fromMemoryIndex $toMemoryIndex" else ""
+        val indexes = if (WAPC.params!!.multipleMemories) " $fromMemoryIndex $toMemoryIndex" else ""
         wat.writeLine("memory.copy$indexes", this)
     }
 

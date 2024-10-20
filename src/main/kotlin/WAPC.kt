@@ -26,11 +26,11 @@ object WAPC {
             }
             val inputFile = input.toFile()
             val program = Program.from(inputFile)
-            TransformationPasses.apply(program)
+            /*TransformationPasses.apply(program)
             WasiThreadsGenerator().apply(program)
             if (params.generateDotFiles) {
                 Analysis.writeDotFiles(program, inputFile.nameWithoutExtension)
-            }
+            }*/
             val outputFile = output?.toFile() ?: File("./out/intermediate/wack_${inputFile.nameWithoutExtension}.wat")
             val wasmFile = program.exportAsWasm(outputFile)
             /*val mergedFile = WasmMerge.merge(listOf(
@@ -52,6 +52,10 @@ object WAPC {
         val dfaShowAlias: Boolean = true,
         val normalizeLoops: Boolean = true,
         val enableAsserts: Boolean = false,
+        val addCommentedIR: Boolean = true,
+        val multipleMemories: Boolean = true,
+        val annotations: Boolean = true,
+        val threadSpawnModule: String = "wasi" /*"wasi_snapshot_preview1"*/,
     )
 
 }

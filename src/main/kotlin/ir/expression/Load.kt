@@ -47,7 +47,7 @@ class Load(
         val ofst = if (offset != 0) " offset=$offset" else ""
         val algn = if (align != 0) " align=$align" else ""
         val sgn = if(sign != null && memorySize != null) "${memorySize}_${sign}" else ""
-        val memIndex = if(Mode.multipleMemories) " $memoryIndex" else ""
+        val memIndex = if(WAPC.params!!.multipleMemories) " $memoryIndex" else ""
         val atomic = if(atomic) ".atomic" else ""
         wat.writeLine("${type}${atomic}.load$sgn$memIndex${ofst}${algn}", this)
     }

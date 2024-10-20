@@ -1,3 +1,4 @@
+import external.PolybenchOutputComparator
 import external.Wasmtime
 import external.runTimed
 import java.io.File
@@ -9,7 +10,7 @@ fun main(args: Array<String>) {
         //File("./samples/matrix_multiply.wasm"),
         //File("./src/test/resources/src/known_pre_allocated.wasm"),
         //File("./samples/transform/loop_normalization/loop_normalization_2.wasm"),
-        File("./samples/polybench/O0/mini_dataset/cholesky.wasm"),
+        File("./samples/polybench/O0/small_dataset/deriche.wasm"),
     )
     for (sample in samples) {
         val output = WAPC.compile(
@@ -19,8 +20,11 @@ fun main(args: Array<String>) {
                 generateDotFiles = true,
                 parallelize = false,
                 parallelizeInnerLoops = false,
-                normalizeLoops = true,
+                normalizeLoops = false,
                 enableAsserts = true,
+                annotations = false,
+                addCommentedIR = false,
+                multipleMemories = false,
             ),
         )
         var sout: String? = null
@@ -34,7 +38,8 @@ fun main(args: Array<String>) {
         println(p_time)
         println(pout.orEmpty())
 
-        println("=====${if (sout == pout) "Exact Match" else "Different"}=====")
+        val comparator = PolybenchOutputComparator()
+        //println("===== ${if (sout == pout) "Exact Match" else "Difference = ${comparator.compare(sout!!, pout!!)}"} =====")
     }
 }
 

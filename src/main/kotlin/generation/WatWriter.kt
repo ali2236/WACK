@@ -1,5 +1,6 @@
 package generation
 
+import WAPC
 import ir.Mode
 import ir.Names
 import ir.statement.Program
@@ -16,7 +17,7 @@ class WatWriter(private val buffer: Appendable) {
     fun writeLine(instruction: String, debug: Statement? = null) {
         startLine()
         write(instruction)
-        if (Mode.debug && watDebug) {
+        if (WAPC.params!!.addCommentedIR && watDebug) {
             debug?.let {
                 for (i in 1..(debugIndent - (indent * Names.indent.length) - instruction.length)) {
                     buffer.append(' ')

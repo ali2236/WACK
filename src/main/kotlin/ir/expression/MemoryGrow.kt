@@ -23,7 +23,7 @@ class MemoryGrow(val memoryId : Index, var amount: Expression) : Expression() {
 
     override fun wat(wat: WatWriter) {
         amount.wat(wat)
-        val idx = if(Mode.multipleMemories) " $memoryId" else ""
+        val idx = if(WAPC.params!!.multipleMemories) " $memoryId" else ""
         wat.writeLine("memory.grow$idx", this)
     }
 

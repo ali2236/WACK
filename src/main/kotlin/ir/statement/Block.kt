@@ -75,7 +75,7 @@ open class Block(
     }
 
     fun watBlockAnnotations(wat: WatWriter) {
-        if (Mode.annotations) {
+        if (WAPC.params!!.annotations) {
             for (annotation in annotations){
                 wat.write(" ")
                 annotation.wat(wat)

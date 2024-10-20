@@ -6,13 +6,13 @@ import kotlin.concurrent.thread
 
 object Wasmtime {
 
-    fun runWithThreadsEnabled(path: Path) : String {
+    fun runWithThreadsEnabled(path: Path): String {
         return run(path, listOf("-W", "all-proposals=y", "-S", "threads"))
     }
 
-    fun run(path: Path, flags: List<String> = listOf()) : String{
+    fun run(path: Path, flags: List<String> = listOf()): String {
         val command = listOf("wasmtime") + flags + listOf(path.toString())
-        //println(command)
+        //println(command.joinToString(" "))
         val process = ProcessBuilder(command).start()
         val stderr = process.errorStream.bufferedReader().lines()
         val stdin = process.inputStream.bufferedReader().lines()

@@ -1,5 +1,6 @@
 package external
 
+import WAPC
 import ir.Mode
 import java.io.File
 
@@ -25,10 +26,10 @@ class Wat2Wasm : FileProcessor {
         commands.add("wat2wasm")
         commands.add(input.absolutePath)
         commands.add("--enable-threads")
-        if (Mode.multipleMemories) {
+        if (WAPC.params!!.multipleMemories) {
             commands.add("--enable-multi-memory")
         }
-        if(Mode.annotations){
+        if(WAPC.params!!.annotations){
             commands.add("--enable-annotations")
         }
         commands.add("-o")

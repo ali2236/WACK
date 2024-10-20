@@ -49,7 +49,7 @@ class CMPXCHG(
         val memSign = if(symbol.sign != null && symbol.sign == WasmBitSign.u) "_u" else ""
         val ofst = if (symbol.offset != 0) " offset=${symbol.offset}" else ""
         val algn = if (symbol.align != 0) " align=${symbol.align}" else ""
-        val memIndex = if(Mode.multipleMemories) " ${symbol.memoryIndex}" else ""
+        val memIndex = if(WAPC.params!!.multipleMemories) " ${symbol.memoryIndex}" else ""
         wat.writeLine("${symbol.type.name}.atomic.rmw$memSize$memSign.cmpxchg$memIndex$ofst$algn")
     }
 }
