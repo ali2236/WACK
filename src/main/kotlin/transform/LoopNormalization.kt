@@ -187,16 +187,17 @@ class LoopNormalization : Transformer {
                     return
                 } else if (v is Increment){
                     return
+                } else if(v is StackExpression){
+                    return
                 }
                 if (v == symbol) {
-                    replace(
-                        BinaryOP(
-                            symbolType,
-                            BinaryOP.Operator.add,
-                            v as Expression,
-                            from,
-                        )
+                    val replacement = BinaryOP(
+                        symbolType,
+                        BinaryOP.Operator.add,
+                        v as Expression,
+                        from,
                     )
+                    replace(replacement)
                 }
                 super.visit(v, replace)
             }

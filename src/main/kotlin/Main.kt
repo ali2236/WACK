@@ -20,11 +20,8 @@ fun main(args: Array<String>) {
                 generateDotFiles = true,
                 parallelize = false,
                 parallelizeInnerLoops = false,
-                normalizeLoops = false,
+                normalizeLoops = true,
                 enableAsserts = true,
-                annotations = false,
-                addCommentedIR = false,
-                multipleMemories = false,
             ),
         )
         var sout: String? = null

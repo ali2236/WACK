@@ -282,6 +282,10 @@ object DfaBuilder {
                 }
             }
 
+            is StackExpression -> {
+                return explainExpression(expr.expr, dfaFacts)
+            }
+
             else -> {
                 throw Error("Unknown Type ${expr.javaClass.simpleName}")
             }

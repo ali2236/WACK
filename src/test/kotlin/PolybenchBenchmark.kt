@@ -39,13 +39,13 @@ class PolyBenchBenchmark : BatchWasmTester() {
         println(BenchmarkResult.header)
 
         // run benchmark
-        val params = WAPC.Params(parallelize = false, normalizeLoops = false)
+        val params = WAPC.Params(parallelize = false)
         val rows = batchTest(_dir.resolve("$optimization/$datasetSize"), params)
             .map {
                 println(it)
-                //assertEquals(it.serialOutput, it.parallelOutput, it.name)
-                val diff = PolybenchOutputComparator().compare(it.serialOutput, it.parallelOutput)
-                assertTrue(diff < 0.5,it.name)
+                assertEquals(it.serialOutput, it.parallelOutput, it.name)
+                //val diff = PolybenchOutputComparator().compare(it.serialOutput, it.parallelOutput)
+                //assertTrue(diff < 0.5,it.name)
                 it
             }
             .toList()

@@ -70,6 +70,7 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
     // range-loop condition
     val endInclusive: Expression
         get() {
+            // TODO: rewrite considering direction and value/symbol limit in range-loops
             if (right is Value) {
                 return when (operator.sign) {
                     "<" -> (right as Value).add(-1)
@@ -82,7 +83,7 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
             } else {
                 return when (operator.sign) {
                     "<" -> right
-                    "<=" -> plus(right, Value.one)
+                    "<=" -> right
                     ">" -> plus(right, Value.one)
                     ">=" -> right
                     "!=" -> right
@@ -129,7 +130,7 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
                 "<" -> ge
                 "<=" -> gt
                 ">" -> le
-                ">=" -> lt
+                ">=" -> le // lt
                 "+" -> sub
                 "-" -> add
                 "/" -> mul

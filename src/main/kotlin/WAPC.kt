@@ -26,11 +26,11 @@ object WAPC {
             }
             val inputFile = input.toFile()
             val program = Program.from(inputFile)
-            /*TransformationPasses.apply(program)
+            TransformationPasses.apply(program)
             WasiThreadsGenerator().apply(program)
             if (params.generateDotFiles) {
                 Analysis.writeDotFiles(program, inputFile.nameWithoutExtension)
-            }*/
+            }
             val outputFile = output?.toFile() ?: File("./out/intermediate/wack_${inputFile.nameWithoutExtension}.wat")
             val wasmFile = program.exportAsWasm(outputFile)
             /*val mergedFile = WasmMerge.merge(listOf(
