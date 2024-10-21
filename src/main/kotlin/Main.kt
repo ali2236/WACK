@@ -39,7 +39,7 @@ fun main(args: Array<String>) {
         println(pout.orEmpty())
 
         val comparator = PolybenchOutputComparator()
-        //println("===== ${if (sout == pout) "Exact Match" else "Difference = ${comparator.compare(sout!!, pout!!)}"} =====")
+        println("===== ${if (sout == pout) "Exact Match" else "Difference = ${comparator.compare(sout!!, pout!!)}"} =====")
     }
 }
 

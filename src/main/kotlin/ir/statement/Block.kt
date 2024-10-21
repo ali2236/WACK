@@ -5,6 +5,7 @@ import generation.WatWriter
 import generation.WebAssemblyBlock
 import ir.Mode
 import ir.expression.Expression
+import ir.expression.StackExpression
 import ir.finder.Visitor
 import ir.wasm.WasmValueType
 
@@ -26,17 +27,24 @@ open class Block(
         instructions.add(stmt)
     }
 
+    private val _poped = mutableSetOf<Long?>()
     open fun pop(): Expression {
+        var foldable = true
         for (i in (instructions.size - 1) downTo 0) {
             val instr = instructions[i]
             if (instr !is Expression) { // checks if instruction is statement - don't change!
+                foldable = false
                 continue
             }
-            return instructions.removeAt(i) as Expression
+            if (foldable) {
+                return instructions.removeAt(i) as Expression
+            } else if (_poped.contains(instr.id)) {
+                continue
+            } else { // dont remove original expression - add pointer to stack location - cant be popped again
+                _poped.add(instr.id)
+                return StackExpression(instr){instructions[i] = it}
+            }
         }
-        /*if(parent != null){
-            return parent!!.pop()
-        }*/
         throw Exception()
     }
 
@@ -76,7 +84,7 @@ open class Block(
 
     fun watBlockAnnotations(wat: WatWriter) {
         if (WAPC.params!!.annotations) {
-            for (annotation in annotations){
+            for (annotation in annotations) {
                 wat.write(" ")
                 annotation.wat(wat)
             }
@@ -84,7 +92,7 @@ open class Block(
     }
 
     fun watBlockType(wat: WatWriter) {
-        if (type != null){
+        if (type != null) {
             wat.write(" (result ${type.name})")
         }
     }
@@ -116,9 +124,9 @@ open class Block(
     }
 
     fun childOf(block: Block): Boolean {
-        var current : Block? = parent
-        while (current != null){
-            if (current == block){
+        var current: Block? = parent
+        while (current != null) {
+            if (current == block) {
                 return true
             }
             current = current.parent
