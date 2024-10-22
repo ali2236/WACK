@@ -35,7 +35,7 @@ class WasiThreadStart(
                         instructions = mutableListOf(
                             //mutexLib.lock.call(wackThread.getMutex2(tid)),
                             //mutexLib.unlock.call(wackThread.getMutex2(tid)),
-                            *mutexLib.criticalSection { print.print(tid, meta.kernelId.get.call().result) },
+                            //*mutexLib.criticalSection { print.print(meta.kernelId.get.call().result, tid) },
                             IndirectFunctionCall(
                                 kernelTable.index,
                                 kernelType,
