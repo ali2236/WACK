@@ -47,16 +47,16 @@ class RangeLoopRestructure : Restructure() {
             val initialRuntimeValue = initialExpressionOf(loop.parent, loop.indexInParent, symbol)
             val initial = initialRuntimeValue ?: initialConstValue ?: return
 
-            // symbol end value
-            val end = condition.endInclusive
-
             // validate has Increment
-            val hasIncrement = BreadthFirstExpressionFinder(Increment::class.java).also { loop.visit(it) }.result().any { inc -> inc.stmt.assignedTo() == symbol }
-            if (!hasIncrement) {
+            val increment = BreadthFirstExpressionFinder(Increment::class.java).also { loop.visit(it) }.result().firstOrNull { inc -> inc.stmt.assignedTo() == symbol }
+            if (increment == null) {
                 return
             }
 
-            val rangeLoop = RangeLoop(symbol, DfaValue.Range(initial, end), condition, loop.instructions)
+            // symbol end value
+              val end = condition.endInclusive(increment.direction)
+
+              val rangeLoop = RangeLoop(symbol, DfaValue.Range(initial, end), condition, loop.instructions)
             replaceCurrentBlock(rangeLoop)
         }
     }

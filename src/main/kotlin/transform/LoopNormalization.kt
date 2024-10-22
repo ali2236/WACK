@@ -35,7 +35,7 @@ class LoopNormalization : Transformer {
     // then replace symbol with <increment*symbol+offset>
     private fun normalizeLoop(loop: RangeLoop) {
         val increment = BreadthFirstExpressionFinder(Increment::class.java).also { loop.visit(it) }.result().first()
-        if (increment.direction == Increment.Direction.minus){
+        if (increment.direction == Increment.Direction.minus && loop.range.to is Value){
             normalizeLoopDirection(loop)
         }
 
@@ -80,17 +80,17 @@ class LoopNormalization : Transformer {
                 if (v is If && v.condition == loop.condition){
                     // 2
                     val c = loop.conditionBinaryOP
-                    val newCondition = BinaryOP(c.type, c.operator.invert(), c.left, from)
+                    val newCondition = BinaryOP(c.type, c.operator.reverse(), c.left, from)
                     v.condition = newCondition
                     loop.condition = newCondition
                     super.visit(v.instructions) {i, stmt -> v.instructions[i] = stmt}
                     return
-                } else if (v is Increment){
+                } else if (v is Increment && v.stmt.assignedTo() == loop.symbol){
                     // 3.5
                     v.stmt.replaceAssign(BinaryOP.plus(v.stmt.assignedTo() as Expression, Value.one))
                     v.direction = Increment.Direction.plus
                     return
-                }else if (v == symbol) {
+                } else if (v == symbol) {
                     // 3
                     val substitute = BinaryOP(
                         symbolType,
@@ -104,6 +104,8 @@ class LoopNormalization : Transformer {
                         v as Expression,
                     )
                     replace(substitute)
+                } else if(v is StackExpression){
+                    return
                 }
                 super.visit(v, replace)
             }
@@ -111,7 +113,7 @@ class LoopNormalization : Transformer {
         cv.visit(loop.instructions) { i, stmt -> loop.instructions[i] = stmt }
 
         // 4. update loop metadata
-        loop.range = DfaValue.Range(newFrom, loop.conditionBinaryOP.endInclusive)
+        loop.range = DfaValue.Range(newFrom, loop.conditionBinaryOP.endInclusive(Increment.Direction.plus))
     }
 
     private fun normalizeLoopStart(loop: RangeLoop){
@@ -205,6 +207,6 @@ class LoopNormalization : Transformer {
         cv.visit(loop.instructions) { i, stmt -> loop.instructions[i] = stmt }
 
         // 4. in loop metadata: replace loop-range with new loop-range
-        loop.range = DfaValue.Range(newFrom, loop.conditionBinaryOP.endInclusive)
+        loop.range = DfaValue.Range(newFrom, loop.conditionBinaryOP.endInclusive(Increment.Direction.plus))
     }
 }

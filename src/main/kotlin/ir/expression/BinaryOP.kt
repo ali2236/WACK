@@ -2,6 +2,7 @@ package ir.expression
 
 import generation.WatWriter
 import ir.finder.Visitor
+import ir.statement.Increment
 import ir.wasm.WasmBitSign
 import ir.wasm.WasmValueType
 
@@ -68,25 +69,24 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
     }
 
     // range-loop condition
-    val endInclusive: Expression
-        get() {
-            // TODO: rewrite considering direction and value/symbol limit in range-loops
+    fun endInclusive(direction: Increment.Direction): Expression {
             if (right is Value) {
                 return when (operator.sign) {
-                    "<" -> (right as Value).add(-1)
-                    "<=" -> (right as Value)
-                    ">" -> (right as Value).add(1)
-                    ">=" -> (right as Value)
-                    "!=" -> (right as Value)
+                    "<" -> (right as Value).add(-1) // i < 100  -> i++,99
+                    "<=" -> (right as Value)        // i <= 100 -> i++,100
+                    ">" -> (right as Value).add(1)  // i > 100  -> i--,101
+                    ">=" -> (right as Value)        // i >= 100 -> i--,100
+                    "!=" -> (right as Value)        // i != 100 -> (i++,99)|(i--,101)
+                        .add(if (direction == Increment.Direction.plus) -1 else 1)
                     else -> throw Exception("operator ${operator.sign} is not supported")
                 }
             } else {
                 return when (operator.sign) {
-                    "<" -> right
+                    "<" -> minus(right, Value.one)
                     "<=" -> right
                     ">" -> plus(right, Value.one)
                     ">=" -> right
-                    "!=" -> right
+                    "!=" -> plus(right, Value.i32(if (direction == Increment.Direction.plus) -1 else 1))
                     else -> throw Exception("operator ${operator.sign} is not supported")
                 }
             }
@@ -130,7 +130,7 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
                 "<" -> ge
                 "<=" -> gt
                 ">" -> le
-                ">=" -> le // lt
+                ">=" -> lt
                 "+" -> sub
                 "-" -> add
                 "/" -> mul
@@ -139,6 +139,16 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
                 ">>" -> shl
                 "&" -> or
                 "|" -> and
+                else -> this
+            }.copy(signed = signed)
+        }
+
+        fun reverse(): Operator {
+            return when (sign) {
+                "<" -> ge
+                "<=" -> ge
+                ">" -> le
+                ">=" -> le
                 else -> this
             }.copy(signed = signed)
         }
@@ -164,6 +174,10 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
 
         fun plus(left: Expression, i: Value): BinaryOP {
             return BinaryOP(left.exprType(), Operator.add, left, i)
+        }
+
+        fun minus(left: Expression, i: Value): BinaryOP {
+            return BinaryOP(left.exprType(), Operator.sub, left, i)
         }
     }
 

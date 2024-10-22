@@ -32,6 +32,9 @@ class Wat2Wasm : FileProcessor {
         if(WAPC.params!!.annotations){
             commands.add("--enable-annotations")
         }
+        if (!WAPC.params!!.stripDebugNames){
+            commands.add("--debug-names")
+        }
         commands.add("-o")
         commands.add(output.absolutePath)
         val process = ProcessBuilder(commands).start()
