@@ -92,7 +92,7 @@ object ThreadKernelGenerator {
                         val size = BinaryOP(
                             WasmValueType.i32,
                             BinaryOP.Operator.sub,
-                            rangeTo,
+                            rangeLoop.conditionBinaryOP.endExclusive,
                             rangeFrom,
                         )
 
