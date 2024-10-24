@@ -115,11 +115,11 @@ object ThreadKernelGenerator {
                         )
 
                         // calculate end
-                        // int end = (thread_num == num_threads - 1) ? size : (size / num_threads) * (thread_num + 1);
+                        // int end = (thread_num == num_threads - 1) ? end : (size / num_threads) * (thread_num + 1);
                         instructions.add(
                             Assignment(
                                 end, Select(
-                                    size,
+                                    rangeLoop.conditionBinaryOP.right,
                                     BinaryOP(
                                         WasmValueType.i32,
                                         BinaryOP.Operator.mul,
@@ -133,7 +133,7 @@ object ThreadKernelGenerator {
                                             WasmValueType.i32,
                                             BinaryOP.Operator.add,
                                             threadId,
-                                            Value(WasmValueType.i32, "1"),
+                                            Value.one,
                                         ),
                                     ),
                                     BinaryOP(
@@ -141,7 +141,7 @@ object ThreadKernelGenerator {
                                             WasmValueType.i32,
                                             BinaryOP.Operator.sub,
                                             maxThreads,
-                                            Value(WasmValueType.i32, "1")
+                                            Value.one
                                         )
                                     ),
                                     WasmValueType.i32,

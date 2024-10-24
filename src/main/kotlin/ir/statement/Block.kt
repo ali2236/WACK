@@ -50,11 +50,11 @@ open class Block(
 
     open fun writeHeader(out: Appendable) {}
 
-    fun printHeader(): String? {
+    fun printHeader(): String {
         val header = StringBuffer()
         writeHeader(header)
         if (header.isEmpty()) {
-            return null
+            return toString()
         }
         return header.toString()
     }
