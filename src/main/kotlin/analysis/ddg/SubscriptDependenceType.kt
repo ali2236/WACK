@@ -1,4 +1,4 @@
-package analysis.ddt
+package analysis.ddg
 
 enum class SubscriptDependenceType {
     ZIV, // no reference to loop symbols

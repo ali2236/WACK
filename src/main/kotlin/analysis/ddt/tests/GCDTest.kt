@@ -1,6 +1,6 @@
 package analysis.ddt.tests
 
-import analysis.ddt.Access
+import analysis.ddg.Access
 import analysis.ddt.DependenceResult
 import analysis.ddt.DependenceTest
 import kotlin.math.abs
@@ -25,7 +25,7 @@ class GCDTest : DependenceTest() {
         val c2 = p2.subscripts.sumOf { it.offset } - p2.constant
         val rem = abs(c1 - c2)
 
-        if(rem % gcd == 0){ // depintine equasion has a solution
+        if(rem % gcd == 0){ // depintine equation has a solution
             // dependent
             return DependenceResult.inconclusive
         } else {

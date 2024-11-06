@@ -1,4 +1,4 @@
-package analysis.ddt
+package analysis.ddg
 
 import ir.finder.SymbolMatcher
 import ir.statement.SymbolLoad
@@ -8,6 +8,7 @@ data class AccessPair(val source : Access, val sink : Access) {
     val parts: List<Access>
         get() = listOf(source, sink)
 
+    // MIV or SIV
     fun findType() : SubscriptDependenceType {
         val symbols = mutableSetOf<SymbolLoad>()
         for(part in parts){
@@ -20,5 +21,9 @@ data class AccessPair(val source : Access, val sink : Access) {
             }
         }
       return SubscriptDependenceType.fromSymbolsUsed(symbols.size)
+    }
+
+    fun dependenceType() {
+
     }
 }

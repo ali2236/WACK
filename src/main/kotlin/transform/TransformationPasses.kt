@@ -10,7 +10,7 @@ object TransformationPasses {
         val passes = listOf<Transformer>(
             SkipMarker(),
             //UnTeeRestructure(),
-            ShiftToMultiply(),
+            //ShiftToMultiply(),
             ConstantPropagation(),
             ConditionRestructure(),
             ConditionalLoopRestructure(),

@@ -1,13 +1,13 @@
 package analysis.ddt
 
+import analysis.ddg.AccessScope
 import analysis.dfa.DfaFact
-import analysis.dfa.DfaValue
 import ir.expression.*
 import ir.finder.BreadthFirstExpressionFinder
-import ir.finder.Finders
 import ir.finder.Visitor
 import ir.statement.Statement
 import ir.statement.SymbolLoad
+import kotlin.math.pow
 
 // also find <ax+c> where <x> is <symbol|load>
 // sometimes <c> is nested within multiple BinOp
@@ -31,7 +31,7 @@ class AddressPolynomialFinder(val address: Expression, val scope: AccessScope, v
                 subscript = Subscript(symbol = symbol)
             }
             visit(part) {}
-            if(subscript != null){
+            if (subscript != null) {
                 p.addSubscript(subscript!!)
             }
         }
@@ -49,11 +49,16 @@ class AddressPolynomialFinder(val address: Expression, val scope: AccessScope, v
         when (v) {
             is BinaryOP -> {
                 when (v.operator.sign) {
+                    BinaryOP.Operator.shl.sign -> {
+                        operator = v.operator
+                    }
+
                     BinaryOP.Operator.mul.sign -> {
                         operator = v.operator
                     }
+
                     BinaryOP.Operator.sub.sign -> {
-                        operatorScope(BinaryOP.Operator.add){
+                        operatorScope(BinaryOP.Operator.add) {
                             visit(v.left) {}
                         }
                         operatorScope(BinaryOP.Operator.sub) {
@@ -69,14 +74,22 @@ class AddressPolynomialFinder(val address: Expression, val scope: AccessScope, v
                     p.constant += v.toInt()
                 } else {
                     val vv = v.value.toInt()
-                    when(operator){
+                    when (operator) {
                         BinaryOP.Operator.add -> {
                             subscript!!.offset += vv
                         }
+
+                        BinaryOP.Operator.shl -> {
+                            val mul = 2.0.pow(vv).toInt()
+                            subscript!!.multiplier *= mul
+                            subscript!!.offset *= mul
+                        }
+
                         BinaryOP.Operator.mul -> {
                             subscript!!.multiplier *= vv
                             subscript!!.offset *= vv // maybe remove this line?
                         }
+
                         BinaryOP.Operator.sub -> {
                             subscript!!.offset -= vv
                         }

@@ -1,6 +1,6 @@
 package analysis.ddt.tests
 
-import analysis.ddt.Access
+import analysis.ddg.Access
 import analysis.ddt.DependenceResult
 import analysis.ddt.DependenceTest
 import ir.expression.BinaryOP
@@ -26,6 +26,6 @@ class RuntimeBoundTest : DependenceTest() {
         val conditions = mutableListOf<Statement>()
         conditions.add(BinaryOP(WasmValueType.i32, BinaryOP.Operator.neq, linearBase1, linearBase2))
         // B. if A.max < C.min or A.min > C.min
-        return DependenceResult(mapOf(), conditions)
+        return DependenceResult(mapOf())
     }
 }

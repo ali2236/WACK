@@ -1,12 +1,11 @@
-package analysis.ddt
+package analysis.ddg
 
+import analysis.ddt.*
 import analysis.dfa.DfaFact
 import analysis.dfa.DfaValue
 import ir.expression.*
 import ir.finder.BreadthFirstExpressionFinder
-import ir.statement.Statement
 import ir.statement.SymbolLoad
-import ir.wasm.WasmValueType
 
 data class Access(
     val symbol: SymbolLoad,

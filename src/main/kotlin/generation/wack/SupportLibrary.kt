@@ -111,7 +111,7 @@ class SupportLibrary(
                 params = listOf(WasmValueType.i32),
                 locals = listOf(WasmValueType.i32, WasmValueType.i32),
                 instructions = mutableListOf(
-                    //*mutex.criticalSection { print.print(Value.i32(300), kernelId) },
+                    *mutex.criticalSection { print.print(Value.i32(300), kernelId) },
                     meta.maxThreads.set.call(Value.i32(WAPC.params!!.threads)),
                     //makeThreadPool.functionData.call(Value.i32(WAPC.params!!.threads)), // TODO: move to somewhere else
                     meta.kernelId.set.call(kernelId),

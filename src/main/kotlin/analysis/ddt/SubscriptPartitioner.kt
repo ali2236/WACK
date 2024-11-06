@@ -1,6 +1,6 @@
 package analysis.ddt
 
-import ir.finder.Finders
+import analysis.ddg.AccessPair
 import ir.finder.SymbolMatcher
 import ir.statement.RangeLoop
 

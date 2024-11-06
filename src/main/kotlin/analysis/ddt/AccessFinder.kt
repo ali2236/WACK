@@ -1,11 +1,12 @@
 package analysis.ddt
 
+import analysis.ddg.Access
+import analysis.ddg.AccessScope
+import analysis.ddg.AccessType
 import analysis.dfa.Dfa
-import analysis.dfa.DfaValue
 import ir.expression.Expression
 import ir.expression.Load
 import ir.expression.Symbol
-import ir.finder.BreadthFirstExpressionFinder
 import ir.finder.Visitor
 import ir.statement.*
 import java.util.Stack
@@ -48,7 +49,7 @@ class AccessFinder(parentScope: RangeLoop, val dfa: Dfa) : Visitor() {
                 val access = Access(
                     assignedTo,
                     AccessType.Write,
-                    AccessScope(scope),
+                    AccessScope(scope, currentStatement!!),
                     finder.at(v) ?: setOf()
                 )
                 accesses.add(access)
@@ -65,7 +66,7 @@ class AccessFinder(parentScope: RangeLoop, val dfa: Dfa) : Visitor() {
                     val access = Access(
                         v,
                         AccessType.Read,
-                        AccessScope(scope),
+                        AccessScope(scope, currentStatement!!),
                         finder.at(currentStatement!!) ?: setOf(),
                     )
                     accesses.add(access)
@@ -74,7 +75,7 @@ class AccessFinder(parentScope: RangeLoop, val dfa: Dfa) : Visitor() {
                     val access = Access(
                         v,
                         AccessType.Read,
-                        AccessScope(scope),
+                        AccessScope(scope, currentStatement!!),
                         finder.at(currentStatement!!) ?: setOf(),
                     )
                     accesses.add(access)

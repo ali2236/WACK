@@ -1,9 +1,10 @@
-package analysis.ddt
+package analysis.ddg
 
 import ir.statement.RangeLoop
+import ir.statement.Statement
 import java.util.Stack
 
-class AccessScope(loops: Stack<RangeLoop>) {
+class AccessScope(loops: Stack<RangeLoop>, val parent: Statement) {
 
     val loops: Stack<RangeLoop>
 

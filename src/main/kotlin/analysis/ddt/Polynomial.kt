@@ -18,7 +18,7 @@ open class Polynomial(
     }
 
     fun getSubscript(symbol: SymbolLoad): Subscript {
-        return subscripts.first { it.symbol == symbol }
+        return subscripts.lastOrNull { it.symbol == symbol } ?: Subscript(0, symbol)
     }
 
     fun addSubscript(subscript: Subscript) {

@@ -1,6 +1,8 @@
 package analysis.ddt
 
-import analysis.dfa.Dfa
+import analysis.ddg.Access
+import analysis.ddg.AccessScope
+import analysis.ddg.AccessType
 import analysis.dfa.StatementFactsFinder
 import ir.expression.Expression
 import ir.expression.Load
@@ -34,7 +36,7 @@ class BreadthOnlyAccessFinder(val scope: Stack<RangeLoop>, val finder: Statement
                 val access = Access(
                     v.assignedTo(),
                     AccessType.Write,
-                    AccessScope(scope),
+                    AccessScope(scope, currentStatement!!),
                     finder.at(v) ?: setOf()
                 )
                 accesses.add(access)
@@ -50,7 +52,7 @@ class BreadthOnlyAccessFinder(val scope: Stack<RangeLoop>, val finder: Statement
                     val access = Access(
                         v,
                         AccessType.Read,
-                        AccessScope(scope),
+                        AccessScope(scope, currentStatement!!),
                         finder.at(currentStatement!!) ?: setOf(),
                     )
                     accesses.add(access)
@@ -59,7 +61,7 @@ class BreadthOnlyAccessFinder(val scope: Stack<RangeLoop>, val finder: Statement
                     val access = Access(
                         v,
                         AccessType.Read,
-                        AccessScope(scope),
+                        AccessScope(scope, currentStatement!!),
                         finder.at(currentStatement!!) ?: setOf(),
                     )
                     accesses.add(access)

@@ -1,6 +1,9 @@
 package analysis.ddt
 
 import WAPC
+import analysis.ddg.AccessPair
+import analysis.ddg.AccessType
+import analysis.ddg.SubscriptDependenceType
 import analysis.ddt.tests.*
 import analysis.ddt.tests.DependenceTester
 import analysis.dfa.Dfa
@@ -47,7 +50,8 @@ class DependenceTester(val function: Function) {
                 val a1 = accesses[i]
                 val a2 = accesses[j]
                 if (a1.accessType == a2.accessType && a2.accessType == AccessType.Read) continue
-                val dependencePossible = DependenceTester.dependencePossible(a1, a2) == DependenceResult.inconclusive
+                val dependenceResult = DependenceTester.dependencePossible(a1, a2)
+                val dependencePossible = dependenceResult == DependenceResult.inconclusive
                 if (dependencePossible) {
                     pairs.add(AccessPair(a1, a2))
                 }
@@ -91,7 +95,6 @@ class DependenceTester(val function: Function) {
             }
         }
         // TODO: runtime dependence test
-        // TODO: use dependence result to return parallel loop
         if (pairs.isEmpty()) {
             // no dependencies
             return listOf(ParallelizableLoop(topLevelRangeLoop))

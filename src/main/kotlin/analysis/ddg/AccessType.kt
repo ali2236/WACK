@@ -1,4 +1,4 @@
-package analysis.ddt
+package analysis.ddg
 
 enum class AccessType {
     Read,

@@ -1,6 +1,6 @@
 package analysis.ddt.tests
 
-import analysis.ddt.Access
+import analysis.ddg.Access
 import analysis.ddt.DependenceResult
 import analysis.ddt.DependenceTest
 import ir.expression.Load

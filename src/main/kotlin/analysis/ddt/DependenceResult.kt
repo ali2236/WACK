@@ -1,11 +1,9 @@
 package analysis.ddt
 
 import ir.statement.RangeLoop
-import ir.statement.Statement
 
 data class DependenceResult(
     val direction: Map<RangeLoop, Direction> = mapOf(),
-    val conditions: List<Statement> = listOf()
 ) {
     companion object {
         val inconclusive = null
@@ -13,7 +11,7 @@ data class DependenceResult(
     }
 
     val independent: Boolean
-        get() = direction.isEmpty() && conditions.isEmpty()
+        get() = direction.isEmpty()
 
     fun merge(other: DependenceResult?): DependenceResult {
         if(other == null) return this
@@ -30,6 +28,6 @@ data class DependenceResult(
                 dirs[loop] = d1.product(d2)
             }
         }
-        return DependenceResult(dirs, this.conditions + other.conditions)
+        return DependenceResult(dirs)
     }
 }
