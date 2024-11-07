@@ -10,7 +10,7 @@ fun main(args: Array<String>) {
         //File("./samples/matrix_multiply.wasm"),
         //File("./src/test/resources/src/known_pre_allocated.wasm"),
         //File("./samples/transform/loop_normalization/loop_normalization_2.wasm"),
-        File("./samples/polybench/O0/small_dataset/lu.wasm"),
+        File("./samples/polybench/O0/small_dataset/gramschmidt.wasm"),
     )
     for (sample in samples) {
         val output = WAPC.compile(
@@ -19,23 +19,25 @@ fun main(args: Array<String>) {
                 threads = 5,
                 generateDotFiles = true,
                 parallelize = true,
-                parallelizeInnerLoops = false,
+                parallelizeInnerLoops = true,
                 normalizeLoops = true,
                 enableAsserts = true,
                 stripDebugNames = false,
                 annotations = false,
             ),
         )
-        var sout: String? = null
-        println("running serial...")
-        val s_time = runTimed { sout = Wasmtime.run(sample.toPath()) }
-        println(s_time)
-        println(sout.orEmpty())
+
         var pout: String? = null
         println("running parallel...")
         val p_time = runTimed { pout = Wasmtime.runWithThreadsEnabled(output) }
         println(p_time)
         println(pout.orEmpty())
+
+        var sout: String? = null
+        println("running serial...")
+        val s_time = runTimed { sout = Wasmtime.run(sample.toPath()) }
+        println(s_time)
+        println(sout.orEmpty())
 
         try {
             println("===== ${if (sout == pout) "Exact Match" else "Difference = ${PolybenchOutputComparator().compare(sout!!, pout!!)}"} =====")

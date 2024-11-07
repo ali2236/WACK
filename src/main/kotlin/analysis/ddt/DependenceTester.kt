@@ -7,6 +7,7 @@ import analysis.ddg.SubscriptDependenceType
 import analysis.ddt.tests.*
 import analysis.ddt.tests.DependenceTester
 import analysis.dfa.Dfa
+import ir.expression.Value
 import ir.finder.BreadthFirstExpressionFinder
 import ir.statement.Function
 import ir.statement.RangeLoop
@@ -107,6 +108,7 @@ class DependenceTester(val function: Function) {
             } else if (WAPC.params!!.parallelizeInnerLoops) {
                 // inner-loops
                 var parallelizableLoops = dependenceResult!!.direction.filter { it.value == Direction.Equal }
+                parallelizableLoops = parallelizableLoops.filter { it.key.range.from == Value.zero } // should not be dependent on outer loop symbol
                 // select the ones that are not sub-loops of other parallelizable loops
                 parallelizableLoops = parallelizableLoops.filter { (pl, d) -> !parallelizableLoops.any { (loop, d) -> pl.childOf(loop) } }
                 return parallelizableLoops.map { ParallelizableLoop(it.key) }
