@@ -110,7 +110,7 @@ class DependenceTester(val function: Function) {
                 var parallelizableLoops = dependenceResult!!.direction.filter { it.value == Direction.Equal }
                 parallelizableLoops = parallelizableLoops.filter { it.key.range.from == Value.zero } // should not be dependent on outer loop symbol
                 // select the ones that are not sub-loops of other parallelizable loops
-                parallelizableLoops = parallelizableLoops.filter { (pl, d) -> !parallelizableLoops.any { (loop, d) -> pl.childOf(loop) } }
+                parallelizableLoops = parallelizableLoops.filter { (pl) -> !parallelizableLoops.any { (loop) -> pl.childOf(loop) } }
                 return parallelizableLoops.map { ParallelizableLoop(it.key) }
             }
         }

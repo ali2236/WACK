@@ -12,7 +12,7 @@ class MutexLibrary(
     val join: WasmFunction,
 ) {
 
-    fun criticalSection(mutex: Expression = Value.i32(1024), task: () -> Statement) : Array<Statement>{
+    fun criticalSection(mutex: Expression = Value.i32(64), task: () -> Statement) : Array<Statement>{
         val t = task()
         if (t is Empty){
             return arrayOf()

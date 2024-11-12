@@ -77,7 +77,7 @@ object ThreadKernelGenerator {
                         val stackBase = Symbol.localI32(Index.number(1))
                         val start = Symbol.localI32(Index.number(2))
                         val end = Symbol.localI32(Index.number(3))
-                        val maxThreads = metaLib.getMaxThreads
+                        val maxThreads = metaLib.maxThreads.get.call().result
 
                         // TODO: Only if has stack_base
                         // new stack_base

@@ -9,7 +9,6 @@ import ir.statement.Store
 import ir.wasm.*
 
 class MetaLibrary(
-    val getMaxThreads: Expression,
     val maxThreads: Property,
     val stackBase: Property,
     val kernelId: Property,
@@ -27,7 +26,7 @@ class MetaLibrary(
 
 
             // functions
-            val i32Bits = 4
+            val i32Bits = 8
             val base = Value.i32(0)
             val maxThreads = Property.fromAddress(
                 program,
@@ -59,7 +58,6 @@ class MetaLibrary(
             )
 
             return MetaLibrary(
-                maxThreads.get.call().result,
                 maxThreads,
                 stackBase,
                 kernelId,

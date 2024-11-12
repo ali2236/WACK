@@ -33,8 +33,9 @@ class WasiThreadStart(
                     //WasmAssert.equal(wackThread.readMutex2(tid), Value.one),
                     Loop(
                         instructions = mutableListOf(
-                            //mutexLib.lock.call(wackThread.getMutex2(tid)),
-                            //mutexLib.unlock.call(wackThread.getMutex2(tid)),
+                            mutexLib.lock.call(wackThread.getMutex2(tid)),
+                            *mutexLib.criticalSection { print.print(tid) },
+                            mutexLib.unlock.call(wackThread.getMutex2(tid)),
                             //*mutexLib.criticalSection { print.print(meta.kernelId.get.call().result, tid) },
                             IndirectFunctionCall(
                                 kernelTable.index,
@@ -42,9 +43,10 @@ class WasiThreadStart(
                                 functionIndex = meta.kernelId.get.call().result,
                                 params = mutableListOf(tid),
                             ),
-                            //mutexLib.lock.call(wackThread.getMutex2(tid)),
+                            mutexLib.lock.call(wackThread.getMutex2(tid)),
                             mutexLib.unlock.call(wackThread.getMutex1(tid)),
-                            Return(), //RawWat("br 0"),
+                            RawWat("br 0"),
+                            //Return(),
                         )
                     ),
                 ),

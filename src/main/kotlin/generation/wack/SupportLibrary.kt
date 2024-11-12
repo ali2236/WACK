@@ -26,13 +26,14 @@ class SupportLibrary(
         ): SupportLibrary {
 
             // make_thread_pool
-            /*val makeThreadPoolMaxThreads = Symbol.localI32(Index.number(0))
+            val makeThreadPoolMaxThreads = Symbol.localI32(Index.number(0))
             val makeThreadPoolTid = Symbol.localI32(Index.number(1))
             val makeThreadPool = program.addFunction(
                 name = "make_thread_pool",
                 params = listOf(WasmValueType.i32),
                 locals = listOf(WasmValueType.i32),
                 instructions = mutableListOf(
+                    // make sure thread_pool does not already exist
                     If(
                         condition = BinaryOP(
                             WasmValueType.i32,
@@ -40,10 +41,11 @@ class SupportLibrary(
                             meta.threadPoolState.get.call().result,
                             Value.one,
                         ),
+                        // if exists do nothing
                         trueBody = mutableListOf(Return())
                     ),
-                    print.print(Value.i32(500)),
-                    // set_max_threads(0);
+                    //*mutex.criticalSection { print.print(Value.i32(500)) },
+                    // set_max_threads(max_threads);
                     meta.maxThreads.set.call(makeThreadPoolMaxThreads),
                     // for(int i=0;i<max_threads;i++)
                     Loop(
@@ -56,13 +58,14 @@ class SupportLibrary(
                                     makeThreadPoolMaxThreads,
                                 ),
                                 trueBody = mutableListOf(
-                                    //wackThread.setMutex1(makeThreadPoolTid, Value.zero),
-                                    //wackThread.setMutex2(makeThreadPoolTid, Value.one),
+                                    // set initial mutex values
+                                    wackThread.setMutex1(makeThreadPoolTid, Value.zero),
+                                    wackThread.setMutex2(makeThreadPoolTid, Value.one),
                                     // if(thread_spawn(i) < 0) exit(1)
                                     If(
                                         condition = BinaryOP(
                                             WasmValueType.i32,
-                                            BinaryOP.Operator.lt.copy(signed = WasmBitSign.u),
+                                            BinaryOP.Operator.lt.copy(signed = WasmBitSign.s),
                                             wasiThreads.spawnThread.call(makeThreadPoolTid).result,
                                             Value.zero,
                                         ),
@@ -78,29 +81,27 @@ class SupportLibrary(
                     ),
                     // set_thread_pool_state(1);
                     meta.threadPoolState.set.call(Value.one),
-                    // set_max_threads(max_threads);
-                    meta.maxThreads.set.call(makeThreadPoolMaxThreads),
                 ),
             )
-
-            val destroyThreadPool = program.addFunction(
-                name = "destroy_thread_pool",
-                locals = listOf(WasmValueType.i32),
-                instructions = mutableListOf(
-                    print.print(Value.i32(502)),
-                    If(
-                        condition = BinaryOP(
-                            WasmValueType.i32,
-                            BinaryOP.Operator.eq,
-                            meta.threadPoolState.get.call().result,
-                            Value.zero,
-                        ),
-                        trueBody = mutableListOf(Return())
-                    ),
-                    // set_thread_pool_state(0);
-                    meta.threadPoolState.set.call(Value.zero),
-                ),
-            )*/
+            /*
+                        val destroyThreadPool = program.addFunction(
+                            name = "destroy_thread_pool",
+                            locals = listOf(WasmValueType.i32),
+                            instructions = mutableListOf(
+                                print.print(Value.i32(502)),
+                                If(
+                                    condition = BinaryOP(
+                                        WasmValueType.i32,
+                                        BinaryOP.Operator.eq,
+                                        meta.threadPoolState.get.call().result,
+                                        Value.zero,
+                                    ),
+                                    trueBody = mutableListOf(Return())
+                                ),
+                                // set_thread_pool_state(0);
+                                meta.threadPoolState.set.call(Value.zero),
+                            ),
+                        )*/
 
 
             val kernelId = Symbol(WasmScope.local, WasmValueType.i32, Index.number(0))
@@ -111,11 +112,11 @@ class SupportLibrary(
                 params = listOf(WasmValueType.i32),
                 locals = listOf(WasmValueType.i32, WasmValueType.i32),
                 instructions = mutableListOf(
-                    *mutex.criticalSection { print.print(Value.i32(300), kernelId) },
-                    meta.maxThreads.set.call(Value.i32(WAPC.params!!.threads)),
-                    //makeThreadPool.functionData.call(Value.i32(WAPC.params!!.threads)), // TODO: move to somewhere else
+                    //*mutex.criticalSection { print.print(kernelId) },
+                    makeThreadPool.functionData.call(Value.i32(WAPC.params!!.threads)), // TODO: move to somewhere else
+                    //meta.maxThreads.set.call(Value.i32(WAPC.params!!.threads)),
                     meta.kernelId.set.call(kernelId),
-                    Assignment(threadCount, meta.getMaxThreads),
+                    Assignment(threadCount, meta.maxThreads.get.call().result),
                     Assignment(threadId, Value.zero),
                     Loop(
                         instructions = mutableListOf(
@@ -129,7 +130,7 @@ class SupportLibrary(
                                 trueBody = mutableListOf(
                                     //print.print(threadId),
                                     mutex.lock.call(wackThread.getMutex1(threadId)),
-                                    //mutex.unlock.call( wackThread.getMutex2(threadId)),
+                                    mutex.unlock.call( wackThread.getMutex2(threadId)),
                                     If(
                                         condition = BinaryOP(
                                             WasmValueType.i32,
@@ -138,7 +139,7 @@ class SupportLibrary(
                                             Value.zero,
                                         ),
                                         trueBody = mutableListOf(
-                                            print.print(Value.i32(40004)),
+                                            //print.print(Value.i32(40004)),
                                             Unreachable()
                                         ),
                                     ),
