@@ -114,7 +114,6 @@ class SupportLibrary(
                 instructions = mutableListOf(
                     //*mutex.criticalSection { print.print(kernelId) },
                     makeThreadPool.functionData.call(Value.i32(WAPC.params!!.threads)), // TODO: move to somewhere else
-                    //meta.maxThreads.set.call(Value.i32(WAPC.params!!.threads)),
                     meta.kernelId.set.call(kernelId),
                     Assignment(threadCount, meta.maxThreads.get.call().result),
                     Assignment(threadId, Value.zero),
@@ -130,19 +129,7 @@ class SupportLibrary(
                                 trueBody = mutableListOf(
                                     //print.print(threadId),
                                     mutex.lock.call(wackThread.getMutex1(threadId)),
-                                    mutex.unlock.call( wackThread.getMutex2(threadId)),
-                                    If(
-                                        condition = BinaryOP(
-                                            WasmValueType.i32,
-                                            BinaryOP.Operator.lt.copy(signed = WasmBitSign.u),
-                                            wasiThreads.spawnThread.call(threadId).result,
-                                            Value.zero,
-                                        ),
-                                        trueBody = mutableListOf(
-                                            //print.print(Value.i32(40004)),
-                                            Unreachable()
-                                        ),
-                                    ),
+                                    mutex.unlock.call(wackThread.getMutex2(threadId)),
                                     Assignment(threadId, BinaryOP.increment(threadId)),
                                     RawWat("br 1"),
                                 ),
