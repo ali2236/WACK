@@ -1,5 +1,6 @@
 package transform
 
+import WAPC
 import ir.annotations.Skip
 import ir.annotations.StackBase
 import ir.expression.Load
@@ -20,7 +21,7 @@ class StackBaseAliasAnnotator : Transformer {
     private fun applyToFunction(function: Function) {
         // How do I detect stack referencing?
         val rangeLoops =
-            BreadthFirstExpressionFinder(RangeLoop::class.java, true).also { it.visit(function) {} }.result()
+            BreadthFirstExpressionFinder(RangeLoop::class.java, !WAPC.params!!.parallelizeInnerLoops).also { it.visit(function) {} }.result()
         for (loop in rangeLoops) {
             if (!loop.hasAnnotation(StackBase::class.java)) {
                 if (loop.symbol is Load) {

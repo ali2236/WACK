@@ -20,6 +20,7 @@ object TransformationPasses {
             ParallelForAnnotator(),
             StackBaseAliasAnnotator(),
             MarkLoopCountersAsPrivate(),
+            MarkLoopTemporariesAsPrivate(),
             //LocalizeRangeLoopCounter(),
         )
         for (pass in passes){

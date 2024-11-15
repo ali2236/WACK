@@ -3,6 +3,7 @@ package ir.expression
 import generation.WatWriter
 import ir.Mode
 import ir.Names
+import ir.finder.ExpressionFinder
 import ir.finder.Visitor
 import ir.statement.SymbolLoad
 import ir.wasm.WasmBitSign
@@ -21,7 +22,7 @@ class Load(
 ) : Expression(), SymbolLoad {
 
     override fun write(out: Appendable) {
-        if(atomic){
+        if (atomic) {
             out.append("Atomic:")
         }
         out.append(Names.memory + memoryIndex)
@@ -46,9 +47,9 @@ class Load(
         address.wat(wat)
         val ofst = if (offset != 0) " offset=$offset" else ""
         val algn = if (align != 0) " align=$align" else ""
-        val sgn = if(sign != null && memorySize != null) "${memorySize}_${sign}" else ""
-        val memIndex = if(WAPC.params!!.multipleMemories) " $memoryIndex" else ""
-        val atomic = if(atomic) ".atomic" else ""
+        val sgn = if (sign != null && memorySize != null) "${memorySize}_${sign}" else ""
+        val memIndex = if (WAPC.params!!.multipleMemories) " $memoryIndex" else ""
+        val atomic = if (atomic) ".atomic" else ""
         wat.writeLine("${type}${atomic}.load$sgn$memIndex${ofst}${algn}", this)
     }
 
@@ -71,6 +72,16 @@ class Load(
         if (align != other.align) return false
 
         return true
+    }
+
+    // Array Patters:
+    // M0[3560+0] - might be a stack variable
+    // M0[L1+(L2<<2)+0] - has <<
+    fun isArrayReference(): Boolean {
+        return ExpressionFinder(BinaryOP::class.java)
+            .also { this.visit(it) }
+            .result()
+            .any { it.operator == BinaryOP.Operator.shl }
     }
 
 }

@@ -52,16 +52,6 @@ class ParallelForAnnotator : Transformer {
                     loop.annotations.add(StackBase(stackBase))
                 }
             }
-
-            // privatize all variables
-            val vars = ExpressionFinder(Symbol::class.java, setOf(Load::class.java, Store::class.java))
-                .also { parallelLoop.loop.visit(it) }
-                .result()
-                .toSet()
-
-            vars.forEach {
-                loop.annotations.add(Private(it))
-            }
         }
     }
 }
