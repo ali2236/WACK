@@ -162,24 +162,6 @@ class LoopNormalization : Transformer {
             }
         }
         conditionVisitor.visit(loop.condition) {}
-        /*            val bv = object : Visitor() {
-                        // TODO: Unused code?
-                        override fun visit(v: Statement, replace: (Statement) -> Unit) {
-                            if (v == to) {
-                                newTo = BinaryOP(
-                                    to.exprType(),
-                                    BinaryOP.Operator.sub,
-                                    to,
-                                    from,
-                                )
-                                replace(newTo as BinaryOP)
-                            }
-                            super.visit(v, replace)
-                        }
-                    }
-                    if (newTo == null){
-                        loop.visit(bv)
-                    }*/
 
         // 3. in loop body: replace <symbol> with <symbol>+<from>
         val cv = object : Visitor() {

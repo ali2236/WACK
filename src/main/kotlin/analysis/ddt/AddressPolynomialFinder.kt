@@ -29,6 +29,8 @@ class AddressPolynomialFinder(val address: Expression, val scope: AccessScope, v
             }
             if (symbol != null) {
                 subscript = Subscript(symbol = symbol)
+            } else {
+                subscript = null
             }
             visit(part) {}
             if (subscript != null) {
@@ -49,12 +51,11 @@ class AddressPolynomialFinder(val address: Expression, val scope: AccessScope, v
         when (v) {
             is BinaryOP -> {
                 when (v.operator.sign) {
-                    BinaryOP.Operator.shl.sign -> {
-                        operator = v.operator
-                    }
-
-                    BinaryOP.Operator.mul.sign -> {
-                        operator = v.operator
+                    BinaryOP.Operator.shl.sign, BinaryOP.Operator.mul.sign, BinaryOP.Operator.add.sign -> {
+                        operatorScope(v.operator) {
+                            super.visit(v, replace)
+                        }
+                        return
                     }
 
                     BinaryOP.Operator.sub.sign -> {
@@ -66,6 +67,7 @@ class AddressPolynomialFinder(val address: Expression, val scope: AccessScope, v
                         }
                         return
                     }
+
                 }
             }
 
