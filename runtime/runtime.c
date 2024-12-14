@@ -104,6 +104,5 @@ void wasi_thread_start(int id, int tid){
             call_kernel(get_kernel_id(), tid);
             lock_mutex(mutex2);
             unlock_mutex(mutex1);
-            return;
     }
 }

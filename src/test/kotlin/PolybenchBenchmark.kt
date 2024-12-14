@@ -39,7 +39,7 @@ class PolyBenchBenchmark : BatchWasmTester() {
         println(BenchmarkResult.header)
 
         // run benchmark
-        val params = WAPC.Params(parallelizeInnerLoops = true)
+        val params = WAPC.Params(threads = 4)
         val rows = batchTest(_dir.resolve("$optimization/$datasetSize"), params)
             .map {
                 println(it)
@@ -59,7 +59,9 @@ class PolyBenchBenchmark : BatchWasmTester() {
         val totalSerialTime = rows.map { it.serialTime.inWholeMilliseconds }.reduce(Long::plus)
         val totalParallelTime = rows.map { it.parallelTime.inWholeMilliseconds }.reduce(Long::plus)
         val avgSpeedup = (totalSerialTime / totalParallelTime.toDouble())
-        println("Avg Speedup: x${avgSpeedup}")
+        val avgAvgSpeedUp = rows.map { it.speedup }.average()
+        println("Total Avg Speedup: x${avgSpeedup}")
+        println("Average Avg Speedup: x${avgAvgSpeedUp}")
 
         // Anomalies:
         println("================ Anomalies ===================")

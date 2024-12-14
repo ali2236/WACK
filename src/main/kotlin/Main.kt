@@ -10,7 +10,7 @@ fun main(args: Array<String>) {
         //File("./samples/matrix_multiply.wasm"),
         //File("./src/test/resources/src/known_pre_allocated.wasm"),
         //File("./samples/transform/loop_normalization/loop_normalization_2.wasm"),
-        File("./samples/polybench/O0/small_dataset/seidel-2d.wasm"),
+        File("./samples/polybench/O0/large_dataset/cholesky.wasm"),
     )
     for (sample in samples) {
         val output = WAPC.compile(
