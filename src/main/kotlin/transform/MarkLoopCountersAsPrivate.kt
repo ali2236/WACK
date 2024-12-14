@@ -1,6 +1,6 @@
 package transform
 
-import WAPC
+import compiler.WAPC
 import ir.annotations.For
 import ir.annotations.Private
 import ir.annotations.Skip

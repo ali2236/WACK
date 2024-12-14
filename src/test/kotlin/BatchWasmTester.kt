@@ -1,3 +1,4 @@
+import compiler.WAPC
 import external.Wasmtime
 import external.runTimed
 import java.nio.file.Files

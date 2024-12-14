@@ -1,6 +1,5 @@
 package generation.wack
 
-import WAPC
 import analysis.dfa.DfaValue
 import generation.debug.PrintLibrary
 import generation.wasm.threads.MutexLibrary
@@ -8,7 +7,6 @@ import ir.annotations.*
 import ir.expression.*
 import ir.finder.AnnotationFinder
 import ir.finder.Finders
-import ir.finder.ReplaceableFinder
 import ir.finder.SymbolReplacer
 import ir.statement.*
 import ir.statement.Function

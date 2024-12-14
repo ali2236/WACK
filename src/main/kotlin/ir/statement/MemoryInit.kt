@@ -1,7 +1,7 @@
 package ir.statement
 
+import compiler.WAPC
 import generation.WatWriter
-import ir.Mode
 import ir.expression.Expression
 import ir.wasm.Index
 

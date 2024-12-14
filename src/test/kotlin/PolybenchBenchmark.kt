@@ -1,10 +1,9 @@
-import external.PolybenchOutputComparator
+import compiler.WAPC
 import java.util.*
 import kotlin.io.path.Path
 import kotlin.streams.toList
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class PolyBenchBenchmark : BatchWasmTester() {
     private val _dir = Path("./samples/polybench")

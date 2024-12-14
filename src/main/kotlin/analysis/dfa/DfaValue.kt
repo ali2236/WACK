@@ -1,6 +1,6 @@
 package analysis.dfa
 
-import WAPC
+import compiler.WAPC
 import ir.expression.Expression
 import ir.expression.Value
 

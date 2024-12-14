@@ -1,6 +1,6 @@
 package transform
 
-import WAPC
+import compiler.WAPC
 import ir.annotations.Skip
 import ir.annotations.StackBase
 import ir.expression.Load

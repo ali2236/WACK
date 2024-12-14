@@ -1,6 +1,6 @@
 package analysis.dfa
 
-import WAPC
+import compiler.WAPC
 import analysis.cfg.CFG
 import generation.DotGraph
 import generation.DotSanitizer

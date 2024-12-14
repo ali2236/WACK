@@ -1,7 +1,6 @@
 package external
 
-import WAPC
-import ir.Mode
+import compiler.WAPC
 import java.io.File
 
 // wat2wasm.exe .\wat_seq.wat --enable-threads --enable-multi-memory

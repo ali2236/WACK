@@ -1,7 +1,6 @@
 package generation.wasi.threads
 
-import WAPC
-import ir.Mode
+import compiler.WAPC
 import ir.statement.Function
 import ir.statement.Program
 import ir.wasm.Index

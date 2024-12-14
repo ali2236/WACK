@@ -1,7 +1,6 @@
 package generation
 
-import WAPC
-import ir.Mode
+import compiler.WAPC
 import ir.Names
 import ir.statement.Program
 import ir.statement.Statement

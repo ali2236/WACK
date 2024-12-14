@@ -1,9 +1,9 @@
 package ir.statement
 
+import compiler.WAPC
 import ir.annotations.WackAnnotation
 import generation.WatWriter
 import generation.WebAssemblyBlock
-import ir.Mode
 import ir.expression.Expression
 import ir.expression.StackExpression
 import ir.finder.Visitor

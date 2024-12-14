@@ -1,15 +1,12 @@
 package transform
 
 import analysis.ddt.DependenceTester
+import compiler.WAPC
 import ir.annotations.*
-import ir.expression.BinaryOP
 import ir.expression.Load
-import ir.expression.Symbol
-import ir.finder.ExpressionFinder
 import ir.finder.Finders
 import ir.statement.Function
 import ir.statement.Program
-import ir.statement.Store
 
 class ParallelForAnnotator : Transformer {
     override fun apply(program: Program) {

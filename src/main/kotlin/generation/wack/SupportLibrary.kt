@@ -1,12 +1,10 @@
 package generation.wack
 
-import WAPC
+import compiler.WAPC
 import generation.debug.PrintLibrary
-import generation.debug.WasmAssert
 import generation.wasi.threads.WasiThreadsLibrary
 import generation.wasm.threads.MutexLibrary
 import ir.expression.BinaryOP
-import ir.expression.Load
 import ir.expression.Symbol
 import ir.expression.Value
 import ir.statement.*

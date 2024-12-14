@@ -1,6 +1,6 @@
 package generation
 
-import WAPC
+import compiler.WAPC
 import generation.debug.PrintLibrary
 import generation.wack.*
 import generation.wasi.threads.KernelTableGenerator

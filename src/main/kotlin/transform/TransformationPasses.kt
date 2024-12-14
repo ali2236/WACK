@@ -3,19 +3,17 @@ package transform
 import ir.statement.Program
 import transform.constant_propegation.ConstantPropagation
 import transform.restructure.*
-import transform.shift_to_multiply.ShiftToMultiply
 
 object TransformationPasses {
     fun apply(program: Program){
         val passes = listOf<Transformer>(
-            SkipMarker(),
-            //UnTeeRestructure(),
-            //ShiftToMultiply(),
+            SkipNoLoopFunctions(),
             ConstantPropagation(),
             ConditionRestructure(),
             ConditionalLoopRestructure(),
             IncrementRestructure(),
             RangeLoopRestructure(),
+            SkipNoRangeLoopFunctions(),
             LoopNormalization(),
             ParallelForAnnotator(),
             StackBaseAliasAnnotator(),

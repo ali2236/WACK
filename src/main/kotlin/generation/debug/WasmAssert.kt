@@ -1,6 +1,6 @@
 package generation.debug
 
-import WAPC
+import compiler.WAPC
 import ir.expression.BinaryOP
 import ir.expression.Expression
 import ir.statement.*

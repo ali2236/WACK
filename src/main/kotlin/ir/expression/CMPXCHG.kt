@@ -1,7 +1,7 @@
 package ir.expression
 
+import compiler.WAPC
 import generation.WatWriter
-import ir.Mode
 import ir.wasm.WasmBitSign
 import ir.wasm.WasmValueType
 

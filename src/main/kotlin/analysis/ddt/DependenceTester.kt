@@ -1,6 +1,6 @@
 package analysis.ddt
 
-import WAPC
+import compiler.WAPC
 import analysis.ddg.AccessPair
 import analysis.ddg.AccessType
 import analysis.ddg.SubscriptDependenceType

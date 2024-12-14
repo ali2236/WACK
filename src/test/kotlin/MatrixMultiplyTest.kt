@@ -1,3 +1,4 @@
+import compiler.WAPC
 import external.Make
 import external.Wasmtime
 import external.runTimed
