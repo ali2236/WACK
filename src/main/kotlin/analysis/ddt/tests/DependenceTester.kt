@@ -3,6 +3,7 @@ package analysis.ddt.tests
 import analysis.ddg.Access
 import analysis.ddt.DependenceResult
 import analysis.ddt.DependenceTest
+import analysis.ddt.Direction
 
 object DependenceTester {
 
@@ -23,7 +24,12 @@ object DependenceTester {
             } catch (e: Exception){
                 tester.exceptionResult()
             }
+
             if(testResult != null){
+                if (testResult.direction.any { it.value == Direction.Any}){
+                    // unknown dependence exists
+                    continue
+                }
                 // dependence exists
                 return testResult
             }

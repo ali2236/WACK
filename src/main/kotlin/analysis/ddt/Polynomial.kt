@@ -18,7 +18,17 @@ open class Polynomial(
     }
 
     fun getSubscript(symbol: SymbolLoad): Subscript {
-        return subscripts.lastOrNull { it.symbol == symbol } ?: Subscript(0, symbol)
+        val ss = subscripts.filter { it.symbol == symbol }
+
+        if (ss.isEmpty()){
+            return Subscript(0, symbol)
+        }
+
+        return ss.reduce { acc, s ->
+            acc.offset += s.offset
+            acc.multiplier += s.multiplier
+            acc
+        }
     }
 
     fun addSubscript(subscript: Subscript) {

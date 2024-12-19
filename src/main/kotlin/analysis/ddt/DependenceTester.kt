@@ -85,7 +85,7 @@ class DependenceTester(val function: Function) {
                         val result = DependenceTester.runTests(
                             pair.source,
                             pair.sink,
-                            listOf(GCDTest(), MIVTest())
+                            listOf(GCDTest(), MIVTest(), /*BanerjeeTest()*/)
                         )
 
                         result?.let {
@@ -108,9 +108,11 @@ class DependenceTester(val function: Function) {
             } else if (WAPC.params!!.parallelizeInnerLoops) {
                 // inner-loops
                 var parallelizableLoops = dependenceResult!!.direction.filter { it.value == Direction.Equal }
-                parallelizableLoops = parallelizableLoops.filter { it.key.range.from == Value.zero } // should not be dependent on outer loop symbol
+                parallelizableLoops =
+                    parallelizableLoops.filter { it.key.range.from == Value.zero } // should not be dependent on outer loop symbol
                 // select the ones that are not sub-loops of other parallelizable loops
-                parallelizableLoops = parallelizableLoops.filter { (pl) -> !parallelizableLoops.any { (loop) -> pl.childOf(loop) } }
+                parallelizableLoops =
+                    parallelizableLoops.filter { (pl) -> !parallelizableLoops.any { (loop) -> pl.childOf(loop) } }
                 return parallelizableLoops.map { ParallelizableLoop(it.key) }
             }
         }

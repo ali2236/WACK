@@ -13,9 +13,9 @@ class MIVTest : DependenceTest() {
         for (loop in commonLoops) {
             val s1 = p1.getSubscript(loop.symbol)
             val s2 = p2.getSubscript(loop.symbol)
-            if (!s1.valid or !s2.valid) { // if either is invalid
+            if (!s1.valid || !s2.valid) { // if either is invalid
                 dv[loop] = Direction.None
-            } else if (s1.valid or s2.valid) {
+            } else if (s1.valid || s2.valid) {
                 if (s1.multiplier == s2.multiplier) {
                     dv[loop] = Direction.fromInt(s1.offset - s2.offset)
                 } else { // TODO: this is probably incorrect
