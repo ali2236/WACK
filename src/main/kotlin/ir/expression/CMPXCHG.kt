@@ -1,7 +1,8 @@
 package ir.expression
 
 import compiler.WAPC
-import generation.WatWriter
+import generation.c.CWriter
+import generation.wat.WatWriter
 import ir.wasm.WasmBitSign
 import ir.wasm.WasmValueType
 
@@ -51,5 +52,9 @@ class CMPXCHG(
         val algn = if (symbol.align != 0) " align=${symbol.align}" else ""
         val memIndex = if(WAPC.params!!.multipleMemories) " ${symbol.memoryIndex}" else ""
         wat.writeLine("${symbol.type.name}.atomic.rmw$memSize$memSign.cmpxchg$memIndex$ofst$algn")
+    }
+
+    override fun c(writer: CWriter) {
+        throw NotImplementedError()
     }
 }

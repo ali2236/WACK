@@ -1,7 +1,8 @@
 package ir.expression
 
 import compiler.WAPC
-import generation.WatWriter
+import generation.c.CWriter
+import generation.wat.WatWriter
 import ir.wasm.WasmBitSign
 import ir.wasm.WasmValueType
 
@@ -41,6 +42,10 @@ class AtomicOp(
         val algn = if (load.align != 0) " align=${load.align}" else ""
         val memIndex = if(WAPC.params!!.multipleMemories) " ${load.memoryIndex}" else ""
         wat.writeLine("${load.type.name}.atomic.rmw$memSize$memSign.${operator.name}$memIndex$ofst$algn")
+    }
+
+    override fun c(writer: CWriter) {
+        throw NotImplementedError()
     }
 
     data class Operator(val name: String){

@@ -1,6 +1,7 @@
 package ir.statement
 
-import generation.WatWriter
+import generation.c.CWriter
+import generation.wat.WatWriter
 import ir.Names
 import ir.expression.Expression
 import ir.expression.Symbol
@@ -35,6 +36,15 @@ open class Assignment(
             wat.writeLine("${symbol.scope}.set ${symbol.index.access(Names.global)}", this)
         } else {
             wat.writeLine("${symbol.scope}.set ${symbol.index}", this)
+        }
+    }
+
+    override fun c(writer: CWriter) {
+        writer.inLine {
+            symbol.c(writer)
+            writer.write(" = ")
+            value.c(writer)
+            writer.write(";")
         }
     }
 

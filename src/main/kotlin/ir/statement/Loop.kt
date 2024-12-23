@@ -1,7 +1,5 @@
 package ir.statement
 
-import generation.WatWriter
-
 open class Loop(instructions: MutableList<Statement> = mutableListOf()) : Block(instructions) {
 
     fun breakConditions(): List<IndexedValue<BrIf>> {

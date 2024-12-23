@@ -1,6 +1,7 @@
 package ir.statement
 
-import generation.WatWriter
+import generation.c.CWriter
+import generation.wat.WatWriter
 
 class Empty : BasicStatement() {
     override fun write(out: Appendable) {
@@ -8,6 +9,10 @@ class Empty : BasicStatement() {
     }
 
     override fun wat(wat: WatWriter) {
+
+    }
+
+    override fun c(writer: CWriter) {
 
     }
 }

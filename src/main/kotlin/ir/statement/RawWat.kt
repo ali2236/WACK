@@ -1,6 +1,6 @@
 package ir.statement
 
-import generation.WatWriter
+import generation.wat.WatWriter
 import ir.finder.Visitor
 
 class RawWat(val instruction: String) : BasicStatement() {

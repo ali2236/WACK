@@ -8,11 +8,11 @@ import java.io.File
 fun main(args: Array<String>) {
     // run
     val samples = listOf(
-        //File("./samples/kernel_matrix_multiply.wasm"),
+        //File("./samples/languages/3mm.go.wasm"),
         //File("./samples/matrix_multiply.wasm"),
         //File("./src/test/resources/src/known_pre_allocated.wasm"),
         //File("./samples/transform/loop_normalization/loop_normalization_2.wasm"),
-        File("./samples/polybench/O0/small_dataset/adi.wasm"),
+        File("./samples/polybench/O0/small_dataset/2mm.wasm"),
     )
     for (sample in samples) {
         testUsingWAPC(sample)
@@ -25,20 +25,24 @@ private fun testUsingWAPC(sample: File){
         params = WAPC.Params(
             threads = 8,
             generateDotFiles = true,
-            parallelize = true,
+            parallelize = false,
             parallelizeInnerLoops = true,
             normalizeLoops = true,
-            enableAsserts = true,
+            enableAsserts = false,
             stripDebugNames = false,
-            annotations = false,
+            annotations = true,
+            addCommentedIR = false,
+            multipleMemories = true,
         ),
     )
+    println(WAPC.stats)
 
     var pout: String? = null
     println("running parallel...")
     val p_time = runTimed { pout = Wasmtime.runWithThreadsEnabled(output) }
     println(p_time)
     println(pout.orEmpty())
+
 
     var sout: String? = null
     println("running serial...")

@@ -1,9 +1,7 @@
 package ir.wasm
 
-import generation.WatWriter
+import generation.wat.WatWriter
 import generation.WebAssemblyInstruction
-import ir.Mode
-import ir.Names
 
 data class WasmExport(val name: String, val kind: WasmExportKind, val index: Index) : WebAssemblyInstruction {
     override fun wat(wat: WatWriter) {

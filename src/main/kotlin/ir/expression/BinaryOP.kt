@@ -1,6 +1,7 @@
 package ir.expression
 
-import generation.WatWriter
+import generation.c.CWriter
+import generation.wat.WatWriter
 import ir.finder.Visitor
 import ir.statement.Increment
 import ir.wasm.WasmBitSign
@@ -30,6 +31,18 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
             right.wat(wat)
             wat.writeLine("${type}.${operator.wat()}", this)
         }
+    }
+
+    override fun c(writer: CWriter) {
+        if (left is BinaryOP) writer.write("(")
+        left.c(writer)
+        if (left is BinaryOP) writer.write(")")
+
+        writer.write(operator.sign)
+
+        if (right is BinaryOP) writer.write("(")
+        right.c(writer)
+        if (right is BinaryOP) writer.write(")")
     }
 
     override fun visit(v: Visitor) {

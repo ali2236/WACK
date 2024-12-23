@@ -1,6 +1,7 @@
 package ir.expression
 
-import generation.WatWriter
+import generation.c.CWriter
+import generation.wat.WatWriter
 import ir.finder.Visitor
 import ir.wasm.WasmValueType
 
@@ -21,6 +22,11 @@ class Convert(val toType: WasmValueType, val instruction: String, var value: Exp
     override fun wat(wat: WatWriter) {
         value.wat(wat)
         wat.writeLine("${toType}.${instruction}", this)
+    }
+
+    override fun c(writer: CWriter) {
+        writer.write("(${toType.cType()})")
+        value.c(writer)
     }
 
     override fun visit(v: Visitor) {

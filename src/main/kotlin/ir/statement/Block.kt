@@ -2,7 +2,7 @@ package ir.statement
 
 import compiler.WAPC
 import ir.annotations.WackAnnotation
-import generation.WatWriter
+import generation.wat.WatWriter
 import generation.WebAssemblyBlock
 import ir.expression.Expression
 import ir.expression.StackExpression
@@ -20,9 +20,11 @@ open class Block(
 ) : BasicStatement(), WebAssemblyBlock {
 
     open fun push(stmt: Statement) {
-        if (stmt is Block) {
-            stmt.parent = this
-            stmt.indexInParent = instructions.size
+        when (stmt){
+            is Block -> {
+                stmt.parent = this
+                stmt.indexInParent = instructions.size
+            }
         }
         instructions.add(stmt)
     }

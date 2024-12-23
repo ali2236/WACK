@@ -1,10 +1,8 @@
 package ir.statement
 
-import generation.WatWriter
-import ir.Mode
+import generation.wat.WatWriter
 import ir.Names
 import ir.wasm.WasmFunction
-import ir.wasm.WasmValueType
 
 class Function(
     val functionData: WasmFunction,
@@ -92,7 +90,8 @@ class Function(
         if (functionData.import == null) {
             wat.indent++
             wat.writeAll(instructions)
-            wat.writeLine(")")
+            wat.startLine()
+            wat.write(")")
             wat.indent--
         }
     }

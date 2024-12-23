@@ -1,7 +1,8 @@
 package ir.expression
 
 import compiler.WAPC
-import generation.WatWriter
+import generation.c.CWriter
+import generation.wat.WatWriter
 import ir.wasm.Index
 import ir.wasm.WasmValueType
 
@@ -19,7 +20,11 @@ class MemorySize(val memoryId: Index) : Expression() {
     }
 
     override fun wat(wat: WatWriter) {
-        val idx = if(WAPC.params!!.multipleMemories) " $memoryId" else ""
+        val idx = if(WAPC.params.multipleMemories) " $memoryId" else ""
         wat.writeLine("memory.size$idx", this)
+    }
+
+    override fun c(writer: CWriter) {
+        writer.writeLine("wasm_rt_memory_size()")
     }
 }

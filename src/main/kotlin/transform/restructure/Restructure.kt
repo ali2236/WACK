@@ -8,6 +8,7 @@ import ir.statement.Statement
 import transform.Transformer
 import java.util.*
 
+@Deprecated("Bad Implementation: Can't access all member instructions. use Transformer + ExpressionReplacer Instead.")
 abstract class Restructure : Transformer {
     lateinit var currentProgram: Program
     lateinit var currentFunction: Function

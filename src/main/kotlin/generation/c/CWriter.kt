@@ -1,5 +1,6 @@
-package generation
+package generation.c
 
+import compiler.WACK
 import compiler.WAPC
 import ir.Names
 import ir.statement.Program
@@ -7,21 +8,21 @@ import ir.statement.Statement
 import java.io.File
 
 
-class WatWriter(private val buffer: Appendable) {
+class CWriter(private val buffer: Appendable) {
 
-    var watDebug: Boolean = true
-    var indent = 0
+    var cDebug: Boolean = true
+    private var indent = 0
     val debugIndent = 36
 
-    fun writeLine(instruction: String, debug: Statement? = null) {
+    fun writeLine(statement: String, debug: Statement? = null) {
         startLine()
-        write(instruction)
-        if (WAPC.params!!.addCommentedIR && watDebug) {
+        write(statement)
+        if (WACK.params.addCommentedIR) {
             debug?.let {
-                for (i in 1..(debugIndent - (indent * Names.indent.length) - instruction.length)) {
+                for (i in 1..(debugIndent - (indent * Names.indent.length) - statement.length)) {
                     buffer.append(' ')
                 }
-                write(" ;; ")
+                write(" // ")
                 it.id?.let { id ->
                     write("${debug.javaClass.simpleName}($id): ")
                 }
@@ -29,6 +30,20 @@ class WatWriter(private val buffer: Appendable) {
             }
         }
         endLine()
+    }
+
+    fun indent(){
+        indent++
+    }
+
+    fun deIndent(){
+        indent--
+    }
+
+    fun indented(block: () -> Unit){
+        indent()
+        block()
+        deIndent()
     }
 
     fun startLine() {
@@ -47,18 +62,24 @@ class WatWriter(private val buffer: Appendable) {
 
     fun writeAll(stmts: List<Statement>) {
         stmts.forEach {
-            it.wat(this)
+            it.c(this)
         }
     }
 
+    fun inLine(block: () -> Unit) {
+        startLine()
+        block()
+        endLine()
+    }
+
     companion object {
-        fun writeToFile(program: Program, watOut: File) : File {
-            val outWriter = watOut.writer()
-            val watWriter = WatWriter(outWriter)
-            program.wat(watWriter)
+        fun writeToFile(program: Program, cOut: File) : File {
+            val outWriter = cOut.writer()
+            val cWriter = CWriter(outWriter)
+            program.c(cWriter)
             outWriter.flush()
             outWriter.close()
-            return watOut
+            return cOut
         }
     }
 }

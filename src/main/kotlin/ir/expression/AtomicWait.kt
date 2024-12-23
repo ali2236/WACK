@@ -1,7 +1,8 @@
 package ir.expression
 
 import compiler.WAPC
-import generation.WatWriter
+import generation.c.CWriter
+import generation.wat.WatWriter
 import ir.wasm.Index
 import ir.wasm.WasmValueType
 
@@ -59,5 +60,9 @@ class AtomicWait(
         val algn = if (align != 0) " align=$align" else ""
         val memIndex = if(WAPC.params!!.multipleMemories) " $memoryIndex" else ""
         wat.writeLine("memory.atomic.wait${type.byteCount() * 8}${memIndex}$ofst$algn", this)
+    }
+
+    override fun c(writer: CWriter) {
+        throw NotImplementedError()
     }
 }

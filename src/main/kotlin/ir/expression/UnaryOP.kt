@@ -1,6 +1,6 @@
 package ir.expression
 
-import generation.WatWriter
+import generation.wat.WatWriter
 import ir.finder.Visitor
 import ir.wasm.WasmBitSign
 import ir.wasm.WasmValueType

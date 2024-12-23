@@ -2,7 +2,7 @@ package ir.statement
 
 import external.Wasm2Wat
 import external.Wat2Wasm
-import generation.WatWriter
+import generation.wat.WatWriter
 import ir.IRConstructor
 import ir.finder.Visitor
 import ir.parser.Wat

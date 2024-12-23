@@ -1,6 +1,7 @@
 package compiler
 
 import external.Wasm2C
+import generation.c.CWriter
 import ir.annotations.Skip
 import ir.statement.Function
 import ir.statement.Program
@@ -22,13 +23,15 @@ object WACK : WebAssemblyCompiler {
         Files.createDirectories(Path("./out/intermediate"))
     }
 
+    var params = Params()
+
     override fun run(input: Path, output: Path?): Path {
         if (!input.exists()) {
             throw Error("Input File doesn't Exist!");
         }
         val inputFile = input.toFile()
         // decompile using w2c2
-        val cFile = Wasm2C.process(inputFile)
+        //val cFile = Wasm2C.process(inputFile)
         // Problem: doesn't support all APIs
         // Alternative: Even wasm2c generated code is barely analysable
         // replace kernel functions with self generated code
@@ -46,12 +49,15 @@ object WACK : WebAssemblyCompiler {
             pass.apply(program)
         }
 
-        // find function with range loops
+        // convert to c
+        val buffer = StringBuilder()
+        val cWriter = CWriter(buffer)
         val functions = program.statements
             .filterIsInstance<Function>()
-            .filterNot { it.hasAnnotation(Skip::class.java) }
 
 
+
+        println(functions)
 
 
         // Problem: replaced normal code doesn't work with other w2c2 code
@@ -60,7 +66,23 @@ object WACK : WebAssemblyCompiler {
         // link with openmp
         // compile to wasm
 
-        return cFile.toPath()
+        return Path(".")
     }
+
+    data class Params(
+        val parallelize : Boolean = true,
+        //val parallelizeInnerLoops: Boolean = true,
+        //val threads: Int = 8,
+        //val generateDotFiles: Boolean = false,
+        //val dfaStatementId: Boolean = false,
+        //val dfaShowAlias: Boolean = true,
+        //val normalizeLoops: Boolean = true,
+        //val enableAsserts: Boolean = false,
+        val addCommentedIR: Boolean = true,
+        //val multipleMemories: Boolean = true,
+        //val annotations: Boolean = true,
+        //val threadSpawnModule: String = "wasi" /*"wasi_snapshot_preview1"*/,
+        //val stripDebugNames : Boolean = true,
+    )
 
 }

@@ -1,6 +1,6 @@
 package ir.expression
 
-import generation.WatWriter
+import generation.wat.WatWriter
 import ir.statement.Statement
 import ir.wasm.WasmValueType
 import java.lang.Exception

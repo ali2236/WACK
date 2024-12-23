@@ -1,7 +1,6 @@
 package ir.statement
 
-import generation.WatWriter
-import ir.expression.Symbol
+import generation.wat.WatWriter
 
 class Unreachable : BasicStatement() {
     override fun write(out: Appendable) {

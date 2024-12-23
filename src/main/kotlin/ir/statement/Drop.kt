@@ -1,6 +1,7 @@
 package ir.statement
 
-import generation.WatWriter
+import generation.c.CWriter
+import generation.wat.WatWriter
 import ir.expression.Expression
 import ir.finder.Visitor
 
@@ -18,5 +19,11 @@ class Drop(var value: Expression) : BasicStatement() {
     override fun wat(wat: WatWriter) {
         value.wat(wat)
         wat.writeLine("drop", this)
+    }
+
+    override fun c(writer: CWriter) {
+        writer.inLine {
+            value.c(writer)
+        }
     }
 }

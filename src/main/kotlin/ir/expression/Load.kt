@@ -1,7 +1,8 @@
 package ir.expression
 
 import compiler.WAPC
-import generation.WatWriter
+import generation.c.CWriter
+import generation.wat.WatWriter
 import ir.Names
 import ir.finder.ExpressionFinder
 import ir.finder.Visitor
@@ -48,9 +49,20 @@ class Load(
         val ofst = if (offset != 0) " offset=$offset" else ""
         val algn = if (align != 0) " align=$align" else ""
         val sgn = if (sign != null && memorySize != null) "${memorySize}_${sign}" else ""
-        val memIndex = if (WAPC.params!!.multipleMemories) " $memoryIndex" else ""
+        val memIndex = if (WAPC.params.multipleMemories) " $memoryIndex" else ""
         val atomic = if (atomic) ".atomic" else ""
         wat.writeLine("${type}${atomic}.load$sgn$memIndex${ofst}${algn}", this)
+    }
+
+    override fun c(writer: CWriter) {
+        if (atomic) {
+            throw Exception("Atomic not supported")
+        }
+        writer.write(Names.memory + memoryIndex)
+        writer.write("[")
+        address.c(writer)
+        writer.write("+$offset")
+        writer.write("]")
     }
 
     override fun clone(): Load {

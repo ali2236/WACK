@@ -38,7 +38,7 @@ class PolyBenchBenchmark : BatchWasmTester() {
         println(BenchmarkResult.header)
 
         // run benchmark
-        val params = WAPC.Params(threads = 4)
+        val params = WAPC.Params(threads = 8)
         val rows = batchTest(_dir.resolve("$optimization/$datasetSize"), params)
             .map {
                 println(it)

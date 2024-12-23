@@ -1,6 +1,6 @@
 package ir.statement
 
-import generation.WatWriter
+import generation.wat.WatWriter
 import ir.wasm.Index
 
 class DataDrop(val dataIndex: Index): BasicStatement() {

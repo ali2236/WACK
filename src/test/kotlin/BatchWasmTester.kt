@@ -12,7 +12,11 @@ import kotlin.time.Duration
 
 abstract class BatchWasmTester {
 
-    fun batchTest(dir: Path, params: WAPC.Params = WAPC.Params(), skip: Set<String> = setOf()): Stream<BenchmarkResult> {
+    fun batchTest(
+        dir: Path,
+        params: WAPC.Params = WAPC.Params(),
+        skip: Set<String> = setOf()
+    ): Stream<BenchmarkResult> {
         var i = 1
         return Files.list(dir)
             .filter { Files.isRegularFile(it) }
@@ -25,7 +29,16 @@ abstract class BatchWasmTester {
                 val serialTime = runTimed { serialOutput = Wasmtime.run(serialFile) }
                 val parallelFile = WAPC.compile(serialFile, params = params)
                 val parallelTime = runTimed { parallelOutput = Wasmtime.runWithThreadsEnabled(parallelFile) }
-                BenchmarkResult(i++, name, serialTime, parallelTime, serialOutput, parallelOutput)
+                BenchmarkResult(
+                    i++,
+                    name,
+                    WAPC.stats.topLevelRangeLoops,
+                    WAPC.stats.loopsParallelized,
+                    serialTime,
+                    parallelTime,
+                    serialOutput,
+                    parallelOutput
+                )
             }
     }
 
@@ -38,6 +51,8 @@ abstract class BatchWasmTester {
     class BenchmarkResult(
         val index: Int,
         val name: String,
+        val topLevelRangeLoops: Int,
+        val loopsParallelized: Int,
         val serialTime: Duration,
         val parallelTime: Duration,
         val serialOutput: String,
@@ -47,11 +62,11 @@ abstract class BatchWasmTester {
             get() = (serialTime.inWholeMilliseconds / parallelTime.inWholeMilliseconds.toDouble())
 
         override fun toString(): String {
-            return "$index,$name,$serialTime,$parallelTime,${String.format("%.2f", speedup)}"
+            return "$index,$name,$topLevelRangeLoops/$loopsParallelized,$serialTime,$parallelTime,${String.format("%.2f", speedup)}"
         }
 
         companion object {
-            val header = "index,name,serial time,parallel time,speedup"
+            val header = "index,name,loops parallelized,serial time,parallel time,speedup"
         }
     }
 }

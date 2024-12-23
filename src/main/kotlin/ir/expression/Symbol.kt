@@ -1,6 +1,6 @@
 package ir.expression
 
-import generation.WatWriter
+import generation.wat.WatWriter
 import ir.Names
 import ir.statement.SymbolLoad
 import ir.wasm.Index

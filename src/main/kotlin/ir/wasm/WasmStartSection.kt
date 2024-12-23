@@ -1,6 +1,6 @@
 package ir.wasm
 
-import generation.WatWriter
+import generation.wat.WatWriter
 import generation.WebAssemblyInstruction
 
 class WasmStartSection(val functionIndex: Index) : WebAssemblyInstruction {

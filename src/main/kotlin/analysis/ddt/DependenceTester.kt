@@ -31,6 +31,7 @@ class DependenceTester(val function: Function) {
     }
 
     private fun testTopLevelLoop(topLevelRangeLoop: RangeLoop): List<ParallelizableLoop> {
+        WAPC.stats.topLevelRangeLoops++
         val finder = AccessFinder(topLevelRangeLoop, dfa)
         if (finder.functionCalls().isNotEmpty()) {
             // has function calls
@@ -81,7 +82,6 @@ class DependenceTester(val function: Function) {
                     else -> {
                         // gcd test
                         // banerjee test
-                        // range test
                         val result = DependenceTester.runTests(
                             pair.source,
                             pair.sink,
@@ -105,7 +105,7 @@ class DependenceTester(val function: Function) {
                 dependenceResult!!.direction[topLevelRangeLoop] == Direction.Equal
             if (noCollision || topLevelHasNoDependence) {
                 return listOf(ParallelizableLoop(topLevelRangeLoop))
-            } else if (WAPC.params!!.parallelizeInnerLoops) {
+            } else if (WAPC.params.parallelizeInnerLoops) {
                 // inner-loops
                 var parallelizableLoops = dependenceResult!!.direction.filter { it.value == Direction.Equal }
                 parallelizableLoops =

@@ -1,4 +1,4 @@
-// Generated from C:/Users/Aligator/Projects/WACK/src/main/java/parser/WatParser.g4 by ANTLR 4.13.1
+// Generated from C:/Users/Aligator/projects/WACK/src/main/java/parser/WatParser.g4 by ANTLR 4.13.1
 package parser;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 

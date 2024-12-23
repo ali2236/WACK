@@ -17,10 +17,12 @@ object WAPC : WebAssemblyCompiler {
         Files.createDirectories(Path("./out/intermediate"))
     }
 
+    var stats : Statistics = Statistics()
     var params: Params = Params()
 
     fun compile(input: Path, output: Path? = null, params: Params = Params()): Path {
         WAPC.params = params
+        stats = Statistics()
         try {
             return run(input, output)
         } finally {
@@ -64,6 +66,11 @@ object WAPC : WebAssemblyCompiler {
         val annotations: Boolean = true,
         val threadSpawnModule: String = "wasi" /*"wasi_snapshot_preview1"*/,
         val stripDebugNames : Boolean = true,
+    )
+
+    data class Statistics(
+        var topLevelRangeLoops : Int = 0,
+        var loopsParallelized : Int = 0,
     )
 
 }

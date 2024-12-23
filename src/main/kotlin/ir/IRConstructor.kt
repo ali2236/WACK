@@ -1,15 +1,11 @@
 package ir
 
-import ir.statement.Assignment
-import ir.expression.Symbol
-import ir.expression.Value
-import ir.statement.*
-import ir.statement.Function
 import ir.parser.WatVisitor
+import ir.statement.Function
+import ir.statement.Program
+import ir.statement.Statement
 import ir.wasm.Index
-import ir.wasm.WasmFunction
 import ir.wasm.WasmModule
-import ir.wasm.WasmScope
 
 class IRConstructor(val module: WasmModule) {
 

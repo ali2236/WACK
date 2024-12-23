@@ -138,18 +138,13 @@ COMPARE:
 
 CONVERT:
     'i32.wrap_i64'
-    | 'i64.extend_i32_s'
-    | 'i64.extend_i32_u'
+    | 'i64.extend_i32_' SIGN
     | 'f32.demote_f64'
     | 'f64.promote_f32'
-    | IXX '.trunc_f32_s'
-    | IXX '.trunc_f32_u'
-    | IXX '.trunc_f64_s'
-    | IXX '.trunc_f64_u'
-    | FXX '.convert_i32_s'
-    | FXX '.convert_i32_u'
-    | FXX '.convert_i64_s'
-    | FXX '.convert_i64_u'
+    | IXX '.trunc_' FXX '_' SIGN
+    | IXX '.trunc_sat_' FXX '_' SIGN
+    | FXX '.convert_i32_' SIGN
+    | FXX '.convert_i64_' SIGN
     | 'f32.reinterpret_i32'
     | 'f64.reinterpret_i64'
     | 'i32.reinterpret_f32'

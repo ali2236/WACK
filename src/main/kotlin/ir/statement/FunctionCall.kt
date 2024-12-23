@@ -1,7 +1,6 @@
 package ir.statement
 
-import generation.WatWriter
-import ir.Mode
+import generation.wat.WatWriter
 import ir.Names
 import ir.expression.Expression
 import ir.expression.SingleResultFunction

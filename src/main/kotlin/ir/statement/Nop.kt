@@ -1,6 +1,6 @@
 package ir.statement
 
-import generation.WatWriter
+import generation.wat.WatWriter
 
 class Nop : BasicStatement() {
     override fun write(out: Appendable) {}

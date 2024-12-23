@@ -1,6 +1,6 @@
 package ir.statement
 
-import generation.WatWriter
+import generation.wat.WatWriter
 import ir.expression.Expression
 import ir.finder.Visitor
 

@@ -1,6 +1,6 @@
 package ir.wasm
 
-import generation.WatWriter
+import generation.wat.WatWriter
 import generation.WebAssemblyInstruction
 import ir.Names
 import ir.expression.Symbol

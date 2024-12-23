@@ -177,7 +177,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             stack.push(Tee(symbol, value))
         } else if (ctx.GLOBAL_GET() != null) {
             val index = Index.parse(ctx.var_().first().text)
-            val type = module.globals.find(index)!!.type.type
+            val type = module.globals.find(index).type.type
             val symbol = Symbol(WasmScope.global, type, index)
             stack.push(symbol)
         } else if (ctx.GLOBAL_SET() != null) {

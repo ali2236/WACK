@@ -1,6 +1,6 @@
 package ir.wasm
 
-import generation.WatWriter
+import generation.wat.WatWriter
 import generation.WebAssemblyInstruction
 
 data class WasmTable(val index: Index, val min: Int, val max: Int?, val refType : WasmRefType) : WebAssemblyInstruction {

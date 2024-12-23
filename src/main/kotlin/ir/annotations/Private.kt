@@ -1,6 +1,7 @@
 package ir.annotations
 
-import generation.WatWriter
+import generation.c.CWriter
+import generation.wat.WatWriter
 import ir.finder.Visitor
 import ir.statement.SymbolLoad
 
@@ -15,6 +16,12 @@ class Private(val symbol: SymbolLoad, var private: SymbolLoad? = null) : WackAnn
         private?.wat(wat)
         wat.watDebug = true
         wat.write("))")
+    }
+
+    override fun c(writer: CWriter) {
+        writer.write("private(")
+        symbol.c(writer)
+        writer.write(")")
     }
 
     override fun visit(v: Visitor) {

@@ -10,9 +10,6 @@ import ir.statement.Program
 
 class ParallelForAnnotator : Transformer {
     override fun apply(program: Program) {
-        if(!WAPC.params!!.parallelize){
-            return
-        }
         program.statements
             .filterIsInstance<Function>()
             .filter { !it.hasAnnotation(Skip::class.java) }
@@ -22,6 +19,7 @@ class ParallelForAnnotator : Transformer {
     private fun applyToFunction(function: Function) {
         val loops = DependenceTester(function).testLoops()
         for (parallelLoop in loops) {
+            WAPC.stats.loopsParallelized++
             val loop = parallelLoop.loop
             loop.annotations.add(Parallel())
             loop.annotations.add(For())
