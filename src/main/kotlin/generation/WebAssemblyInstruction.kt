@@ -7,6 +7,6 @@ interface WebAssemblyInstruction {
 
     fun wat(wat : WatWriter)
 
-    fun c(writer: CWriter) {}
+    fun c(writer: CWriter)
 
 }

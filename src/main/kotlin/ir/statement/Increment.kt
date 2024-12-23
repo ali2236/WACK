@@ -1,5 +1,6 @@
 package ir.statement
 
+import generation.c.CWriter
 import generation.wat.WatWriter
 import ir.expression.Expression
 import ir.finder.Visitor
@@ -28,6 +29,18 @@ class Increment(var stmt: AssignmentStore, var direction: Direction) : BasicStat
 
     override fun wat(wat: WatWriter) {
         stmt.wat(wat)
+    }
+
+    override fun c(writer: CWriter) {
+        writer.inLine {
+            stmt.assignedTo().c(writer)
+            val s = when(direction){
+                Direction.plus -> "++"
+                Direction.minus -> "--"
+            }
+            writer.write(s)
+            writer.write(";")
+        }
     }
 
     enum class Direction {

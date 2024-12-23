@@ -1,5 +1,6 @@
 package ir.expression
 
+import generation.c.CWriter
 import generation.wat.WatWriter
 import ir.Names
 import ir.statement.SymbolLoad
@@ -19,6 +20,10 @@ open class Symbol(val scope: WasmScope, val type: WasmValueType, val index : Ind
         } else {
             wat.writeLine("${scope.name}.get $index", this)
         }
+    }
+
+    override fun c(writer: CWriter) {
+        writer.write(index.access(scope.prefix(), ""))
     }
 
     override fun exprType(): WasmValueType {

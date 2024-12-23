@@ -12,7 +12,7 @@ interface Statement : Visitable, WebAssemblyInstruction {
 
         private var statementId : Long = 0L
 
-        fun newId() : Long{
+        fun newId() : Long {
             return statementId++
         }
 

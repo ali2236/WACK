@@ -1,5 +1,6 @@
 package ir.expression
 
+import generation.c.CWriter
 import generation.wat.WatWriter
 import ir.finder.Visitor
 import ir.wasm.WasmValueType
@@ -30,6 +31,17 @@ class Select(var val1: Expression, var val2: Expression, var selector: Expressio
         selector.wat(wat)
         val type = if(resultType != null) " (result $resultType)" else ""
         wat.writeLine("select$type", this)
+    }
+
+    override fun c(writer: CWriter) {
+        writer.inLine {
+            selector.c(writer)
+            writer.write(" ? ")
+            val1.c(writer)
+            writer.write(" : ")
+            val2.c(writer)
+            writer.write(";")
+        }
     }
 
     override fun visit(v: Visitor) {
