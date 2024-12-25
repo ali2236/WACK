@@ -8,10 +8,13 @@ import analysis.ddt.tests.*
 import analysis.ddt.tests.DependenceTester
 import analysis.dfa.Dfa
 import ir.expression.Load
+import ir.expression.Symbol
 import ir.expression.Value
 import ir.finder.BreadthFirstExpressionFinder
+import ir.finder.ExpressionFinder
 import ir.statement.Function
 import ir.statement.RangeLoop
+import ir.statement.Store
 
 class DependenceTester(val function: Function) {
 

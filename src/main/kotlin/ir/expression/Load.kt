@@ -86,14 +86,4 @@ class Load(
         return true
     }
 
-    // Array Patters:
-    // M0[3560+0] - might be a stack variable
-    // M0[L1+(L2<<2)+0] - has <<
-    fun isArrayReference(): Boolean {
-        return ExpressionFinder(BinaryOP::class.java)
-            .also { this.visit(it) }
-            .result()
-            .any { it.operator == BinaryOP.Operator.shl }
-    }
-
 }

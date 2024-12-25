@@ -1,5 +1,6 @@
 package transform
 
+import analysis.dfa.Dfa
 import compiler.WAPC
 import ir.annotations.For
 import ir.annotations.Private
@@ -8,6 +9,7 @@ import ir.expression.Load
 import ir.expression.Symbol
 import ir.finder.BreadthFirstExpressionFinder
 import ir.finder.ExpressionFinder
+import ir.finder.StackVariableFinder
 import ir.statement.Function
 import ir.statement.Program
 import ir.statement.RangeLoop
@@ -41,18 +43,16 @@ class MarkLoopTemporariesAsPrivate : Transformer {
                     }
 
                     // privatize all non-array stack-variables
-                    /*val loopPrivate = forLoop.annotations.filterIsInstance<Private>().map { it.symbol }.toSet()
-                    val stackVars = ExpressionFinder(Store::class.java)
-                        .also { forLoop.visit(it) }
-                        .result()
-                        .map { it.symbol }
-                        .toSet()
-                        .filter { !loopPrivate.contains(it) } // not already private
-                        .filter { !it.isArrayReference() } // not an array reference
+                    // avoid:
+                    // L1 = L0<<2+368
+                    // M[L1+0] = ...
+                    val dfa = Dfa.from(function)
+                    val loopPrivate = forLoop.annotations.filterIsInstance<Private>().map { it.symbol }.toSet()
+                    val stackVars = StackVariableFinder(forLoop, loopPrivate, dfa).result()
 
                     stackVars.forEach {
                         forLoop.annotations.add(Private(it))
-                    }*/
+                    }
                 }
             }
     }
