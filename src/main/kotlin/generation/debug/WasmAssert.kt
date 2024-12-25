@@ -8,7 +8,7 @@ import ir.wasm.WasmValueType
 
 object WasmAssert {
     fun equal(first: Expression, second: Expression): Statement {
-        if (!WAPC.params!!.enableAsserts){
+        if (!WAPC.params.enableAsserts){
             return Empty()
         }
         return If(
@@ -23,7 +23,7 @@ object WasmAssert {
     }
 
     fun notEqual(first: Expression, second: Expression): Statement {
-        if (!WAPC.params!!.enableAsserts){
+        if (!WAPC.params.enableAsserts){
             return Empty()
         }
         return If(

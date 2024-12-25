@@ -31,22 +31,23 @@ class ParallelForAnnotator : Transformer {
                 //println("Added Conditions To Parallel For Loop")
             }
             // generally alias stack access
-            if(parallelLoop.conditions.isNotEmpty()){
+            /*if(parallelLoop.conditions.isNotEmpty()){
                 // find stack_base
                 val symbols = Finders.symbols(parallelLoop.conditions.first())
                 val stackBase = symbols.first()
                 // set @stack_base annotation
-                loop.annotations.add(StackBase(stackBase))
-            } else if(parallelLoop.loop.symbol is Load) {
+                loop.annotations.add(TransferIn(stackBase))
+            } else */
+            /*if(parallelLoop.loop.symbol is Load) {
                 val loopSymbol = parallelLoop.loop.symbol as Load
                 // find stack_base
                 val symbols = Finders.symbols(loopSymbol)
                 val stackBase = symbols.firstOrNull()
                 // set @stack_base annotation
                 stackBase?.let {
-                    loop.annotations.add(StackBase(stackBase))
+                    loop.annotations.add(TransferIn(stackBase))
                 }
-            }
+            }*/
         }
     }
 }

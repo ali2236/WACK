@@ -32,15 +32,6 @@ object ThreadKernelGenerator {
                     parallelBlock.parent = forLoop.parent
                     parallelBlock.indexInParent = forLoop.indexInParent
 
-                    // replace stack_base
-                    val localStackBase = forLoop.annotations.filterIsInstance<StackBase>().firstOrNull()
-                    if (localStackBase != null) {
-                        val replaces = mapOf<SymbolLoad, Symbol>(
-                            localStackBase.symbol to Symbol.localI32(Index.number(1))
-                        )
-                        SymbolReplacer(replaces).also { forLoop.visit(it) }
-                    }
-
                     // loop boundaries
                     val rangeLoop = (forLoop as RangeLoop)
                     val rangeFrom = rangeLoop.range.from
@@ -63,7 +54,6 @@ object ThreadKernelGenerator {
                         Index("__kernel_$kernels"),
                         type = kernelType, /* thread_id */
                         locals = mutableListOf(
-                            WasmValueType.i32/* stack_base */,
                             WasmValueType.i32/* start */,
                             WasmValueType.i32/* end */
                         ),
@@ -72,19 +62,36 @@ object ThreadKernelGenerator {
                     // put loop as function body
                     val kernel = Function(kernelFunction).apply {
                         val threadId = Symbol.localI32(Index.number(0))
-                        val stackBase = Symbol.localI32(Index.number(1))
-                        val start = Symbol.localI32(Index.number(2))
-                        val end = Symbol.localI32(Index.number(3))
+                        val start = Symbol.localI32(Index.number(1))
+                        val end = Symbol.localI32(Index.number(2))
                         val maxThreads = metaLib.maxThreads.get.call().result
 
-                        // TODO: Only if has stack_base
-                        // new stack_base
-                        instructions.add(
-                            Assignment(
-                                stackBase,
-                                metaLib.stackBase.get.call().result,
+                        // create transfer variables
+                        val localTransferIn = forLoop.annotations.filterIsInstance<TransferIn>()
+                        val replaceMap = mutableMapOf<SymbolLoad, Symbol>()
+                        val loadTransferee = mutableListOf<Statement>()
+                        localTransferIn.forEach { t ->
+                            // allocate new symbol for transfere
+                            kernelFunction.locals.add(t.symbol.type)
+                            val newSymbol = Symbol(WasmScope.local, t.symbol.type, Index.next(kernelFunction.locals))
+                            replaceMap[t.symbol] = newSymbol
+                            loadTransferee.add(
+                                Assignment(
+                                    newSymbol,
+                                    metaLib.localTransfer(t.symbol.type).load.call(Value.i32(t.index)).result,
+                                )
                             )
-                        )
+
+                            /*loadTransferee.addAll(
+                                mutex.criticalSection { print.print(threadId, newSymbol) }
+                            )*/
+                        }
+
+                        // replace old references
+                        SymbolReplacer(replaceMap).also { forLoop.visit(it) }
+
+                        // get transferees values
+                        instructions.addAll(loadTransferee)
 
                         // size = to - from
                         val size = BinaryOP(
@@ -192,7 +199,7 @@ object ThreadKernelGenerator {
 
                     parallelBlock.apply {
                         annotations.add(CallKernel(kernelId))
-                        forLoop.annotations.filterIsInstance<StackBase>().firstOrNull()?.let {
+                        forLoop.annotations.filterIsInstance<TransferIn>().forEach {
                             parallelBlock.annotations.add(it)
                         }
                         generateCallKernel(function, this)

@@ -15,6 +15,7 @@ data class WasmFunction(
         get() = type.params + locals
 
     fun call(vararg params: Expression): FunctionCall {
+        // TODO: fix inverse call param issue
         return FunctionCall(index, mutableListOf(*params), type.result)
     }
 

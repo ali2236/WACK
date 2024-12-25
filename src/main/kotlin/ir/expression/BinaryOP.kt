@@ -157,6 +157,7 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
             val rem = Operator("%", "rem")
             val rotl = Operator("<<<", "rotl")
             val rotr = Operator(">>>", "rotr")
+            val copysign = Operator("±", "copysign")
         }
 
         fun invert(): Operator {
@@ -206,6 +207,10 @@ class BinaryOP(val type: WasmValueType, var operator: Operator, var left: Expres
                 symbol,
                 Value(symbol.type, "1"),
             )
+        }
+
+        fun mul(left: Expression, i: Value): BinaryOP {
+            return BinaryOP(left.exprType(), Operator.mul, left, i)
         }
 
         fun plus(left: Expression, i: Value): BinaryOP {

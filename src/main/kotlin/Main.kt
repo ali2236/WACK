@@ -12,7 +12,8 @@ fun main(args: Array<String>) {
         //File("./samples/matrix_multiply.wasm"),
         //File("./src/test/resources/src/known_pre_allocated.wasm"),
         //File("./samples/transform/loop_normalization/loop_normalization_2.wasm"),
-        File("./samples/polybench/O0/small_dataset/2mm.wasm"),
+        File("./samples/polybench/O0/small_dataset/deriche.wasm"),
+        //File("./samples/NAS/O0/A/bt.wasm"),
     )
     for (sample in samples) {
         testUsingWAPC(sample)
@@ -25,14 +26,13 @@ private fun testUsingWAPC(sample: File){
         params = WAPC.Params(
             threads = 8,
             generateDotFiles = true,
-            parallelize = false,
+            parallelize = true,
             parallelizeInnerLoops = true,
             normalizeLoops = true,
             enableAsserts = false,
             stripDebugNames = false,
-            annotations = true,
-            addCommentedIR = false,
-            multipleMemories = true,
+            annotations = false,
+            addCommentedIR = true,
         ),
     )
     println(WAPC.stats)

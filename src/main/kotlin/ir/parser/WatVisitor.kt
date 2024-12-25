@@ -230,6 +230,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
                 "rotl" -> BinaryOP.Operator.rotl
                 "rotr" -> BinaryOP.Operator.rotr
                 "div" -> BinaryOP.Operator.div
+                "copysign" -> BinaryOP.Operator.copysign
                 else -> throw Error("unkown binary operator $operatorName")
             }
             val second = stack.pop()

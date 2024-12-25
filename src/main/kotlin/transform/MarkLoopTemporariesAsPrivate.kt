@@ -21,7 +21,7 @@ class MarkLoopTemporariesAsPrivate : Transformer {
             .forEach { function ->
                 // find all top level for loops
                 val topLevelForLoops =
-                    BreadthFirstExpressionFinder(RangeLoop::class.java, !WAPC.params!!.parallelizeInnerLoops)
+                    BreadthFirstExpressionFinder(RangeLoop::class.java, !WAPC.params.parallelizeInnerLoops)
                         .also { function.visit(it) }
                         .result()
                         .filter { it.hasAnnotation(For::class.java) }
@@ -41,7 +41,7 @@ class MarkLoopTemporariesAsPrivate : Transformer {
                     }
 
                     // privatize all non-array stack-variables
-                    val loopPrivate = forLoop.annotations.filterIsInstance<Private>().map { it.symbol }.toSet()
+                    /*val loopPrivate = forLoop.annotations.filterIsInstance<Private>().map { it.symbol }.toSet()
                     val stackVars = ExpressionFinder(Store::class.java)
                         .also { forLoop.visit(it) }
                         .result()
@@ -52,7 +52,7 @@ class MarkLoopTemporariesAsPrivate : Transformer {
 
                     stackVars.forEach {
                         forLoop.annotations.add(Private(it))
-                    }
+                    }*/
                 }
             }
     }

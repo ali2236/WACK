@@ -16,7 +16,7 @@ object TransformationPasses {
             SkipNoRangeLoopFunctions(),
             LoopNormalization(),
             ParallelForAnnotator(),
-            StackBaseAliasAnnotator(),
+            LocalsTransferInAnnotator(),
             MarkLoopCountersAsPrivate(),
             MarkLoopTemporariesAsPrivate(),
             //LocalizeRangeLoopCounter(),

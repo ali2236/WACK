@@ -7,6 +7,7 @@ import analysis.ddg.SubscriptDependenceType
 import analysis.ddt.tests.*
 import analysis.ddt.tests.DependenceTester
 import analysis.dfa.Dfa
+import ir.expression.Load
 import ir.expression.Value
 import ir.finder.BreadthFirstExpressionFinder
 import ir.statement.Function
@@ -97,8 +98,10 @@ class DependenceTester(val function: Function) {
         }
         // TODO: runtime dependence test
         if (pairs.isEmpty()) {
-            // no dependencies
-            return listOf(ParallelizableLoop(topLevelRangeLoop))
+            if (accesses.any { it.symbol is Load }) {
+                // no dependencies only if array kernel
+                return listOf(ParallelizableLoop(topLevelRangeLoop))
+            }
         } else if (dependenceResult != null) {
             val noCollision = dependenceResult == DependenceResult.noCollision
             val topLevelHasNoDependence =

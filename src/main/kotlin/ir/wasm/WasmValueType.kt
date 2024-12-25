@@ -6,8 +6,8 @@ enum class WasmValueType {
     i32,
     i64,
     f32,
-    f64,
-    Unknown;
+    f64;
+    //Unknown
 
     fun cType(): String {
         return when (this) {
@@ -15,7 +15,7 @@ enum class WasmValueType {
             i64 -> "long"
             f32 -> "float"
             f64 -> "double"
-            Unknown -> "void*"
+            //Unknown -> "void*"
         }
     }
 
@@ -23,7 +23,7 @@ enum class WasmValueType {
         return when (this) {
             i32, i64 -> "0"
             f32, f64 -> "0.0"
-            Unknown -> "NULL"
+            //Unknown -> "NULL"
         }
     }
 
@@ -33,7 +33,7 @@ enum class WasmValueType {
             i64 -> 8
             f32 -> 4
             f64 -> 8
-            Unknown -> 4
+           // Unknown -> 4
         }
     }
 
@@ -43,7 +43,7 @@ enum class WasmValueType {
             i64 -> Long.MIN_VALUE
             f32 -> Float.MIN_VALUE
             f64 -> Double.MIN_VALUE
-            Unknown -> Double.NaN
+            //Unknown -> Double.NaN
         }.toString()
     }
 
@@ -53,7 +53,7 @@ enum class WasmValueType {
             i64 -> Long.MAX_VALUE
             f32 -> Float.MAX_VALUE
             f64 -> Double.MAX_VALUE
-            Unknown -> Double.NaN
+            //Unknown -> Double.NaN
         }.toString()
     }
 
@@ -63,7 +63,7 @@ enum class WasmValueType {
             i64 -> value.toLong()
             f32 -> value.toFloat()
             f64 -> value.toDouble()
-            Unknown -> Double.NaN
+            //Unknown -> Double.NaN
         }
     }
 
@@ -73,7 +73,7 @@ enum class WasmValueType {
             i64 -> number.toLong()
             f32 -> number.toFloat()
             f64 -> number.toDouble()
-            Unknown -> Double.NaN
+            //Unknown -> Double.NaN
         }.toString()
     }
 

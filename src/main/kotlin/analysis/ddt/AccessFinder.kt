@@ -49,7 +49,7 @@ class AccessFinder(parentScope: RangeLoop, val dfa: Dfa) : Visitor() {
                 val access = Access(
                     assignedTo,
                     AccessType.Write,
-                    AccessScope(scope, currentStatement!!),
+                    AccessScope(scope, currentStatement ?: v),
                     finder.at(v) ?: setOf()
                 )
                 accesses.add(access)

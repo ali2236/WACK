@@ -5,21 +5,21 @@ import generation.wat.WatWriter
 import ir.expression.Symbol
 import ir.finder.Visitor
 
-class StackBase(val symbol: Symbol) : WackAnnotation {
+class TransferIn(val symbol: Symbol, val index: Int) : WackAnnotation {
     override fun wat(wat: WatWriter) {
-        wat.write("(@stack (")
+        wat.write("(@transfer_in (")
         wat.endLine()
         wat.indent++
         symbol.wat(wat)
         wat.indent--
         wat.startLine()
-        wat.write("))")
+        wat.write(") $index)")
     }
 
     override fun c(writer: CWriter) {
-        writer.write("stack_base(")
+        writer.write("transfer_in(")
         symbol.c(writer)
-        writer.write(")")
+        writer.write(", $index)")
     }
 
     override fun visit(v: Visitor) {

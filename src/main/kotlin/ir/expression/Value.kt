@@ -40,7 +40,7 @@ open class Value(val type: WasmValueType, val value: String) : ImmutableExpressi
             WasmValueType.i64 -> Value(type, (value.toLong() + i).toString())
             WasmValueType.f32 -> Value(type, (value.toFloat() + i).toString())
             WasmValueType.f64 -> Value(type, (value.toDouble() + i).toString())
-            WasmValueType.Unknown -> throw Error("Type $type unknown to add")
+            //WasmValueType.Unknown -> throw Error("Type $type unknown to add")
         }
     }
 
@@ -58,7 +58,7 @@ open class Value(val type: WasmValueType, val value: String) : ImmutableExpressi
             WasmValueType.i64 -> Value(type, (value.toLong() * i).toString())
             WasmValueType.f32 -> Value(type, (value.toFloat() * i).toString())
             WasmValueType.f64 -> Value(type, (value.toDouble() * i).toString())
-            WasmValueType.Unknown -> throw Error("Type $type unknown to multiply")
+            //WasmValueType.Unknown -> throw Error("Type $type unknown to multiply")
         }
     }
 

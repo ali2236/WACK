@@ -27,7 +27,7 @@ class Store(
         data.wat(wat)
         val ofst = if (symbol.offset != 0) " offset=${symbol.offset}" else ""
         val algn = if (symbol.align != 0) " align=${symbol.align}" else ""
-        val memIndex = if(WAPC.params!!.multipleMemories) " ${symbol.memoryIndex}" else ""
+        val memIndex = if(WAPC.params.multipleMemories) " ${symbol.memoryIndex}" else ""
         val memSize = if (symbol.memorySize != null) "${symbol.memorySize}" else ""
         val atomic = if(symbol.atomic) ".atomic" else ""
         wat.writeLine("${symbol.type}${atomic}.store${memSize}${memIndex}${ofst}${algn}", this)

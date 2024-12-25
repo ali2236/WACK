@@ -7,7 +7,7 @@ import kotlin.concurrent.thread
 object Wasmtime {
 
     fun runWithThreadsEnabled(path: Path): String {
-        return run(path, listOf("-W", "all-proposals=y", "-S", "threads"))
+        return run(path, listOf("-W", "all-proposals=y", "-S", "threads", "-D", "coredump=./trap.coredump"))
     }
 
     fun run(path: Path, flags: List<String> = listOf()): String {
