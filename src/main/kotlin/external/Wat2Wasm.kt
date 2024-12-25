@@ -25,13 +25,13 @@ class Wat2Wasm : FileProcessor {
         commands.add("wat2wasm")
         commands.add(input.absolutePath)
         commands.add("--enable-threads")
-        if (WAPC.params!!.multipleMemories) {
+        if (WAPC.params.multipleMemories) {
             commands.add("--enable-multi-memory")
         }
-        if(WAPC.params!!.annotations){
+        if(WAPC.params.annotations){
             commands.add("--enable-annotations")
         }
-        if (!WAPC.params!!.stripDebugNames){
+        if (!WAPC.params.stripDebugNames){
             commands.add("--debug-names")
         }
         commands.add("-o")

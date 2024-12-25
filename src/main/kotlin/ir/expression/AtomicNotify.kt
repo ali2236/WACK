@@ -51,7 +51,7 @@ class AtomicNotify(
         k.wat(wat)
         val ofst = if (offset != 0) " offset=$offset" else ""
         val algn = if (align != 0) " align=$align" else ""
-        val memIndex = if(WAPC.params!!.multipleMemories) " $memoryIndex" else ""
+        val memIndex = if(WAPC.params.multipleMemories) " $memoryIndex" else ""
         wat.writeLine("memory.atomic.notify${memIndex}$ofst$algn", this)
     }
 

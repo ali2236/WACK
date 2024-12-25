@@ -64,7 +64,7 @@ interface DfaValue {
 
 
         override fun toString(): String {
-            if(expr == null || !WAPC.params!!.dfaShowAlias){
+            if(expr == null || !WAPC.params.dfaShowAlias){
                 return  "?"
             } else {
                 return "\"$expr\""

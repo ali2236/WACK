@@ -66,6 +66,7 @@ object WAPC : WebAssemblyCompiler {
         val annotations: Boolean = true,
         val threadSpawnModule: String = "wasi" /*"wasi_snapshot_preview1"*/,
         val stripDebugNames : Boolean = true,
+        val minimumLoopCost : Int = 100000,
     )
 
     data class Statistics(

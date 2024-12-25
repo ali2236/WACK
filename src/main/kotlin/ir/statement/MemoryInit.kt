@@ -27,7 +27,7 @@ class MemoryInit(
         d.wat(wat)
         s.wat(wat)
         n.wat(wat)
-        val index = if(WAPC.params!!.multipleMemories) " $memoryId" else ""
+        val index = if(WAPC.params.multipleMemories) " $memoryId" else ""
         wat.writeLine("memory.init$index $dataSection", this)
     }
 }

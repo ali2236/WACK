@@ -17,7 +17,7 @@ class MarkLoopCountersAsPrivate : Transformer {
             .forEach { function ->
                 // find all top level for loops
                 val topLevelForLoops =
-                    BreadthFirstExpressionFinder(RangeLoop::class.java, !WAPC.params!!.parallelizeInnerLoops)
+                    BreadthFirstExpressionFinder(RangeLoop::class.java, !WAPC.params.parallelizeInnerLoops)
                         .also { function.visit(it) }
                         .result()
                         .filter { it.hasAnnotation(For::class.java) }

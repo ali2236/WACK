@@ -54,7 +54,7 @@ class Dfa(val nodes : MutableList<DfaNode>) : DotGraph() {
             out.append("label=<<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\"><TR><TD BORDER=\"0\" ALIGN=\"LEFT\" COLSPAN=\"2\">")
 
             // label & statement
-            if(WAPC.params!!.dfaStatementId){
+            if(WAPC.params.dfaStatementId){
                 dfaNode.statement?.id.let { id ->
                     dot.append("#$id: ")
                 }

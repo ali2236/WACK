@@ -40,7 +40,7 @@ class AtomicOp(
         val memSign = if(load.sign != null && load.sign == WasmBitSign.u) "_u" else ""
         val ofst = if (load.offset != 0) " offset=${load.offset}" else ""
         val algn = if (load.align != 0) " align=${load.align}" else ""
-        val memIndex = if(WAPC.params!!.multipleMemories) " ${load.memoryIndex}" else ""
+        val memIndex = if(WAPC.params.multipleMemories) " ${load.memoryIndex}" else ""
         wat.writeLine("${load.type.name}.atomic.rmw$memSize$memSign.${operator.name}$memIndex$ofst$algn")
     }
 
