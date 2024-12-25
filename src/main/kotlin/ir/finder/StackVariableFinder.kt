@@ -1,8 +1,7 @@
 package ir.finder
 
-import analysis.dfa.Dfa
-import analysis.dfa.DfaFact
 import analysis.dfa.DfaValue
+import analysis.dfa.StatementFactsFinder
 import ir.expression.BinaryOP
 import ir.expression.Expression
 import ir.expression.Load
@@ -10,9 +9,8 @@ import ir.statement.Statement
 import ir.statement.Store
 import ir.statement.SymbolLoad
 
-class StackVariableFinder(block: Statement, val exclude: Set<SymbolLoad> /*Already private*/, val dfa: Dfa) : Visitor() {
+class StackVariableFinder(block: Statement, val exclude: Set<SymbolLoad> /*Already private*/, val finder: StatementFactsFinder) : Visitor() {
 
-    private val finder = dfa.finder()
     private val _stackVars = mutableListOf<Load>()
 
     init {

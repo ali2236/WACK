@@ -46,9 +46,9 @@ class MarkLoopTemporariesAsPrivate : Transformer {
                     // avoid:
                     // L1 = L0<<2+368
                     // M[L1+0] = ...
-                    val dfa = Dfa.from(function)
+                    val finder = Dfa.from(function).finder()
                     val loopPrivate = forLoop.annotations.filterIsInstance<Private>().map { it.symbol }.toSet()
-                    val stackVars = StackVariableFinder(forLoop, loopPrivate, dfa).result()
+                    val stackVars = StackVariableFinder(forLoop, loopPrivate, finder).result()
 
                     stackVars.forEach {
                         forLoop.annotations.add(Private(it))
