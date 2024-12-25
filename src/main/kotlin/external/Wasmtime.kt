@@ -19,7 +19,9 @@ object Wasmtime {
         val input = Stream.concat(stdin, stderr)
         val output = StringBuilder()
         thread {
-            input.forEach(output::appendLine)
+            input.forEach {
+                output.appendLine(it)
+            }
         }
 
         process.waitFor()

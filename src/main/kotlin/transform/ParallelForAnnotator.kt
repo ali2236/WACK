@@ -19,7 +19,6 @@ class ParallelForAnnotator : Transformer {
     private fun applyToFunction(function: Function) {
         val loops = DependenceTester(function).testLoops()
         for (parallelLoop in loops) {
-            WAPC.stats.loopsParallelized++
             val loop = parallelLoop.loop
             loop.annotations.add(Parallel())
             loop.annotations.add(For())

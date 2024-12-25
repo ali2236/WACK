@@ -24,6 +24,7 @@ class WasiThreadsGenerator : Generator {
         val wasiThreads = WasiThreadsLibrary.generate(program)
         val supportLibrary = SupportLibrary.generate(program, mutex, metaLib, wackThread, wasiThreads, print)
         ThreadKernelGenerator.generate(program, metaLib, mutex, print) { function, block ->
+            WAPC.stats.loopsParallelized++
             block.instructions.clear()
             val kernelId = block.annotations.filterIsInstance<CallKernel>().first().kernelIndex
             block.annotations.filterIsInstance<TransferIn>().forEach { t ->
