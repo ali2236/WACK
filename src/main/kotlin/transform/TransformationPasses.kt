@@ -16,6 +16,7 @@ object TransformationPasses {
             SkipNoRangeLoopFunctions(),
             LoopNormalization(),
             ParallelForAnnotator(),
+            ReductionAnnotator(),
             ProfitabilityAnalysis(),
             LocalsTransferInAnnotator(),
             MarkLoopCountersAsPrivate(),
