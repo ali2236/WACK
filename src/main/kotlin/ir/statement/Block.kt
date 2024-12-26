@@ -34,6 +34,7 @@ open class Block(
         var foldable = true
         for (i in (instructions.size - 1) downTo 0) {
             val instr = instructions[i]
+            // result blocks are expressions!
             if (instr !is Expression) { // checks if instruction is statement - don't change!
                 foldable = false
                 continue

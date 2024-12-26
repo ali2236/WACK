@@ -121,6 +121,8 @@ class DependenceTester(val function: Function) {
                     parallelizableLoops.filter { (pl) -> !parallelizableLoops.any { (loop) -> pl.childOf(loop) } }
                 return parallelizableLoops.map { ParallelizableLoop(it.key) }
             }
+        } else {
+            return listOf(ParallelizableLoop(topLevelRangeLoop))
         }
         return listOf()
     }

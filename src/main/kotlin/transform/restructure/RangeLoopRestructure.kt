@@ -37,7 +37,7 @@ class RangeLoopRestructure : Transformer {
                         try {
                             transformIntoRangeLoop(it.statement, it.replace)
                         } catch (e: Exception) {
-                            println("range-loop-restructure: $e")
+                            //println("range-loop-restructure: $e")
                         }
                     }
                 }

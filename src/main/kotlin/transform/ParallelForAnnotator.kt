@@ -4,6 +4,7 @@ import analysis.ddt.DependenceTester
 import compiler.WAPC
 import ir.annotations.*
 import ir.expression.Load
+import ir.finder.BrDepthCheck
 import ir.finder.Finders
 import ir.statement.Function
 import ir.statement.Program
@@ -20,6 +21,13 @@ class ParallelForAnnotator : Transformer {
         val loops = DependenceTester(function).testLoops()
         for (parallelLoop in loops) {
             val loop = parallelLoop.loop
+
+            if (BrDepthCheck().also { it.visit(loop){} }.outOfBoundaryJump){
+                // dont parallelize when there is jumps(br with depth outside of topLevelRangeLoop)
+                continue
+            }
+
+
             loop.annotations.add(Parallel())
             loop.annotations.add(For())
             //println("Loop Marked as Parallel For")

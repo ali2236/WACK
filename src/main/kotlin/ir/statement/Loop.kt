@@ -1,6 +1,8 @@
 package ir.statement
 
-open class Loop(instructions: MutableList<Statement> = mutableListOf()) : Block(instructions) {
+import ir.wasm.WasmValueType
+
+open class Loop(instructions: MutableList<Statement> = mutableListOf(), type: WasmValueType? = null) : Block(instructions, type = type) {
 
     fun breakConditions(): List<IndexedValue<BrIf>> {
         return instructions.withIndex()

@@ -60,7 +60,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             type = WasmValueType.parse(ctx.block().block_type().value_type().text)
         }
         if (ctx.LOOP() != null) {
-            newScope(Loop())
+            newScope(Loop(type = type))
             super.visitBlock_instr(ctx)
             val loop = exitScope() as Loop
             if (type != null) {
@@ -103,13 +103,13 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
         } else if (ctx.BR() != null) {
             val depth = ctx.var_().first().text.toInt()
             val target = blocks[blocks.size - depth - 1]
-            val result = if (target.type != null) stack.pop() else null
+            val result = if (target.type != null && target !is Loop) stack.pop() else null
             stack.push(Br(target, depth, result))
         } else if (ctx.BR_IF() != null) {
             val depth = ctx.var_().first().text.toInt()
             val ifCondition = stack.pop()
             val target = blocks[blocks.size - depth - 1]
-            val result = if (target.type != null) stack.pop() else null
+            val result = if (target.type != null && target !is Loop) stack.pop() else null
             val brif = BrIf(ifCondition, target, depth, result)
             stack.push(brif)
         } else if (ctx.RETURN() != null) {
@@ -410,7 +410,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val memoryIndex = Index.parse(ctx.var_().firstOrNull()?.text)
             val notify = AtomicNotify(memoryIndex, offset, align, k, i)
             stack.push(notify)
-        } else if(ctx.ATOMIC_CMPXCHG() != null){
+        } else if (ctx.ATOMIC_CMPXCHG() != null) {
             val type = WasmValueType.parse(ctx.ATOMIC_CMPXCHG()!!.text.substring(0, 3))
             val memoryIndex = Index.parse(ctx.var_().getOrNull(0)?.text)
             val offset = ctx.OFFSET_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
@@ -430,7 +430,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
             val i = stack.pop()
             val cmpxchg = CMPXCHG(load, c3, c2, i)
             stack.push(cmpxchg)
-        } else if(ctx.ATOMIC_OPR() != null){
+        } else if (ctx.ATOMIC_OPR() != null) {
             val type = WasmValueType.parse(ctx.ATOMIC_OPR()!!.text.substring(0, 3))
             val memoryIndex = Index.parse(ctx.var_().getOrNull(0)?.text)
             val offset = ctx.OFFSET_EQ_NAT()?.text?.substringAfter("=")?.toIntOrNull() ?: 0
@@ -461,7 +461,7 @@ class WatVisitor(val module: WasmModule) : WatParserBaseVisitor<Unit>() {
 
 private fun <E : IndexedSection> List<E>.find(predicate: Index): E {
     val r = firstOrNull { it.getSectionIndex() == predicate }
-    if(r == null){
+    if (r == null) {
         throw Exception("Index $predicate not found!")
     } else {
         return r

@@ -10,9 +10,9 @@ class Br(val target: Block, var depth: Int, var result: Expression? = null) : Ba
         if (target is Loop && depth == 0) {
             out.append("continue$resultValue;\n")
         } else if (target is Block && depth == 0) {
-            out.append("break$resultValue;\n")
+            out.append("break $resultValue;\n")
         } else {
-            out.append("Br $depth$resultValue")
+            out.append("Br $depth $resultValue;\n")
         }
     }
 
