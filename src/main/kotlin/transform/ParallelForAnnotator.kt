@@ -11,9 +11,7 @@ import ir.statement.Program
 
 class ParallelForAnnotator : Transformer {
     override fun apply(program: Program) {
-        program.statements
-            .filterIsInstance<Function>()
-            .filter { !it.hasAnnotation(Skip::class.java) }
+        program.allNonSkipFunctions()
             .forEach { applyToFunction(it) }
     }
 

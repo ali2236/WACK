@@ -15,6 +15,7 @@ import ir.finder.ExpressionFinder
 import ir.statement.Function
 import ir.statement.RangeLoop
 import ir.statement.Store
+import transform.allNonSkipRangeLoops
 
 class DependenceTester(val function: Function) {
 
@@ -23,10 +24,7 @@ class DependenceTester(val function: Function) {
     fun testLoops(): List<ParallelizableLoop> {
         val loops = mutableListOf<ParallelizableLoop>()
         // for each top level Loop
-        val rangeLoops =
-            BreadthFirstExpressionFinder(RangeLoop::class.java, true)
-                .also { it.visit(function) {} }
-                .result()
+        val rangeLoops = function.allNonSkipRangeLoops()
         for (topLevelRangeLoop in rangeLoops) {
             val result = testTopLevelLoop(topLevelRangeLoop)
             loops.addAll(result)

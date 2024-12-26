@@ -34,6 +34,7 @@ private fun testUsingWAPC(sample: File){
             annotations = false,
             addCommentedIR = false,
             minimumLoopCost = 0,
+            reductionParallelization = false,
         ),
     )
     println(WAPC.stats)
