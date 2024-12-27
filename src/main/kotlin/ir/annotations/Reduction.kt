@@ -7,10 +7,7 @@ import ir.statement.SymbolLoad
 
 class Reduction(val symbol: SymbolLoad, val operator: BinaryOP.Operator) : WackAnnotation {
     override fun wat(wat: WatWriter) {
-        wat.write("(@reduce (${operator.sign}) (")
-        wat.endLine()
-        symbol.wat(wat)
-        wat.write(")")
+        wat.write("(@reduce)")
     }
 
     override fun visit(v: Visitor) {

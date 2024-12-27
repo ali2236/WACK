@@ -7,6 +7,7 @@ import analysis.ddg.SubscriptDependenceType
 import analysis.ddt.tests.*
 import analysis.ddt.tests.DependenceTester
 import analysis.dfa.Dfa
+import ir.annotations.Skip
 import ir.expression.Load
 import ir.expression.Symbol
 import ir.expression.Value
@@ -19,12 +20,15 @@ import transform.allNonSkipRangeLoops
 
 class DependenceTester(val function: Function) {
 
-    val dfa = Dfa.from(function)
+    val finder = Dfa.from(function).finder()
 
     fun testLoops(): List<ParallelizableLoop> {
         val loops = mutableListOf<ParallelizableLoop>()
         // for each top level Loop
-        val rangeLoops = function.allNonSkipRangeLoops()
+        val rangeLoops = BreadthFirstExpressionFinder(RangeLoop::class.java, true)
+            .also { it.visit(function) {} }
+            .result()
+            .filterNot { it.hasAnnotation(Skip::class.java) }
         for (topLevelRangeLoop in rangeLoops) {
             val result = testTopLevelLoop(topLevelRangeLoop)
             loops.addAll(result)
@@ -34,7 +38,7 @@ class DependenceTester(val function: Function) {
 
     private fun testTopLevelLoop(topLevelRangeLoop: RangeLoop): List<ParallelizableLoop> {
         WAPC.stats.topLevelRangeLoops++
-        val finder = AccessFinder(topLevelRangeLoop, dfa)
+        val finder = AccessFinder(finder).apply { visit(topLevelRangeLoop){} }
         if (finder.functionCalls().isNotEmpty()) {
             // has function calls
             // no parallel loops

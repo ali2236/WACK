@@ -1,5 +1,6 @@
 package transform
 
+import analysis.dfa.Dfa
 import compiler.WAPC
 import ir.annotations.For
 import ir.annotations.Parallel
@@ -8,12 +9,12 @@ import ir.statement.Program
 
 class ReductionAnnotator : Transformer {
     override fun apply(program: Program) {
-        program.allNonSkipFunctions()
-            .flatMap { it.allNonSkipRangeLoops() }
-            .parallelFor()
-            .forEach { loop ->
+        program.allNonSkipFunctions().forEach { function ->
+            val finder = Dfa.from(function).finder()
+            val rangeLoops =  function.allNonSkipRangeLoops().parallelFor()
+            for (loop in rangeLoops){
                 // check for reduction
-                val reductions = ReductionFinder().apply { visit(loop){} }.result()
+                val reductions = ReductionFinder(finder, loop).apply { visit(loop){} }.result()
                 // mark reduction if found
                 if (reductions.isNotEmpty()){
                     if (WAPC.params.reductionParallelization){
@@ -23,5 +24,6 @@ class ReductionAnnotator : Transformer {
                     }
                 }
             }
+        }
     }
 }

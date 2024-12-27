@@ -3,7 +3,7 @@ package analysis.ddt
 import analysis.ddg.Access
 import analysis.ddg.AccessScope
 import analysis.ddg.AccessType
-import analysis.dfa.Dfa
+import analysis.dfa.StatementFactsFinder
 import ir.expression.Expression
 import ir.expression.Load
 import ir.expression.Symbol
@@ -11,19 +11,15 @@ import ir.finder.Visitor
 import ir.statement.*
 import java.util.Stack
 
-class AccessFinder(parentScope: RangeLoop, val dfa: Dfa) : Visitor() {
+class AccessFinder(val finder: StatementFactsFinder) : Visitor() {
 
     private val accesses = mutableListOf<Access>()
     private val functionCalls = mutableListOf<Statement>() // <FunctionCall|IndirectFunctionCall>
     private val scope = Stack<RangeLoop>()
     private val subLoops = mutableListOf<RangeLoop>()
-    private val finder = dfa.finder()
+    private val loopSymbols = mutableListOf<SymbolLoad>()
     private var currentStatement: Statement? = null
     private var dialias = DiAlias()
-
-    init {
-        visit(parentScope) {}
-    }
 
     // depth first
     // push scope on range loop
@@ -61,6 +57,7 @@ class AccessFinder(parentScope: RangeLoop, val dfa: Dfa) : Visitor() {
 
             is SymbolLoad -> {
                 if (isLoopSymbol(v)) {
+                    loopSymbols.add(v)
                     return
                 } else if(isStackVariable(v)){
                     val access = Access(
@@ -125,5 +122,15 @@ class AccessFinder(parentScope: RangeLoop, val dfa: Dfa) : Visitor() {
 
     fun functionCalls(): List<Statement> {
         return functionCalls
+    }
+
+    fun loopSymbolAccesses(): List<SymbolLoad> {
+        return loopSymbols
+    }
+
+    fun visitExpression(address: Expression, loop: RangeLoop, v: Statement) {
+        scope.push(loop)
+        currentStatement = v
+        visit(address){}
     }
 }

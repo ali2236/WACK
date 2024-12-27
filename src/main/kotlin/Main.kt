@@ -9,7 +9,6 @@ fun main(args: Array<String>) {
     // run
     val samples = listOf(
         //File("./samples/languages/3mm.go.wasm"),
-        //File("./samples/matrix_multiply.wasm"),
         //File("./src/test/resources/src/known_pre_allocated.wasm"),
         //File("./samples/transform/loop_normalization/loop_normalization_2.wasm"),
         //File("./samples/polybench/O0/small_dataset/2mm.wasm"),

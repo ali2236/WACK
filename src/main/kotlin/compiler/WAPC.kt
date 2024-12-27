@@ -63,7 +63,7 @@ object WAPC : WebAssemblyCompiler {
         val enableAsserts: Boolean = false,
         val addCommentedIR: Boolean = true,
         val multipleMemories: Boolean = true,
-        val annotations: Boolean = true,
+        val annotations: Boolean = false,
         val threadSpawnModule: String = "wasi" /*"wasi_snapshot_preview1"*/,
         val stripDebugNames : Boolean = true,
         val minimumLoopCost : Int = 100000,
