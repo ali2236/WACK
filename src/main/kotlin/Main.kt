@@ -10,9 +10,10 @@ fun main(args: Array<String>) {
     val samples = listOf(
         //File("./samples/languages/3mm.go.wasm"),
         //File("./src/test/resources/src/known_pre_allocated.wasm"),
-        //File("./samples/transform/loop_normalization/loop_normalization_2.wasm"),
+        //File("./samples/transform/loop_normalization/loop_normalization.wasm"),
+        File("./samples/transform/reduction.wasm"),
         //File("./samples/polybench/O0/extralarge_dataset/atax.wasm"),
-        File("./samples/NAS/O0/A/cg.wasm"),
+        //File("./samples/NAS/O0/A/cg.wasm"),
     )
     for (sample in samples) {
         testUsingWAPC(sample)
