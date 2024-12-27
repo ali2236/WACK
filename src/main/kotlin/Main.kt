@@ -11,8 +11,8 @@ fun main(args: Array<String>) {
         //File("./samples/languages/3mm.go.wasm"),
         //File("./src/test/resources/src/known_pre_allocated.wasm"),
         //File("./samples/transform/loop_normalization/loop_normalization_2.wasm"),
-        //File("./samples/polybench/O0/small_dataset/2mm.wasm"),
-        File("./samples/NAS/O0/A/cg.wasm"),
+        //File("./samples/polybench/O0/extralarge_dataset/atax.wasm"),
+        File("./samples/NAS/O0/A/ep.wasm"),
     )
     for (sample in samples) {
         testUsingWAPC(sample)
@@ -26,14 +26,14 @@ private fun testUsingWAPC(sample: File){
             threads = 8,
             generateDotFiles = true,
             parallelize = true,
-            parallelizeInnerLoops = false,
-            normalizeLoops = false,
+            parallelizeInnerLoops = true,
+            normalizeLoops = true,
             enableAsserts = false,
             stripDebugNames = false,
             annotations = false,
             addCommentedIR = false,
             minimumLoopCost = 0,
-            reductionParallelization = false,
+            reductionParallelization = true,
         ),
     )
     println(WAPC.stats)
@@ -53,6 +53,7 @@ private fun testUsingWAPC(sample: File){
 
     try {
         println("===== ${if (sout == pout) "Exact Match" else "Difference = ${PolybenchOutputComparator().compare(sout!!, pout!!)}"} =====")
+        println("Speed up=${(s_time.inWholeMilliseconds/p_time.inWholeMilliseconds.toDouble())}x")
     } catch (e: Exception){
         println("===== Exception =====")
     }

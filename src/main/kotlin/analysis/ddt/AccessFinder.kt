@@ -128,7 +128,7 @@ class AccessFinder(val finder: StatementFactsFinder) : Visitor() {
         return loopSymbols
     }
 
-    fun visitExpression(address: Expression, loop: RangeLoop, v: Statement) {
+    fun visitExpression(address: Statement, loop: RangeLoop, v: Statement) {
         scope.push(loop)
         currentStatement = v
         visit(address){}

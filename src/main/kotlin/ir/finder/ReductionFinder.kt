@@ -1,6 +1,7 @@
 package ir.finder
 
 import analysis.ddt.AccessFinder
+import analysis.ddt.DiAlias
 import analysis.dfa.DfaFact
 import analysis.dfa.DfaValue
 import analysis.dfa.StatementFactsFinder
@@ -49,15 +50,16 @@ class ReductionFinder(val finder: StatementFactsFinder, val loop: RangeLoop) : V
                 // check if address is changing in each iteration
                 if (reduction != null) {
                     val address = symbol.address
-                    if (address is Symbol) {
-                        val alias = finder.at(v)?.firstOrNull { it.symbol == address }?.value
-                        if (alias is DfaValue.Alias && alias.expr != null) {
-                            val access =
-                                AccessFinder(finder).apply { visitExpression(alias.expr, loop, v) }.loopSymbolAccesses()
-                            if (access.isNotEmpty()) {
-                                reduction = null
-                            }
-                        }
+                    val facts = finder.at(v)
+                    val symbolsDependentOn = mutableSetOf<SymbolLoad>()
+                    if (address is SymbolLoad){
+                        symbolsDependentOn.add(address)
+                    }
+                    val deAlias = DiAlias().apply(address, facts)
+                    val access =
+                        AccessFinder(finder).apply { visitExpression(deAlias, loop, v) }.loopSymbolAccesses()
+                    if (access.isNotEmpty()) {
+                        reduction = null
                     }
                 }
 

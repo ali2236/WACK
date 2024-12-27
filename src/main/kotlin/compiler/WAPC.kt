@@ -61,7 +61,7 @@ object WAPC : WebAssemblyCompiler {
         val dfaShowAlias: Boolean = true,
         val normalizeLoops: Boolean = true,
         val enableAsserts: Boolean = false,
-        val addCommentedIR: Boolean = true,
+        val addCommentedIR: Boolean = false,
         val multipleMemories: Boolean = true,
         val annotations: Boolean = false,
         val threadSpawnModule: String = "wasi" /*"wasi_snapshot_preview1"*/,

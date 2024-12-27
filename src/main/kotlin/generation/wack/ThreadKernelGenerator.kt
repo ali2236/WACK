@@ -154,14 +154,13 @@ object ThreadKernelGenerator {
                             )
                         )
 
-                        // debug print range
-                        /*instructions.addAll(
-                            mutex.criticalSection { print.print(start, end) }
-                        )*/
-                        //instructions.addAll(mutex.criticalSection { print.print(stackBase) })
 
+                        ///
+                        /// Loop Body
+                        ///
                         forLoop.range = DfaValue.Range(start, end)
                         instructions.add(forLoop)
+
 
                         // replace locals with new boundaries
                         // replace init with start
@@ -183,6 +182,60 @@ object ThreadKernelGenerator {
                                 }
                             }
                         SymbolReplacer(toReplace).also { forLoop.visit(it) }
+
+                        ///
+                        /// Reductions
+                        ///
+                        /// mutex_lock {
+                        ///     <reduction_var> = <reduction_var> <op> <local_reduction_var>
+                        /// }
+                        if (forLoop.hasAnnotation(Reduction::class.java)) {
+                            val reductions = forLoop.annotations.filterIsInstance<Reduction>()
+                            for (reduction in reductions) {
+                                val symbol = reduction.symbol
+                                val localSymbol = toReplace[symbol] ?: continue
+                                instructions.addAll(mutex.criticalSection {
+                                    when (symbol) {
+                                        is Load -> {
+                                            Store(
+                                                symbol,
+                                                BinaryOP(symbol.type, reduction.operator, symbol, localSymbol)
+                                            )
+                                        }
+
+                                        else -> {
+                                            throw Exception("Symbol reductions are not yet supported")
+                                            //Assignment()
+                                        }
+                                    }
+                                })
+                            }
+                        }
+
+                        ///
+                        /// TransferOut
+                        ///
+                        /// if(thread_id == max_threads - 1){
+                        ///     save_local_<type>(index, value)
+                        /// }
+                        if (forLoop.hasAnnotation(TransferOut::class.java)) {
+                            val transfers = forLoop.annotations.filterIsInstance<TransferOut>()
+                            instructions.add(
+                                If(
+                                    BinaryOP(
+                                        WasmValueType.i32,
+                                        BinaryOP.Operator.eq,
+                                        threadId,
+                                        BinaryOP.minus(maxThreads, Value.one),
+                                    ),
+                                    trueBody = transfers.map { transfer ->
+                                        val symbol = transfer.symbol
+                                        val index = Value.i32(transfer.index)
+                                        metaLib.localTransfer(symbol.type).save.call(symbol, index)
+                                    }.toMutableList()
+                                ),
+                            )
+                        }
 
                         // replace condition.right with end
                         (rangeLoop.condition as BinaryOP).right = end// what to replace with end
