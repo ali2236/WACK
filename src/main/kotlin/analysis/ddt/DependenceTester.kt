@@ -91,7 +91,7 @@ class DependenceTester(val function: Function) {
                         val result = DependenceTester.runTests(
                             pair.source,
                             pair.sink,
-                            listOf(GCDTest(), MIVTest(), /*BanerjeeTest()*/)
+                            listOf(GCDTest(),/* MIVTest(),*/ BanerjeeTest())
                         )
 
                         result?.let {

@@ -68,6 +68,10 @@ class AddressPolynomialFinder(val address: Expression, val scope: AccessScope, v
                         return
                     }
 
+                    BinaryOP.Operator.div.sign, BinaryOP.Operator.shr.sign -> {
+                        throw Exception("Address is not Affine!")
+                    }
+
                 }
             }
 

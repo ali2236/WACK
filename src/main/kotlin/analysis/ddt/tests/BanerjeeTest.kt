@@ -16,6 +16,8 @@ class BanerjeeTest : DependenceTest() {
         val dv = mutableMapOf<RangeLoop, Direction>()
         val loops = a1.scope.intersect(a2.scope)
         for (loop in loops){
+            val p1HasSubscript = p1.getSubscript(loop.symbol).multiplier != 0
+            val p2HasSubscript = p2.getSubscript(loop.symbol).multiplier != 0
             val loopSymbolSubscript = diff.getSubscript(loop.symbol)
 
             val L = if (loop.range.from is Value) (loop.range.from as Value).value.toInt() else 0
@@ -28,8 +30,10 @@ class BanerjeeTest : DependenceTest() {
                 dv[loop] = Direction.Less
             } else if (diff.constant > UB){
                 dv[loop] = Direction.Greater
-            } else {
+            } else if(p1HasSubscript || p2HasSubscript){
                 dv[loop] = Direction.Equal
+            } else {
+                dv[loop] = Direction.None
             }
         }
 

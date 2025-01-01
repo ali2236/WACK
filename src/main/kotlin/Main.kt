@@ -11,8 +11,9 @@ fun main(args: Array<String>) {
         //File("./samples/languages/3mm.go.wasm"),
         //File("./src/test/resources/src/known_pre_allocated.wasm"),
         //File("./samples/transform/loop_normalization/loop_normalization.wasm"),
-        File("./samples/transform/reduction.wasm"),
-        //File("./samples/polybench/O0/extralarge_dataset/atax.wasm"),
+        //File("./samples/transform/reduction.wasm"),
+        //File("./samples/simple_loop.wasm"),
+        File("./samples/polybench/O0/small_dataset/adi.wasm"),
         //File("./samples/NAS/O0/A/cg.wasm"),
     )
     for (sample in samples) {
