@@ -12,8 +12,9 @@ fun main(args: Array<String>) {
         //File("./src/test/resources/src/known_pre_allocated.wasm"),
         //File("./samples/transform/loop_normalization/loop_normalization.wasm"),
         //File("./samples/transform/reduction.wasm"),
+        File("./samples/ddt/gcd/gcd_test_2.wasm"),
         //File("./samples/simple_loop.wasm"),
-        File("./samples/polybench/O0/small_dataset/adi.wasm"),
+        //File("./samples/polybench/O0/small_dataset/adi.wasm"),
         //File("./samples/NAS/O0/A/cg.wasm"),
     )
     for (sample in samples) {
@@ -32,10 +33,10 @@ private fun testUsingWAPC(sample: File){
             normalizeLoops = true,
             enableAsserts = false,
             stripDebugNames = false,
-            annotations = false,
+            annotations = true,
             addCommentedIR = false,
             minimumLoopCost = 0,
-            reductionParallelization = true,
+            reductionParallelization = false,
         ),
     )
     println(WAPC.stats)

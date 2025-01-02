@@ -1,12 +1,9 @@
 package analysis.ddt
 
 import ir.expression.Expression
-import ir.expression.Symbol
 import ir.expression.Value
 import ir.statement.SymbolLoad
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 
 open class Polynomial(
     val subscripts: MutableList<Subscript> = mutableListOf<Subscript>(),
@@ -68,6 +65,7 @@ open class Polynomial(
         val s1 = subscripts
         val s2 = other.subscripts
         val s3 = mutableListOf<Subscript>()
+        var offset = 0
 
         for (sub in s1 + s2) {
             val sub2 = s3.firstOrNull { it.symbol == sub.symbol }
@@ -84,11 +82,13 @@ open class Polynomial(
                 s3.remove(sub2)
                 if(sub3.multiplier != 0){
                     s3.add(sub3)
+                } else {
+                    offset += sub3.offset
                 }
             }
         }
 
-        return Polynomial(s3, abs(constant - other.constant))
+        return Polynomial(s3, abs(constant - other.constant) + offset)
     }
 
     override fun toString(): String {
