@@ -108,12 +108,19 @@ class SupportLibrary(
             val parallel = program.addFunction(
                 name = "wack__parallel",
                 params = listOf(WasmValueType.i32),
-                locals = listOf(WasmValueType.i32, WasmValueType.i32),
+                locals = listOf(WasmValueType.i32, WasmValueType.i32, WasmValueType.i32),
                 instructions = mutableListOf(
                     //*mutex.criticalSection { print.print(kernelId) },
-                    makeThreadPool.functionData.call(Value.i32(WAPC.params!!.threads)), // TODO: move to somewhere else
-                    meta.kernelId.set.call(kernelId),
                     Assignment(threadCount, meta.maxThreads.get.call().result),
+                    // if max_threads is not assigned, use compiler default
+                    If(
+                        BinaryOP(WasmValueType.i32, BinaryOP.Operator.eq, threadCount, Value.zero),
+                        trueBody = mutableListOf(
+                            Assignment(threadCount, Value.i32(WAPC.params.threads))
+                        ),
+                    ),
+                    makeThreadPool.functionData.call(threadCount),
+                    meta.kernelId.set.call(kernelId),
                     Assignment(threadId, Value.zero),
                     Loop(
                         instructions = mutableListOf(

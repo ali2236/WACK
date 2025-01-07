@@ -1,5 +1,6 @@
 package generation.wack
 
+import compiler.WAPC
 import ir.expression.*
 import ir.statement.Program
 import ir.statement.Statement
@@ -44,13 +45,17 @@ class WackThread(
         fun generate(program: Program): WackThread {
             val module = program.module
 
-            // memory
-            val m = Index.next(module.memories)
-            val threadsMemory = WasmMemory(m, 8, 8, true)
-            module.memories.add(threadsMemory)
+            // memory range 16kb-64kb
+            // max possible threads = 6144 max threads
+            val threadsMemory = if (!WAPC.params.multipleMemories) module.memories.first()
+            else {
+                val m = WasmMemory(Index.next(module.memories), 8, 8, true)
+                module.memories.add(m)
+                m
+            }
 
             // functions
-            val offset = 4096
+            val offset = if(WAPC.params.multipleMemories) 4096 else (16384+8) // 16kb
             val i32Bytes = 4
             val getThreadPropertyAddress = {tid: Expression, prop: Property ->
                 BinaryOP.plus(

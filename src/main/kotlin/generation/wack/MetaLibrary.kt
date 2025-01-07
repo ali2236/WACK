@@ -1,5 +1,6 @@
 package generation.wack
 
+import compiler.WAPC
 import generation.debug.PrintLibrary
 import generation.wasm.threads.MutexLibrary
 import ir.expression.*
@@ -7,6 +8,7 @@ import ir.statement.Program
 import ir.statement.Store
 import ir.wasm.*
 
+// first 16kb
 class MetaLibrary(
     val maxThreads: Property,
     //val stackBase: Property,
@@ -20,9 +22,13 @@ class MetaLibrary(
             val module = program.module
 
             // memory import/export
-            val m = Index.next(module.memories)
-            val metaMemory = WasmMemory(m, 1, 1, true)
-            module.memories.add(metaMemory)
+            val metaMemory = if (!WAPC.params.multipleMemories) module.memories.first()
+            else {
+                val m = Index.next(module.memories)
+                val mm = WasmMemory(m, 1, 1, true)
+                module.memories.add(mm)
+                mm
+            }
 
 
             // functions
@@ -71,6 +77,10 @@ class MetaLibrary(
                 transferTypes[type] = localTransfer
             }
 
+            // export set_max_threads
+            module.exports.add(
+                WasmExport("\"wapc__set_max_threads\"", WasmExportKind.func, maxThreads.set.index)
+            )
 
             return MetaLibrary(
                 maxThreads,

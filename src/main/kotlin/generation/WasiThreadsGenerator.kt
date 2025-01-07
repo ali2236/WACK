@@ -18,7 +18,7 @@ import ir.statement.Program
 class WasiThreadsGenerator : Generator {
     override fun apply(program: Program) {
         if (!WAPC.params.parallelize) return
-        Mode.insure("multipleMemories", WAPC.params.multipleMemories, true)
+        //Mode.insure("multipleMemories", WAPC.params.multipleMemories, true)
         val print = PrintLibrary.load(program)
         val metaLib = MetaLibrary.generate(program)
         val wackThread = WackThread.generate(program)

@@ -1,5 +1,6 @@
 package generation.wasm.threads
 
+import compiler.WAPC
 import generation.debug.PrintLibrary
 import ir.expression.*
 import ir.statement.*
@@ -12,7 +13,7 @@ class MutexLibrary(
     val join: WasmFunction,
 ) {
 
-    fun criticalSection(mutex: Expression = Value.i32(64), task: () -> Statement) : Array<Statement>{
+    fun criticalSection(mutex: Expression = Value.i32(16384), task: () -> Statement) : Array<Statement>{
         val t = task()
         if (t is Empty){
             return arrayOf()
@@ -27,6 +28,7 @@ class MutexLibrary(
     companion object {
         fun generate(program: Program, memory: WasmMemory, print: PrintLibrary): MutexLibrary {
             val m = memory.index
+            val i = if (WAPC.params.multipleMemories) "$m" else ""
 
             // functions
             val tryLockMutex = program.addFunction(
@@ -35,7 +37,7 @@ class MutexLibrary(
                     RawWat("local.get 0"),
                     RawWat("i32.const 0"),
                     RawWat("i32.const 1"),
-                    RawWat("i32.atomic.rmw.cmpxchg $m"),
+                    RawWat("i32.atomic.rmw.cmpxchg $i"),
                     RawWat("i32.eqz"),
                 )
             )
@@ -54,7 +56,7 @@ class MutexLibrary(
                                     RawWat("local.get 0"),
                                     RawWat("i32.const 1"),
                                     RawWat("i64.const -1"),
-                                    RawWat("memory.atomic.wait32 $m"),
+                                    RawWat("memory.atomic.wait32 $i"),
                                     RawWat("drop"),
                                     RawWat("br 0"),
                                 )
@@ -71,10 +73,10 @@ class MutexLibrary(
                 instructions = mutableListOf(
                     RawWat("local.get 0"),
                     RawWat("i32.const 0"),
-                    RawWat("i32.atomic.store $m"),
+                    RawWat("i32.atomic.store $i"),
                     RawWat("local.get 0"),
                     RawWat("i32.const 1"),
-                    RawWat("memory.atomic.notify $m"),
+                    RawWat("memory.atomic.notify $i"),
                     RawWat("drop"),
                     //print.print(Symbol.localI32(Index.number(0)), Value.zero),
                 ),

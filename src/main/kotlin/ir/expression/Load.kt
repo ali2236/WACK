@@ -15,7 +15,7 @@ class Load(
     val type: WasmValueType,
     var address: Expression,
     val memoryIndex: Index,
-    val offset: Int = 0,
+    var offset: Int = 0,
     val align: Int = 0,
     val memorySize: Int? = null,
     val sign: WasmBitSign? = null,

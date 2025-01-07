@@ -5,7 +5,7 @@ import ir.statement.Statement
 import ir.wasm.WasmValueType
 import java.lang.Exception
 
-open class Value(val type: WasmValueType, val value: String) : ImmutableExpression() {
+open class Value(val type: WasmValueType, var value: String) : ImmutableExpression() {
     override fun exprType(): WasmValueType {
         return type
     }
