@@ -81,26 +81,6 @@ class SupportLibrary(
                     meta.threadPoolState.set.call(Value.one),
                 ),
             )
-            /*
-                        val destroyThreadPool = program.addFunction(
-                            name = "destroy_thread_pool",
-                            locals = listOf(WasmValueType.i32),
-                            instructions = mutableListOf(
-                                print.print(Value.i32(502)),
-                                If(
-                                    condition = BinaryOP(
-                                        WasmValueType.i32,
-                                        BinaryOP.Operator.eq,
-                                        meta.threadPoolState.get.call().result,
-                                        Value.zero,
-                                    ),
-                                    trueBody = mutableListOf(Return())
-                                ),
-                                // set_thread_pool_state(0);
-                                meta.threadPoolState.set.call(Value.zero),
-                            ),
-                        )*/
-
 
             val kernelId = Symbol(WasmScope.local, WasmValueType.i32, Index.number(0))
             val threadId = Symbol(WasmScope.local, WasmValueType.i32, Index.number(1))
@@ -111,14 +91,8 @@ class SupportLibrary(
                 locals = listOf(WasmValueType.i32, WasmValueType.i32, WasmValueType.i32),
                 instructions = mutableListOf(
                     //*mutex.criticalSection { print.print(kernelId) },
-                    Assignment(threadCount, meta.maxThreads.get.call().result),
                     // if max_threads is not assigned, use compiler default
-                    If(
-                        BinaryOP(WasmValueType.i32, BinaryOP.Operator.eq, threadCount, Value.zero),
-                        trueBody = mutableListOf(
-                            Assignment(threadCount, Value.i32(WAPC.params.threads))
-                        ),
-                    ),
+                    Assignment(threadCount, meta.nonZeroMaxThreads.call().result),
                     makeThreadPool.functionData.call(threadCount),
                     meta.kernelId.set.call(kernelId),
                     Assignment(threadId, Value.zero),

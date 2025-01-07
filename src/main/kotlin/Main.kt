@@ -15,18 +15,18 @@ fun main(args: Array<String>) {
     // run
     val samples = listOf(
         //File("./samples/languages/3mm.go.wasm"),
-        //File("./src/test/resources/src/known_pre_allocated.wasm"),
+       // File("./src/test/resources/src/known_pre_allocated.wasm"),
         //File("./samples/transform/loop_normalization/loop_normalization.wasm"),
         //File("./samples/transform/reduction.wasm"),
         //File("./samples/ddt/gcd/gcd_test_2.wasm"),
         //File("./samples/simple_loop.wasm"),
-        //File("./samples/polybench/O0/small_dataset/adi.wasm"),
+        File("./samples/polybench/O0/small_dataset/2mm.wasm"),
         //File("./samples/NAS/O0/A/cg.wasm"),
-        Path("./benchmark"),
+        //Path("./benchmark"),
     )
     for (sample in samples) {
-        //testUsingWAPC(sample)
-        compileFolder(sample)
+        testUsingWAPC(sample)
+        //compileFolder(sample)
         //compileFolder(sample, WAPC.Params(threads = 2))
         //compileFolder(sample, WAPC.Params(threads = 4))
         //compileFolder(sample, WAPC.Params(threads = 8))
@@ -53,6 +53,7 @@ private fun testUsingWAPC(sample: File) {
             minimumLoopCost = 1000,
             reductionParallelization = true,
             multipleMemories = true,
+            scheduler = WAPC.Scheduler.thread,
         ),
     )
     println(WAPC.stats)

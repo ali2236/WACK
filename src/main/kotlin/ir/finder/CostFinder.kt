@@ -3,6 +3,7 @@ package ir.finder
 import analysis.dfa.FactsFinder
 import analysis.dfa.StatementFactsFinder
 import ir.expression.BinaryOP
+import ir.expression.Expression
 import ir.expression.UnaryOP
 import ir.expression.Value
 import ir.statement.*
@@ -12,15 +13,16 @@ class CostFinder(val finder: StatementFactsFinder) : Visitor() {
 
     private var multiplier = 1
     private var cost = 0L
+    private var symbolicCost = Value.zero
 
-    fun guesstimate(stmt: Statement): Long {
+    fun guesstimate(stmt: Statement): Pair<Long, Expression> {
         cost = 0L
+        symbolicCost = Value.zero
         visit(stmt){}
-        return cost
+        return Pair(cost, symbolicCost)
     }
 
     override fun visit(v: Statement, replace: (Statement) -> Unit) {
-        if (cost == -1L) return
         when (v) {
             is RangeLoop -> {
                 if(v.range.to is Value){

@@ -61,10 +61,10 @@ object ThreadKernelGenerator {
 
                     // put loop as function body
                     val kernel = Function(kernelFunction).apply {
-                        val threadId = Symbol.localI32(Index.number(0))
+                        val taskId = Symbol.localI32(Index.number(0))
                         val start = Symbol.localI32(Index.number(1))
                         val end = Symbol.localI32(Index.number(2))
-                        val maxThreads = metaLib.maxThreads.get.call().result
+                        val tasksCount = metaLib.tasksCount.get.call().result
 
                         // create transfer variables
                         val localTransferIn = forLoop.annotations.filterIsInstance<TransferIn>()
@@ -102,7 +102,7 @@ object ThreadKernelGenerator {
                         )
 
                         // calculate start
-                        // int start = (size / num_threads) * thread_num;
+                        // int start = (size / num_tasks) * task_id;
                         instructions.add(
                             Assignment(
                                 start, BinaryOP(
@@ -112,15 +112,15 @@ object ThreadKernelGenerator {
                                         WasmValueType.i32,
                                         BinaryOP.Operator.div.copy(signed = WasmBitSign.s),
                                         size,
-                                        maxThreads,
+                                        tasksCount,
                                     ),
-                                    threadId,
+                                    taskId,
                                 )
                             )
                         )
 
                         // calculate end
-                        // int end = (thread_num == num_threads - 1) ? end : (size / num_threads) * (thread_num + 1);
+                        // int end = (task_id == tasks_count - 1) ? end : (size / tasks_count) * (task_id + 1);
                         instructions.add(
                             Assignment(
                                 end, Select(
@@ -132,20 +132,20 @@ object ThreadKernelGenerator {
                                             WasmValueType.i32,
                                             BinaryOP.Operator.div.copy(signed = WasmBitSign.s),
                                             size,
-                                            maxThreads,
+                                            tasksCount,
                                         ),
                                         BinaryOP(
                                             WasmValueType.i32,
                                             BinaryOP.Operator.add,
-                                            threadId,
+                                            taskId,
                                             Value.one,
                                         ),
                                     ),
                                     BinaryOP(
-                                        WasmValueType.i32, BinaryOP.Operator.eq, threadId, BinaryOP(
+                                        WasmValueType.i32, BinaryOP.Operator.eq, taskId, BinaryOP(
                                             WasmValueType.i32,
                                             BinaryOP.Operator.sub,
-                                            maxThreads,
+                                            tasksCount,
                                             Value.one
                                         )
                                     ),
@@ -215,7 +215,7 @@ object ThreadKernelGenerator {
                         ///
                         /// TransferOut
                         ///
-                        /// if(thread_id == max_threads - 1){
+                        /// if(task_id == tasks_count - 1){
                         ///     save_local_<type>(index, value)
                         /// }
                         if (forLoop.hasAnnotation(TransferOut::class.java)) {
@@ -225,8 +225,8 @@ object ThreadKernelGenerator {
                                     BinaryOP(
                                         WasmValueType.i32,
                                         BinaryOP.Operator.eq,
-                                        threadId,
-                                        BinaryOP.minus(maxThreads, Value.one),
+                                        taskId,
+                                        BinaryOP.minus(tasksCount, Value.one),
                                     ),
                                     trueBody = transfers.map { transfer ->
                                         val symbol = transfer.symbol
@@ -252,7 +252,7 @@ object ThreadKernelGenerator {
 
                     parallelBlock.apply {
                         annotations.add(CallKernel(kernelId))
-                        forLoop.annotations.filterIsInstance<TransferIn>().forEach {
+                        forLoop.annotations.filter { it is TransferIn || it is TransferOut || it is Tasks }.forEach {
                             parallelBlock.annotations.add(it)
                         }
                         generateCallKernel(function, this)

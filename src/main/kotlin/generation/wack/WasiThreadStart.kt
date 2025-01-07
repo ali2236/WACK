@@ -24,9 +24,12 @@ class WasiThreadStart(
         ): WasiThreadStart {
             val kernelType = program.module.findOrAddType(params = listOf(WasmValueType.i32)).index
             val tid = Symbol.localI32(Index.number(1))
+            val taskId = Symbol.localI32(Index.number(2))
+            val tasks = Symbol.localI32(Index.number(3))
             val wasiThreadStart = program.addFunction(
                 name = "wasi_thread_start",
                 params = listOf(WasmValueType.i32, WasmValueType.i32),
+                locals = listOf(WasmValueType.i32, WasmValueType.i32),
                 instructions = mutableListOf(
                     //*mutexLib.criticalSection { print.print(tid) },
                     //WasmAssert.equal(wackThread.readMutex1(tid), Value.zero),
@@ -36,11 +39,25 @@ class WasiThreadStart(
                             mutexLib.join.call(wackThread.getMutex2(tid)),
                             //*mutexLib.criticalSection { print.print(tid) },
                             //*mutexLib.criticalSection { print.print(meta.kernelId.get.call().result, tid) },
-                            IndirectFunctionCall(
-                                kernelTable.index,
-                                kernelType,
-                                functionIndex = meta.kernelId.get.call().result,
-                                params = mutableListOf(tid),
+                            Assignment(tasks, meta.tasksCount.get.call().result),
+                            Loop(
+                                instructions = mutableListOf(
+                                    *mutexLib.criticalSection { Assignment(taskId, meta.getTask.call().result) },
+                                    //Assignment(taskId, meta.getTask.call().result),
+                                    If(
+                                        condition = BinaryOP(WasmValueType.i32, BinaryOP.Operator.lt.copy(signed = WasmBitSign.s), taskId, tasks),
+                                        trueBody = mutableListOf(
+                                            //*mutexLib.criticalSection { print.print(taskId) },
+                                            IndirectFunctionCall(
+                                                kernelTable.index,
+                                                kernelType,
+                                                functionIndex = meta.kernelId.get.call().result,
+                                                params = mutableListOf(tid),
+                                            ),
+                                            RawWat("br 1"),
+                                        ),
+                                    ),
+                                ),
                             ),
                             mutexLib.lock.call(wackThread.getMutex2(tid)),
                             mutexLib.unlock.call(wackThread.getMutex1(tid)),

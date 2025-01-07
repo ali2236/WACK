@@ -6,11 +6,14 @@ import compiler.WAPC
 import ir.annotations.For
 import ir.annotations.Parallel
 import ir.annotations.Skip
+import ir.annotations.Tasks
+import ir.expression.BinaryOP
 import ir.finder.CostFinder
 import ir.finder.LoopFinder
 import ir.statement.Function
 import ir.statement.Program
 import ir.statement.RangeLoop
+import ir.wasm.WasmValueType
 
 class ProfitabilityAnalysis : Transformer {
     override fun apply(program: Program) {
@@ -30,14 +33,26 @@ class ProfitabilityAnalysis : Transformer {
         val finder = Dfa.from(function).finder()
         val costFinder = CostFinder(finder)
         for(loop in parallelForLoops){
-            val cost = costFinder.guesstimate(loop)
+            val (cost, symbolicCost) = costFinder.guesstimate(loop)
             if (cost != CostFinder.UNKNOWN){
                 if (cost < WAPC.params.minimumLoopCost){
                     // don't parallelize
                     loop.annotations.removeIf { it is Parallel || it is For }
                 } else {
-                    //println(cost)
+                    // calculate optimal number of tasks
+                    when(WAPC.params.scheduler){
+                        WAPC.Scheduler.thread -> {}
+                        WAPC.Scheduler.task -> {
+                            loop.annotations.add(
+                                Tasks(loop.range.to),
+                            )
+                        }
+                    }
                 }
+            } else {
+                loop.annotations.add(
+                    Tasks(loop.range.to),
+                )
             }
         }
     }

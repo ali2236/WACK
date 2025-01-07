@@ -9,6 +9,7 @@ import generation.wasi.threads.WasiThreadsLibrary
 import generation.wasi.threads.WasiThreadsMemory
 import generation.wasm.threads.MutexLibrary
 import ir.annotations.CallKernel
+import ir.annotations.Tasks
 import ir.annotations.TransferIn
 import ir.annotations.TransferOut
 import ir.expression.Value
@@ -28,6 +29,19 @@ class WasiThreadsGenerator : Generator {
         ThreadKernelGenerator.generate(program, metaLib, mutex, print) { function, block ->
             WAPC.stats.loopsParallelized++
             block.instructions.clear()
+
+            //block.instructions.add(print.print(metaLib.nonZeroMaxThreads.call().result))
+
+            val tasks = block.annotations.filterIsInstance<Tasks>().firstOrNull()
+
+            block.instructions.add(
+                metaLib.tasksCount.set.call(
+                    if (tasks == null) metaLib.nonZeroMaxThreads.call().result
+                    else tasks.maxTasks
+                )
+            )
+            block.instructions.add(metaLib.resetTasks.call())
+
             val kernelId = block.annotations.filterIsInstance<CallKernel>().first().kernelIndex
             block.annotations.filterIsInstance<TransferIn>().forEach { t ->
                 block.instructions.add(metaLib.localTransfer(t.symbol.type).save.call(t.symbol, Value.i32(t.index)))

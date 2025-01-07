@@ -1,9 +1,9 @@
 package generation.wack
 
 import compiler.WAPC
-import generation.debug.PrintLibrary
-import generation.wasm.threads.MutexLibrary
 import ir.expression.*
+import ir.statement.Assignment
+import ir.statement.If
 import ir.statement.Program
 import ir.statement.Store
 import ir.wasm.*
@@ -11,10 +11,13 @@ import ir.wasm.*
 // first 16kb
 class MetaLibrary(
     val maxThreads: Property,
-    //val stackBase: Property,
+    val tasksCount: Property,
     val kernelId: Property,
     val threadPoolState: Property,
     val localTransfer: (WasmValueType) -> LocalTransfer,
+    val nonZeroMaxThreads: WasmFunction,
+    val resetTasks: WasmFunction,
+    val getTask: WasmFunction,
     val metaMemory: WasmMemory
 ) {
     companion object {
@@ -42,26 +45,71 @@ class MetaLibrary(
                 metaMemory,
                 base.add(0L * i32Bytes),
             )
-            /*val stackBase = Property.fromAddress(
+            val tasksCount = Property.fromAddress(
                 program,
-                "stack_base",
+                "tasks_count",
                 WasmValueType.i32,
                 metaMemory,
-                base.add(1L * i64Bytes),
-            )*/
+                base.add(1L * i32Bytes),
+            )
             val kernelId = Property.fromAddress(
                 program,
                 "kernel_id",
                 WasmValueType.i32,
                 metaMemory,
-                base.add(1L * i32Bytes),
+                base.add(2L * i32Bytes),
             )
             val threadPoolState = Property.fromAddress(
                 program,
                 "thread_pool_state",
                 WasmValueType.i32,
                 metaMemory,
-                base.add(2L * i32Bytes),
+                base.add(3L * i32Bytes),
+            )
+            val taskId = Property.fromAddress(
+                program,
+                "task_id",
+                WasmValueType.i32,
+                metaMemory,
+                base.add(4L * i32Bytes),
+            )
+
+            val _tc = Symbol.localI32(Index.number(0))
+            val nonZeroMaxThreads = program.addFunction(
+                "wack__non_zero_max_threads",
+                result = listOf(WasmValueType.i32),
+                locals = listOf(WasmValueType.i32),
+                instructions = mutableListOf(
+                    Value.i32(WAPC.params.threads),
+                    /*Assignment(_tc, maxThreads.get.call().result),
+                    ResultBlock(
+                        WasmValueType.i32,
+                        If(
+                            BinaryOP(WasmValueType.i32, BinaryOP.Operator.eq, _tc, Value.zero),
+                            trueBody = mutableListOf(Value.i32(WAPC.params.threads)),
+                            elseBody = mutableListOf(_tc),
+                            type = WasmValueType.i32
+                        ),
+                    ),*/
+                ),
+            )
+
+            val resetTasks = program.addFunction(
+                "wack__reset_tasks",
+                instructions = mutableListOf(
+                    taskId.set.call(Value.zero),
+                ),
+            )
+
+            val getTask = program.addFunction(
+                "wack__get_task",
+                locals = listOf(WasmValueType.i32),
+                result = listOf(WasmValueType.i32),
+                instructions = mutableListOf(
+                    Assignment(_tc, taskId.get.call().result),
+                    taskId.set.call(BinaryOP.plus(_tc, Value.one)),
+                    _tc,
+                ),
             )
 
             // locals transfer
@@ -84,10 +132,13 @@ class MetaLibrary(
 
             return MetaLibrary(
                 maxThreads,
-                //stackBase,
+                tasksCount,
                 kernelId,
                 threadPoolState,
                 { type -> transferTypes[type] ?: throw Exception("Unknown Type $type") },
+                nonZeroMaxThreads.functionData,
+                resetTasks.functionData,
+                getTask.functionData,
                 metaMemory,
             )
         }
