@@ -19,14 +19,14 @@ fun main(args: Array<String>) {
         //File("./samples/transform/loop_normalization/loop_normalization.wasm"),
         //File("./samples/transform/reduction.wasm"),
         //File("./samples/ddt/gcd/gcd_test_2.wasm"),
-        //File("./samples/simple_loop.wasm"),
+        File("./samples/simple_loop.wasm"),
         //File("./samples/polybench/O0/small_dataset/adi.wasm"),
         //File("./samples/NAS/O0/A/cg.wasm"),
-        Path("./benchmark"),
+        //Path("./benchmark"),
     )
     for (sample in samples) {
-        //testUsingWAPC(sample)
-        compileFolder(sample)
+        testUsingWAPC(sample)
+        //compileFolder(sample)
         //compileFolder(sample, WAPC.Params(threads = 2))
         //compileFolder(sample, WAPC.Params(threads = 4))
         //compileFolder(sample, WAPC.Params(threads = 8))

@@ -57,23 +57,29 @@ object DfaBuilder {
     // returns changed
     private fun propegate(node: DfaNode): Boolean {
         var changed = false
-        // propagate IN -> OUT except those in GEN
+        // propagate IN -> OUT except those in GEN, those are KILLed
         node.IN.facts.filter { inIt ->
-            !node.GEN.facts.any { genIt ->
+            val gensForIn = node.GEN.facts.filter { genIt ->
+                var eq = genIt.symbol == inIt.symbol
                 if (genIt.symbol is Load) {
                     try {
                         val address = explainExpression(genIt.symbol.address.clone(), node.IN.facts)
                         if (address is DfaValue.Expr) {
                             val gen = genIt.symbol.clone().also { it.address = address.value }
-                            val eq = gen == inIt.symbol
-                            return@any eq
+                            eq = gen == inIt.symbol
                         }
                     } catch (e: Exception) {
                     }
                 }
-                val eq = genIt.symbol == inIt.symbol
                 eq
             }
+
+            // all INs are KILLed
+            if (gensForIn.isNotEmpty()){
+                node.KILL.put(inIt)
+            }
+
+            gensForIn.isEmpty()
         }.forEach {
             val o = node.OUT.put(it)
             changed = o || changed

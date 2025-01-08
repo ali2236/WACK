@@ -74,6 +74,8 @@ class Dfa(val nodes : MutableList<DfaNode>) : DotGraph() {
             out.append("<BR ALIGN=\"LEFT\"/>")
             dot.append("GEN = {" + dfaNode.GEN +"}")
             out.append("<BR ALIGN=\"LEFT\"/>")
+            dot.append("KILL = {" + dfaNode.KILL +"}")
+            out.append("<BR ALIGN=\"LEFT\"/>")
             dot.append("OUT = {" + dfaNode.OUT + "}")
             out.append("<BR ALIGN=\"LEFT\"/>")
 
