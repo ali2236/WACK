@@ -9,8 +9,6 @@ object Wasm2Wat : FileProcessor {
             return input
         }
 
-        // TODO: validate wasm2wat is present
-
         // make output file
         val output = File("./out/intermediate/${input.nameWithoutExtension}.wat")
         if (output.exists()) {

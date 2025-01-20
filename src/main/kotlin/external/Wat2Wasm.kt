@@ -11,8 +11,6 @@ class Wat2Wasm : FileProcessor {
             return input
         }
 
-        // TODO: validate wat2wasm is present
-
         // make output file
         val output = File("./out/${input.nameWithoutExtension}.wasm")
         if (output.exists()) {

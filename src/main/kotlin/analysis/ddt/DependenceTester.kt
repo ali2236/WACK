@@ -104,7 +104,6 @@ class DependenceTester(val function: Function) {
                 }
             }
         }
-        // TODO: runtime dependence test
         if (pairs.isEmpty()) {
             if (accesses.any { it.symbol is Load }) {
                 // no dependencies only if array kernel

@@ -8,7 +8,7 @@ import ir.expression.Value
 import ir.statement.Statement
 import ir.wasm.WasmValueType
 
-@Deprecated("needs updating")
+@Deprecated("implementation not complete")
 class RuntimeBoundTest : DependenceTest() {
     override fun test(a1: Access, a2: Access): DependenceResult? {
         val p1 = a1.polynomial()

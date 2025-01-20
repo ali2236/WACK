@@ -58,8 +58,6 @@ class AliasMemory : Transformer {
                         val symbol = aliases[store.symbol]!!
                         replace(Assignment(symbol, store.data))
                     }
-
-                // TODO: commit to stack/heap on end
             }
     }
 }

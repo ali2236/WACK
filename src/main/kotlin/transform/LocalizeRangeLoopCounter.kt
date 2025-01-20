@@ -49,8 +49,6 @@ class LocalizeRangeLoopCounter : Transformer {
                         .associate { Pair(it.symbol as SymbolLoad, it.private as Symbol) }
 
                     SymbolReplacer(replace).also { function.visit(it) }
-
-                    // TODO: commit back to memory after loop end somehow from last thread?
                 }
 
             }

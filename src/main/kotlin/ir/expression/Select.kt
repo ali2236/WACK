@@ -6,7 +6,6 @@ import ir.finder.Visitor
 import ir.wasm.WasmValueType
 
 // return selector == 0 ? val2 : val1
-// TODO: implementation maybe incorrect
 class Select(var val1: Expression, var val2: Expression, var selector: Expression, val resultType: WasmValueType?) :
     Expression() {
     override fun clone(): Expression {

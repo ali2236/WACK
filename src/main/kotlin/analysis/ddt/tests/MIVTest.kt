@@ -18,7 +18,7 @@ class MIVTest : DependenceTest() {
             } else if (s1.valid || s2.valid) {
                 if (s1.multiplier == s2.multiplier) {
                     dv[loop] = Direction.fromInt(s1.offset - s2.offset)
-                } else { // TODO: this is probably incorrect
+                } else {
                     dv[loop] = Direction.None
                 }
             } else {
