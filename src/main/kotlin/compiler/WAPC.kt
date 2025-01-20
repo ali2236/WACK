@@ -68,11 +68,16 @@ object WAPC : WebAssemblyCompiler {
         val stripDebugNames : Boolean = true,
         val minimumLoopCost : Int = 100000,
         val reductionParallelization: Boolean = false,
+        val dependenceTest : DependenceTest = DependenceTest.miv,
     )
 
     data class Statistics(
         var topLevelRangeLoops : Int = 0,
         var loopsParallelized : Int = 0,
     )
+
+    enum class DependenceTest{
+        banerjee, miv
+    }
 
 }

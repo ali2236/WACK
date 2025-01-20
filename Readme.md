@@ -1,36 +1,33 @@
-# TODO
-- [x] Multiple Memory Support
-- [x] Lock Thread Mutex Before Kernel Lock
-- [x] Parallel Block Generation
-- [x] DFA
-  - [x] Constant Propagation
-  - [x] Memory Aliasing
-- [x] Block WasmBlockType
-- [x] Else for If block
-- [x] Move RangeLoop Restructure to Optimization Passes
-- [x] Element & Data Section Parsing
-- [x] Support Store 8/16/32 types
-- [x] Move Increment Restructure to Optimization Passes
-- [x] Privatize Loop Symbol if needed
-- [x] Generate Deep-Loop Kernels correctly
-- [x] Dependence Analysis
-- [x] GCD Test
-- [x] Data Dependency Test
-- [ ] Eval or Runtime Evaluation
-- [ ] Runtime limit evaluation(omp if)
-- [ ] Profitability Analysis
-- [ ] Permit Pure Functions in loops
-- [x] `+=` operator
-- [ ] Thread Local Storage (TLS)
+# Automatic Parallelization of WebAssembly Code for Heterogeneous Edge Hardware
 
-Currently not supported:
-- O3
+By: Ali Qanbari
 
-### How to Run
-```
-wasmtime -W all-proposals=y -S threads .\wack_matrix_multiply.wasm
-```
+Supervising Professor: Dr. Sedighian
 
+## Abstract
+
+Despite the years that have passed since the advent of multi-core processors, a significant portion of
+existing programming code remains written sequentially and fails to fully leverage the capabilities of
+existing hardware. Factors such as the difficulty of analyzing and rewriting code for parallel processing, lack of access to source code, and the high cost of manual rewriting are considered major obstacles
+in this area. One key solution to overcome these challenges is the automatic parallelization of code
+at the binary level, which allows for taking advantage of parallel processing even when the source
+code is unavailable. This research aims to evaluate the effectiveness of automatic parallelization of
+WebAssembly code on various heterogeneous hardware in edge environments. To achieve this, a tool
+was designed to automatically convert sequential WebAssembly code into a parallel version using a
+Single-Program Multiple-Data approach, with a special focus on loop parallelization. Evaluation of the
+proposed method on a subset of Polybench tests showed that it is capable of effectively identifying and
+parallelizing computational loops. Additionally, evaluations on heterogeneous edge hardware, including mobile devices and desktop systems, demonstrated that the proposed method can run and exploit
+resources across different computing platforms.
+
+---
+
+### How to parallelize a wasm file using WAPC
+
+Call `WAPC.Compile` and supply the the required arguments and compiler parameters in a java or kotlin file.
+
+### How to run output binaries using wasmtime
 ```
-wasm-opt -O3 --enable-threads --enable-bulk-memory --enable-reference-types --enable-multimemory .\wack_matrix_multiply.wasm -o opt_mat.wasm
+wasmtime -W all-proposals=y -S threads .\wack_{file_name}.wasm
 ```
+replace `{file_name}` with the input file name.
+look at the `testUsingWAPC` function in `Main.kt` for a complete example.

@@ -86,12 +86,15 @@ class DependenceTester(val function: Function) {
                     }
 
                     else -> {
-                        // gcd test
-                        // banerjee test
+                        val directionTest = when(WAPC.params.dependenceTest){
+                            WAPC.DependenceTest.banerjee -> BanerjeeTest()
+                            WAPC.DependenceTest.miv -> MIVTest()
+                        }
+
                         val result = DependenceTester.runTests(
                             pair.source,
                             pair.sink,
-                            listOf(GCDTest(),/* MIVTest(),*/ BanerjeeTest())
+                            listOf(GCDTest(), directionTest)
                         )
 
                         result?.let {

@@ -14,26 +14,17 @@ import kotlin.streams.toList
 fun main(args: Array<String>) {
     // run
     val samples = listOf(
-        //File("./samples/languages/3mm.go.wasm"),
         //File("./src/test/resources/src/known_pre_allocated.wasm"),
-        //File("./samples/transform/loop_normalization/loop_normalization.wasm"),
+        //File("./samples/transform/loop_normalization/loop_normalization_2.wasm"),
         //File("./samples/transform/reduction.wasm"),
         //File("./samples/ddt/gcd/gcd_test_2.wasm"),
-        File("./samples/simple_loop.wasm"),
-        //File("./samples/polybench/O0/small_dataset/adi.wasm"),
-        //File("./samples/NAS/O0/A/cg.wasm"),
-        //Path("./benchmark"),
+        //File("./samples/simple_loop.wasm"),
+        //File("./samples/polybench/O0/large_dataset/trmm.wasm"),
+        Path("./benchmark"),
     )
     for (sample in samples) {
-        testUsingWAPC(sample)
-        //compileFolder(sample)
-        //compileFolder(sample, WAPC.Params(threads = 2))
-        //compileFolder(sample, WAPC.Params(threads = 4))
-        //compileFolder(sample, WAPC.Params(threads = 8))
-        //compileFolder(sample, WAPC.Params(threads = 16))
-        //compileFolder(sample, WAPC.Params(threads = 32))
-        //compileFolder(sample, WAPC.Params(threads = 64))
-        //compileFolder(sample, WAPC.Params(threads = 128))
+        //testUsingWAPC(sample)
+        compileFolder(sample)
     }
 }
 
@@ -48,11 +39,12 @@ private fun testUsingWAPC(sample: File) {
             normalizeLoops = true,
             enableAsserts = false,
             stripDebugNames = false,
-            annotations = false,
-            addCommentedIR = false,
-            minimumLoopCost = 1000,
+            annotations = true,
+            addCommentedIR = true,
+            minimumLoopCost = 0,
             reductionParallelization = true,
             multipleMemories = true,
+            dependenceTest = WAPC.DependenceTest.miv,
         ),
     )
     println(WAPC.stats)
@@ -87,21 +79,19 @@ private fun testUsingWAPC(sample: File) {
     }
 }
 
-private fun testUsingWACK(sample: File) {
-    val output = WACK.run(sample.toPath())
-    println(output)
-}
-
 private fun compileFolder(dir: Path, params: WAPC.Params = WAPC.Params()) {
     Files.list(dir)
         .filter { Files.isRegularFile(it) }
         .filter { it.extension == "wasm" }
         .map { serialFile ->
-            //val path = WAPC.compile(serialFile, params = params)
+            val path = WAPC.compile(serialFile, params = params)
             Files.createDirectories(Path("./out/serial"))
-            //val out = Path("./out/t${params.threads}/"+ path.toFile().name.substring(5))
-            val out = Path("./out/serial/"+ serialFile.toFile().name)
-            Files.copy(serialFile, out)
-            WasmOpt.process(out.toFile())
+            Files.createDirectories(Path("./out/t${params.threads}"))
+            val outp = Path("./out/t${params.threads}/"+ path.toFile().name.substring(5))
+            val outs = Path("./out/serial/"+ serialFile.toFile().name)
+            Files.copy(serialFile, outs)
+            Files.move(path, outp)
+            WasmOpt.process(outs.toFile())
+            WasmOpt.process(outp.toFile())
         }.toList()
 }
