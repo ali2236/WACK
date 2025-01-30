@@ -13,4 +13,8 @@ class Reduction(val symbol: SymbolLoad, val operator: BinaryOP.Operator) : WackA
     override fun visit(v: Visitor) {
 
     }
+
+    override fun toString(): String {
+        return "@reduction($symbol, ${operator.sign})"
+    }
 }

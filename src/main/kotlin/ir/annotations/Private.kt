@@ -27,4 +27,8 @@ class Private(val symbol: SymbolLoad, var private: SymbolLoad? = null) : WackAnn
     override fun visit(v: Visitor) {
 
     }
+
+    override fun toString(): String {
+        return "@private($symbol)"
+    }
 }

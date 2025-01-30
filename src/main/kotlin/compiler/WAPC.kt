@@ -2,8 +2,17 @@ package compiler
 
 import analysis.Analysis
 import generation.WasiThreadsGenerator
+import ir.expression.Load
+import ir.expression.SingleResultFunction
+import ir.expression.Symbol
+import ir.expression.Value
+import ir.statement.FunctionCall
 import ir.statement.Program
+import ir.statement.Store
+import ir.wasm.Index
+import ir.wasm.WasmValueType
 import transform.TransformationPasses
+import transform.constant_propegation.ConstantPropagation
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -17,7 +26,7 @@ object WAPC : WebAssemblyCompiler {
         Files.createDirectories(Path("./out/intermediate"))
     }
 
-    var stats : Statistics = Statistics()
+    var stats: Statistics = Statistics()
     var params: Params = Params()
 
     fun compile(input: Path, output: Path? = null, params: Params = Params()): Path {
@@ -31,7 +40,7 @@ object WAPC : WebAssemblyCompiler {
     }
 
     override fun run(input: Path, output: Path?): Path {
-        if(!input.exists()){
+        if (!input.exists()) {
             throw Error("Input File doesn't Exist!");
         }
         val inputFile = input.toFile()
@@ -51,9 +60,8 @@ object WAPC : WebAssemblyCompiler {
     }
 
 
-
     data class Params(
-        val parallelize : Boolean = true,
+        val parallelize: Boolean = true,
         val parallelizeInnerLoops: Boolean = true,
         val threads: Int = 8,
         val generateDotFiles: Boolean = false,
@@ -64,19 +72,19 @@ object WAPC : WebAssemblyCompiler {
         val addCommentedIR: Boolean = false,
         val multipleMemories: Boolean = true,
         val annotations: Boolean = false,
-        val threadSpawnModule: String = "wasi" /*"wasi_snapshot_preview1"*/,
-        val stripDebugNames : Boolean = true,
-        val minimumLoopCost : Int = 100000,
+        val threadSpawnModule: String = "wasi", /*"wasi_snapshot_preview1"*/
+        val stripDebugNames: Boolean = true,
+        val minimumLoopCost: Int = 100000,
         val reductionParallelization: Boolean = false,
-        val dependenceTest : DependenceTest = DependenceTest.miv,
+        val dependenceTest: DependenceTest = DependenceTest.miv,
     )
 
     data class Statistics(
-        var topLevelRangeLoops : Int = 0,
-        var loopsParallelized : Int = 0,
+        var topLevelRangeLoops: Int = 0,
+        var loopsParallelized: Int = 0,
     )
 
-    enum class DependenceTest{
+    enum class DependenceTest {
         banerjee, miv
     }
 

@@ -64,6 +64,7 @@ open class Block(
 
     override fun write(out: Appendable) {
         val len = instructions.size
+        annotations.forEach { out.appendLine(it.toString()) }
         writeHeader(out)
         if (brackets) out.append("{\n")
         for (i in 0 until len) {
@@ -86,7 +87,7 @@ open class Block(
     }
 
     fun watBlockAnnotations(wat: WatWriter) {
-        if (WAPC.params!!.annotations) {
+        if (WAPC.params.annotations) {
             for (annotation in annotations) {
                 wat.write(" ")
                 annotation.wat(wat)

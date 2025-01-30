@@ -19,4 +19,8 @@ class ThreadId(var symbol: Symbol) : WackAnnotation {
     override fun visit(v: Visitor) {
         v.visit(symbol){this.symbol = it as Symbol}
     }
+
+    override fun toString(): String {
+        return "@thread_id($symbol)"
+    }
 }

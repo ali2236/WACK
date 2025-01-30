@@ -17,4 +17,8 @@ class CallKernel(val kernelIndex: Int) :WackAnnotation{
 
     }
 
+    override fun toString(): String {
+        return "@call_kernel($kernelIndex)"
+    }
+
 }

@@ -14,4 +14,8 @@ class TransferOut(val symbol: Symbol, val index: Int) : WackAnnotation {
     override fun visit(v: Visitor) {
 
     }
+
+    override fun toString(): String {
+        return "@transfer_out($symbol)"
+    }
 }

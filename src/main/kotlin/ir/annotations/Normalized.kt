@@ -9,4 +9,8 @@ class Normalized : WackAnnotation {
     }
 
     override fun visit(v: Visitor) { }
+
+    override fun toString(): String {
+        return "@normalized"
+    }
 }

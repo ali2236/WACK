@@ -10,7 +10,7 @@ object TransformationPasses {
         if(!WAPC.params.multipleMemories){
             OffsetMemoryLocations().apply(program)
         }
-        val passes = listOf<Transformer>(
+        val passes = listOf(
             SkipNoLoopFunctions(),
             ConstantPropagation(),
             ConditionRestructure(),

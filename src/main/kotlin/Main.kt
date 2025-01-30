@@ -19,12 +19,12 @@ fun main(args: Array<String>) {
         //File("./samples/transform/reduction.wasm"),
         //File("./samples/ddt/gcd/gcd_test_2.wasm"),
         //File("./samples/simple_loop.wasm"),
-        //File("./samples/polybench/O0/large_dataset/trmm.wasm"),
-        Path("./benchmark"),
+        File("./samples/polybench/O0/large_dataset/adi.wasm"),
+        //Path("./benchmark"),
     )
     for (sample in samples) {
-        //testUsingWAPC(sample)
-        compileFolder(sample)
+        testUsingWAPC(sample)
+        //compileFolder(sample)
     }
 }
 

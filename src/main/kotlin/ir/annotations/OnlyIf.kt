@@ -25,4 +25,8 @@ class OnlyIf(val condition: Statement) : WackAnnotation {
     override fun visit(v: Visitor) {
 
     }
+
+    override fun toString(): String {
+        return "@only_if($condition)"
+    }
 }
