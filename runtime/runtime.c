@@ -60,12 +60,13 @@ void make_thread_pool(int max_threads){
     }
     set_max_threads(max_threads);
     for(int i=0;i<max_threads;i++){
+        unlock_mutex(mutex1);
         lock_mutex(mutex2);
         if(thread_spawn(i) < 0){
             exit(1);
         }
     }
-    get_thread_pool_state(1);
+    set_thread_pool_state(1);
 }
 
 void destroy_thread_pool(){
@@ -83,7 +84,7 @@ void parallel(int kernel_id) {
     num_threads = get_max_threads();
     for (int i = 0; i < num_threads; ++i) {
         lock_mutex(get_wack_thread_property_address(i, __wack_thread_mutex1));
-        //unlock_mutex(get_wack_thread_property_address(i, __wack_thread_mutex2));
+        unlock_mutex(get_wack_thread_property_address(i, __wack_thread_mutex2));
     }
     for (int i = 0; i < num_threads; ++i){
         join_mutex(get_wack_thread_property_address(i, __wack_thread_mutex1));
@@ -99,8 +100,7 @@ void wasi_thread_start(int id, int tid){
     int mutex1 = get_wack_thread_property_address(tid, __wack_thread_mutex1);
     int mutex2 = get_wack_thread_property_address(tid, __wack_thread_mutex2);
     while(true){
-            lock_mutex(mutex2);
-            unlock_mutex(mutex2);
+            join_mutex(mutex2);
             call_kernel(get_kernel_id(), tid);
             lock_mutex(mutex2);
             unlock_mutex(mutex1);
