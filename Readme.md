@@ -1,6 +1,3 @@
-# Automatic Parallelization of WebAssembly Code for Heterogeneous Edge Hardware
-
----
 
 ### How to parallelize a wasm file using WAPC
 
